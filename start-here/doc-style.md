@@ -196,6 +196,12 @@ without programming-language knowledge.
 - Eligibility gates with AND / OR / NOT logic
 - State-transition guards with conditions
 - Price or quantity formulas with multiple terms
+- A condition that suspends or permits a set of independent operations
+- Field, evidence, or action obligations that vary by context (required / optional / prohibited)
+- Ordered time-offset triggers, expiry windows, or SLA escalation chains
+- Multi-criteria ranking where the order of criteria matters
+- A set of state changes that must all succeed or all fail together
+- Rate limits, rolling caps, or alert thresholds measured over a time window
 - Any condition that needs more than one prose sentence to express unambiguously
 
 **When not to use:**
