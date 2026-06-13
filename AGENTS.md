@@ -38,6 +38,17 @@ When working in this repository, the agent must assume these roles:
   testable requirements, and traceable decisions.
 - Keep human readability, brevity, and reviewability as secondary constraints.
 
+## Documentation Style
+
+- Default style:
+  `documentation-style-variants/online-invoicing-service/01-ai-agent-contract.md`.
+- Fallback style:
+  `documentation-style-variants/online-invoicing-service/03-engineering-spec.md`.
+- Use the fallback only when a document needs implementation contracts, state,
+  invariants, failure handling, or reliability detail.
+- When the two styles overlap, keep the AI-agent contract structure and add only
+  the engineering detail needed for implementation readiness.
+
 ## Working Guidelines
 
 - Read existing files before editing, and preserve the repository's current style.
