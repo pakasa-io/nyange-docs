@@ -188,32 +188,36 @@ on address save, the address is saved as `UNRESOLVED`, but checkout remains bloc
 confirmed. Customers may correct the map pin. Any non-customer coordinate correction requires explicit
 coordinate-correction permission and audit logging.
 
-An order is allocated to one outlet. The outlet must satisfy all of the following before it is eligible:
+An order is allocated to one outlet. Outlet eligibility gate:
 
-1. **Geographic**: at launch, the customer's delivery address falls within one of the outlet's active radius-ring
-   service zones, based on the confirmed customer and outlet coordinates. A distance at a ring's minimum boundary is
-   eligible for that ring; a distance at its maximum boundary is not. Polygon service zones are out of launch scope.
-2. **Operational**: the outlet must be active. For express orders, the outlet must also be currently operating at
-   placement time — if no eligible outlet is currently operating, express delivery is unavailable at checkout and is not
-   offered as a selectable delivery mode; the customer must choose batched delivery or not place the order. For batched
-   orders, the outlet need only have a valid future delivery window available — it does not need to be currently
-   operating when the order is placed. Inventory is reserved at placement time regardless.
-3. **Delivery mode**: the outlet supports the requested delivery mode (express or batched).
-4. **Payment method**: COD and mobile money are both enabled by default at launch unless an outlet policy overrides
-   them. The outlet must support the customer's selected payment method. An outlet with no active payment method is
-   ineligible for all orders and must be disabled from fulfillment until at least one payment method is active.
-5. **Stock availability**: the outlet has sufficient available stock for all items in the order, except for the
-   accessory-only relaxation described below when a core-cylinder outlet exists. For refill orders, this gate checks
-   outgoing filled cylinders and accessories only; the expected customer empty cylinder is an incoming return and does
-   not consume stock at placement.
-6. **Refill vendor policy**: for refill items, the outlet accepts the customer's incoming cylinder vendor. If the outlet
-   has no configured incoming vendor restriction, it accepts cylinders from all supported vendors by default.
-7. **Same-vendor policy**: if the customer requests same-vendor outgoing, the outlet must have that policy enabled and
-   the corresponding filled inventory.
-8. **Capacity gate (optional)**: if the outlet has a configured active-online-order limit and has reached that limit, it
-   is excluded from the candidate set entirely — it does not appear in the ranked list. An outlet below its limit is
-   ranked by load as normal. Walk-in orders are not subject to the online order capacity gate and do not count toward
-   that limit.
+```
+outlet eligible :=
+  address_in_active_service_zone
+  AND outlet_active
+  AND (express_order  → outlet_currently_operating
+       batched_order  → has_valid_future_delivery_window)
+  AND supports_delivery_mode
+  AND supports_payment_method
+  AND sufficient_available_stock          // accessory relaxation applies; see below
+  AND (refill_order → accepts_incoming_vendor)
+  AND (same_vendor_requested → same_vendor_policy_enabled AND filled_stock_available)
+  AND (capacity_limit == none OR active_online_orders < capacity_limit)
+```
+
+Condition notes:
+
+- **Geographic**: customer address within an active radius-ring service zone by confirmed coordinates. Minimum boundary
+  inclusive; maximum boundary exclusive. Polygon zones are out of launch scope.
+- **Operational**: outlet must be active. Express additionally requires currently operating at placement — if no eligible
+  outlet operates, express is unavailable and the customer must choose batched. Batched needs a valid future delivery
+  window only; currently operating at placement is not required. Inventory reserved at placement regardless.
+- **Payment method**: COD and mobile money enabled by default unless outlet policy overrides. An outlet with no active
+  payment method is ineligible for all orders.
+- **Stock availability**: required for all order items. For refill orders, checks outgoing filled cylinders and
+  accessories only; the customer's empty cylinder is an incoming return and does not consume stock at placement.
+- **Same-vendor**: expected vendor-depot returns or IN_REFILL cylinders do not satisfy this constraint.
+- **Capacity gate**: optional. Outlet excluded entirely if it has reached its configured active-online-order limit.
+  Walk-in orders do not count toward this limit.
 
 **Service zone templates at launch:**
 
@@ -228,11 +232,13 @@ allocation. Actual outlet coordinates are outlet master data, not hard-coded in 
 
 **Priority ranking** (among eligible outlets):
 
-1. Distance to customer (closest first).
-2. Delivery fee (lowest first).
-3. Current active order load (least loaded first) — counted as active online delivery orders only, from assignment
-   through delivery-run closure; walk-in sales do not count toward this load.
-4. Outlet priority score (higher score preferred; default 0 when no score is set).
+```
+rank outlets by:
+  1. distance_to_customer     ASC
+  2. delivery_fee             ASC
+  3. active_online_order_load ASC  // assignment through delivery-run closure; walk-ins excluded
+  4. outlet_priority_score    DESC // default 0 when not set
+```
 
 Delivery-agent capacity is not an outlet-allocation factor at launch. An otherwise eligible outlet is not excluded
 because no delivery agent is immediately available; delivery assignment happens after outlet allocation under the
@@ -372,10 +378,12 @@ Unpaid mobile-money orders have a two-stage configurable expiry window. The cloc
 Launch durations are global defaults; changes or outlet/payment-method overrides require Product Manager approval plus
 the operations approval authority required by the active policy.
 
-| Stage                  | Trigger                                                 | Action                                                                                         |
-|------------------------|---------------------------------------------------------|------------------------------------------------------------------------------------------------|
-| Stage 1 — Warning      | 30 minutes                                              | Reservation-expiry warning notification sent to the customer. Reservation remains active.      |
-| Stage 2 — Cancellation | 60 minutes total (30-minute grace period after warning) | Order cancelled and inventory reservation released if no payment reference has been submitted. |
+```
+t = 0    → clock starts; order at AWAITING_CUSTOMER_PAYMENT; reservation active
+t = 30m  → warning sent; reservation still active
+t = 60m  → if no reference submitted  → CANCELLED; reservation released
+           if reference submitted      → clock stops permanently
+```
 
 - Submitting a reference at any point before cancellation stops the expiry clock and moves the order to
   `AWAITING_STAFF_VERIFICATION`. The expiry path is permanently closed once a reference is submitted, regardless of the

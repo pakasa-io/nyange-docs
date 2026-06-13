@@ -53,21 +53,19 @@ Daily closing is the outlet's end-of-day financial reconciliation.
 - An overdue daily closing is an internal alert condition for permissioned daily-closing actors for that outlet.
 - It does not by itself remove normal fulfillment access beyond the restrictions listed below.
 
-**Restrictions when overdue** (unless a Super Admin urgency override with reason and audit trail is recorded; for cash refund payouts, an Outlet Manager within outlet scope may also use an urgent override under the active refund policy with reason and audit trail):
-
-| Restricted action |
-|---|
-| Cash refund payouts |
-| Large inventory adjustments (above the inventory adjustment approval threshold) |
-| Price changes outside the outlet guardrail |
-| Manual financial ledger adjustments |
-| Manual payment reassignment |
-| Above-threshold expense approval and posting (UGX 100,000 or more at launch) |
-
-**Normal operations during overdue closing** (not restricted):
-- Online order placement, POS/walk-in sales, inventory reservation, acceptance, picking, dispatch.
-- COD collection, mobile-money verification, stock intake.
-- Within-guardrail price changes.
+```
+if closing_overdue AND NOT super_admin_urgency_override:
+  blocked:  cash_refund_payouts            // Outlet Manager urgent override allowed for this item
+  blocked:  large_inventory_adjustments    // above adjustment approval threshold
+  blocked:  price_changes_outside_guardrail
+  blocked:  manual_financial_ledger_adjustments
+  blocked:  manual_payment_reassignment
+  blocked:  above_threshold_expense_approval  // >= 100,000 UGX at launch
+  allowed:  online_order_placement, pos_walk_in_sales, inventory_reservation
+  allowed:  order_acceptance, picking, batching, dispatch, delivery_agent_assignment
+  allowed:  cod_collection, mobile_money_verification, stock_intake
+  allowed:  within_guardrail_price_changes
+```
 
 **Liability and settlement recognition:**
 - Overdue daily closing does not block creation or posting of refund liabilities or internal settlement records at financial closure.
@@ -89,9 +87,10 @@ Daily closing is the outlet's end-of-day financial reconciliation.
 
 Outlet expenses are categorized and approval-gated by amount.
 
-**Launch threshold:**
-- Below UGX 100,000: may be approved without separate review when the active expense approval policy allows it.
-- At or above UGX 100,000: require approval and a receipt attachment before posting.
+```
+if expense_amount < 100,000 UGX   → may post without separate review (when active policy allows)
+if expense_amount >= 100,000 UGX  → requires approval AND receipt attachment before posting
+```
 
 **Rules:**
 - Receipt attachments are required above the active threshold and optional below it.
@@ -174,11 +173,19 @@ Cross-reference: [order.md](order.md) — pending-closure SLA and escalation pat
 2. Escalation reaches Super Admin.
 3. Super Admin assigns a resolution path to every open closure blocker, such as waiving with adjustment, marking lost stock, confirming damage, or accepting a cash variance.
 4. Required forced-closure approval is obtained under the active materiality policy:
-   - Material forced closures require dual approval, and the requester cannot satisfy the second approval.
-   - Low-risk forced closures may use single Super Admin approval within that policy.
-   - At launch, a forced closure is material if its combined financial or inventory impact is UGX 100,000 or more, any saleable filled cylinder is missing or lost, any refund or write-off is created, or the closure resolves more than one blocker category.
-   - Low-risk forced closures below those thresholds may use single Super Admin approval within the active policy.
-   - The materiality policy starts from global defaults and may define outlet/category overrides.
+
+```
+material_forced_closure :=
+  combined_financial_or_inventory_impact >= 100,000 UGX
+  OR any_saleable_filled_cylinder_missing_or_lost
+  OR any_refund_or_write_off_created
+  OR closure_resolves_more_than_one_blocker_category
+// materiality policy starts from global defaults; may define outlet/category overrides
+
+if material_forced_closure  → dual approval required; requester cannot satisfy second approval
+else                        → single Super Admin approval within active policy
+```
+
 5. After required approval, any compensating inventory and cash adjustment entries are posted with explicit linkage to the forced closure.
 6. Loss or variance responsibility defaults to the outlet or delivery run that held custody when the loss, damage, or cash variance occurred. When custody facts identify that holder, the custody-chain result is the default; Super Admin may override responsibility only when custody facts are unclear or conflicting, and only with reason, note, and audit trail. Staff, agent, and approver identities remain visible in custody and audit reports for operational accountability. Resulting losses affect outlet-level reporting, not staff payroll or personal financial liability.
 7. The forced-closure audit trail identifies the order, every resolved blocker, approving actor(s), reason, timestamp, the resolution path for each blocker, and any adjustment facts used to correct the business truth.

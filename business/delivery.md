@@ -134,7 +134,18 @@ Cross-reference: for the intake leg (INTAKE_PENDING through COMPLETED/FAILED), s
 
 - PIN confirmation is the customer's final acceptance of the delivered order and amount due.
 - For refill deliveries, the agent must record every expected returned cylinder's vendor, size, condition, any approved conversion, COD delta or cash collection, and delivery exception before requesting PIN confirmation.
-- **PIN attempt limits**: PIN entry is rate-limited. Launch defaults: 5 invalid attempts within a 15-minute window triggers a 15-minute lockout. After 2 lockouts, or after 10 lifetime invalid attempts against the active PIN, the agent cannot retry without fallback by a permissioned Outlet Cashier, Outlet Manager, Customer Support Agent, or Super Admin. The fallback requires customer verification note, reason code, and Safety/Audit record, regenerates a new PIN (invalidating the old one), notifies the customer via push/email, and may reveal the replacement PIN once only to one of those fallback actors with explicit reveal permission after customer verification. Delivery agents cannot request fallback, perform fallback, or view/reveal PINs.
+- **PIN attempt limits:**
+
+```
+if count(invalid_attempts, window=15min) >= 5                        → lockout(15min)
+if lockout_count >= 2
+   OR count(lifetime_invalid_attempts_against_active_PIN) >= 10      → fallback required
+```
+
+  Fallback actors: permissioned Outlet Cashier, Outlet Manager, Customer Support Agent, or Super Admin.
+  Fallback: customer verification note + reason code + audit; regenerates new PIN (invalidates old); notifies
+  customer via push/email; reveals replacement PIN once only to fallback actor with explicit reveal permission.
+  Delivery Agents cannot request, perform, or view/reveal PINs.
 
 ### Doorstep Cylinder Exceptions
 
@@ -171,14 +182,27 @@ Cross-reference: for the intake leg (INTAKE_PENDING through COMPLETED/FAILED), s
 
 - The same launch field-proof policy applies to express and batched deliveries.
 - An authoritative timestamp is always recorded.
-- **GPS required** for: arrival, failed delivery, doorstep defect, and terminal delivery attempts when the device can provide it; otherwise the agent must record a controlled location-unavailable reason and note, and the action may proceed unless the active manager/outlet override policy requires additional approval.
-- **Photos required** for:
-  - Damaged returned cylinders.
-  - Unexpected-vendor or wrong-size returned cylinders when a physical cylinder is present.
-  - Refused returned cylinders when a physical cylinder is present.
-  - Every defective outgoing cylinder report.
-  - Failed-delivery reasons involving a physical defect or safety issue when safe to capture.
-- **No photo required** for missing returned cylinders (time/location facts and a reason note are required), or customer-unavailable, refusal, PIN-failure, cash-mismatch, PIN-fallback, handover, and support-review paths (structured facts, reason notes, and audit required) unless they also involve a physical defect or custody exception.
+
+```
+GPS required when:
+  action IN [arrival, failed_delivery, doorstep_defect, terminal_delivery_attempt]
+  AND device_can_provide_gps
+// if GPS unavailable: agent records controlled location-unavailable reason and note
+// action may proceed unless active policy requires additional approval
+
+photo required when:
+  damaged_returned_cylinder
+  OR (unexpected_vendor OR wrong_size) AND physical_cylinder_present
+  OR refused_returned_cylinder AND physical_cylinder_present
+  OR defective_outgoing_cylinder
+  OR failed_delivery AND (physical_defect OR safety_issue) AND safe_to_capture
+
+photo NOT required when:
+  missing_cylinder  // time + location facts + reason note instead
+  OR action IN [customer_unavailable, refusal, PIN_failure, cash_mismatch,
+                PIN_fallback, handover, support_review]
+  // unless the action also involves a physical defect or custody exception
+```
 
 **Evidence retention:**
 - Required or voluntarily supplied photos are linked to the relevant delivery exception.
@@ -193,14 +217,16 @@ Cross-reference: for the intake leg (INTAKE_PENDING through COMPLETED/FAILED), s
 
 Agents collect exact cash due (COD amount plus any approved underpayment top-up, delivery-fee delta, conversion delta, or doorstep price-recalculation delta).
 
-**Short collection:**
-- Requires Outlet Manager approval, or Super Admin approval where the active threshold policy requires it, before delivery can be marked complete.
-- At launch, Outlet Managers may approve short collections up to UGX 10,000 per order and UGX 50,000 per agent shift; above either limit requires Super Admin approval.
+**Short and over collection:**
 
-**Over collection:**
-- The excess is recorded as a cash discrepancy and requires Outlet Manager approval, or Super Admin approval where the active threshold policy requires it, before delivery can be marked complete.
-- At launch, Outlet Managers may approve over-collection discrepancies up to UGX 10,000 per order and UGX 50,000 per agent shift; above either limit requires Super Admin approval.
-- The approved discrepancy is reconciled at close.
+```
+if abs_variance_per_order <= 10,000 UGX
+   AND shift_cumulative_variance <= 50,000 UGX  → Outlet Manager approval
+else                                             → Super Admin approval
+```
+
+- Required before delivery can be marked complete.
+- Over-collection excess is recorded as a cash discrepancy; reconciled at close.
 
 **Agent rules:**
 - Agents record cash collected. They cannot modify the expected amount.
@@ -226,11 +252,13 @@ The base delivery fee is determined by the assigned outlet's active service zone
 
 **Fee calculation:**
 
-1. Each active outlet service zone maps to a global zone template.
-2. The template's default fee applies unless the outlet has an active service-zone fee override.
-3. Express delivery fee applies a global default multiplier of **1.5** against that service-zone base fee.
-4. This multiplier is configurable per outlet and per service zone.
-5. Outlet Managers may adjust the multiplier within the configured guardrail.
+```
+base_delivery_fee  := zone_template_default ?? outlet_service_zone_override
+express_fee        := base_delivery_fee × express_multiplier
+express_multiplier := outlet_or_zone_override ?? global_default (1.5)
+```
+
+- Outlet Managers may adjust the multiplier within the configured guardrail.
 
 **Launch zone defaults:**
 

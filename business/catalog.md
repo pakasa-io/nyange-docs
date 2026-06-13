@@ -126,13 +126,15 @@ component level: each bundle item has a bundled price and a standalone price.
 
 Outlet Managers may adjust outlet-specific prices within bounded limits.
 
-**Within-guardrail conditions** (both must hold):
+**Within-guardrail conditions:**
 
-1. The percentage change from the current approved basis is within the configured percentage limit.
-2. The absolute change from the current approved basis is within the configured absolute limit.
-
-The current approved basis is the active approved outlet rule for the same price identity at the proposed effective
-start time, or the active global/default rule when no outlet rule exists.
+```
+within_guardrail :=
+  abs(percentage_change) <= configured_percentage_limit
+  AND abs(absolute_change) <= configured_absolute_limit
+// both conditions must hold
+// basis: active approved outlet rule at proposed effective time, or global/default when no outlet rule exists
+```
 
 **Outcomes:**
 

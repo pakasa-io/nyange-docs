@@ -75,15 +75,21 @@ PENDING_CREATION (liability condition: overpayment, failed delivery, pre-deliver
 
 **Approval thresholds (at launch):**
 
-- Refund liabilities below UGX 50,000 become collectible without separate approval.
-- Refund liabilities at or above UGX 50,000 require approval before a collection code is issued.
-- Outlet Managers may approve refund liabilities from UGX 50,000 through UGX 500,000 within their outlet scope.
-- Above UGX 500,000, Super Admin approval is required.
-- The active refund approval policy starts from global defaults and may define outlet/refund-reason overrides.
+```
+if refund_amount < 50,000 UGX             → COLLECTIBLE           // no approval required
+if refund_amount in [50,000–500,000 UGX]  → PENDING_APPROVAL (Outlet Manager, within outlet scope)
+if refund_amount > 500,000 UGX            → PENDING_APPROVAL (Super Admin)
+// active refund approval policy may define outlet/refund-reason overrides
+```
 
 **Collection code expiry and regeneration:**
 
-- Refund collection codes expire after 24 hours after issuance at launch.
+```
+t = 0    → code issued; refund COLLECTIBLE
+t = 24h  → if code not used  → CODE_EXPIRED; liability remains open
+           // new code can be issued from CODE_EXPIRED
+```
+
 - A permissioned Customer Support Agent or Super Admin can regenerate an expired code with audit.
 - Regeneration when the customer loses access requires customer verification through a linked support case with reason
   and audit.
