@@ -1,62 +1,68 @@
 # Notifications
 
-**Intent**: Define the notification channel boundaries and event-to-channel assignments for the Nyange platform at
-launch.
+**Intent**: Define launch notification channel boundaries and event-to-channel
+assignments.
+
+**Reader task**: Use this document to decide which channel a notification may
+use and to confirm that notification delivery does not control business state.
 
 **Source**: §7.20 Notification Channel Boundaries
 
----
+## Boundary
+
+- Notifications are communication side effects of domain events.
+- Notifications do not own order, payment, inventory, delivery, refund, support,
+  or finance state.
+- Failed or unsent notifications may be surfaced for operational review where
+  relevant, but they must not block or reverse committed business activity.
 
 ## Business Rules
 
 - General business notifications use push and email at launch.
 - SMS is reserved for customer authentication OTP only.
-- WhatsApp and customer-configurable notification preferences are not launch behavior.
-- Notification types are classified as transactional or non-transactional for future policy use.
-- Notifications are best-effort and must not block or reverse committed order, payment, inventory, delivery, refund,
-  support, or financial-ledger activity.
-- Failed or unsent notifications are surfaced for operational review where relevant.
+- WhatsApp is not launch behavior.
+- Customer-configurable notification preferences are not launch behavior.
+- Notification types are classified as transactional or non-transactional for
+  future policy use.
+- Support-triggered customer communications must use approved transactional
+  notification templates or events with safe structured parameters.
+- Support-authored freeform message bodies are not supported.
 
 ## Channel Assignments
 
-Launch notification channels are assigned by event type, not customer preference:
+Launch channels are assigned by event type, not customer preference.
 
-| Event                                              | Channels    |
-|----------------------------------------------------|-------------|
-| Order confirmation                                 | Push, Email |
-| Delivery PIN                                       | Push, Email |
-| Payment confirmation                               | Push, Email |
-| Failed delivery                                    | Push, Email |
-| Reservation-expiry warning                         | Push, Email |
-| Dispatch notification                              | Push only   |
-| Exhausted-candidate Super Admin intervention alert | Push only   |
-| Outlet low-stock alert                             | Push only   |
-| Configured operational risk alert                  | Push only   |
+| Event | Channels |
+| --- | --- |
+| Order confirmation | Push, Email |
+| Delivery PIN | Push, Email |
+| Payment confirmation | Push, Email |
+| Failed delivery | Push, Email |
+| Reservation-expiry warning | Push, Email |
+| Dispatch notification | Push only |
+| Exhausted-candidate Super Admin intervention alert | Push only |
+| Outlet low-stock alert | Push only |
+| Configured operational risk alert | Push only |
 
-## Refund Collection Codes
+## Sensitive Content
 
-Refund collection codes are **not** sent in push, email, or SMS message bodies.
+### Refund Collection Codes
 
-Notifications may:
+- Refund collection codes are not sent in push, email, or SMS message bodies.
+- A notification may tell the customer that a refund is collectible.
+- A notification may identify the collection outlet.
+- A notification may direct the customer to the authenticated customer
+  experience.
+- A permissioned Customer Support Agent or Super Admin may perform audited code
+  reveal only after customer verification.
 
-- Tell the customer a refund is collectible.
-- Identify the collection outlet.
-- Direct the customer to the authenticated customer experience or to a permissioned Customer Support Agent or Super
-  Admin for audited reveal after customer verification.
+### Delivery PIN
 
-## Delivery PIN
-
-Delivery PIN notifications use push and email at launch and are governed by the PIN exposure and fallback rules
-in [delivery.md](delivery.md) (§6.3).
-
-## Support-Requested Notifications
-
-Support-requested customer notifications must use approved transactional notification templates or events with safe
-structured parameters. Support-authored freeform message bodies are not supported. The same launch notification
-boundaries apply.
+- Delivery PIN notifications use push and email at launch.
+- PIN exposure and fallback rules are governed by [delivery.md](delivery.md).
 
 ## Non-Goals
 
-- WhatsApp integration (not launch behavior).
-- Customer-configurable channel preferences (not launch behavior).
+- WhatsApp integration.
+- Customer-configurable channel preferences.
 - SMS for anything other than customer authentication OTP.
