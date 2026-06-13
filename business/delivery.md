@@ -73,7 +73,7 @@ cylinders are accounted for.**
   doorstep field facts, PIN confirmation, failed-delivery outcome, and delivery
   cash collection facts.
 - Delivery does not own inventory intake recognition, refund payout, payment
-  reference verification, or financial closure.
+  policy, or financial closure.
 - Returned cylinders collected during delivery become inventory only after the
   intake leg in [inventory.md](inventory.md).
 
@@ -313,13 +313,12 @@ if lockout_count >= 2
 - The actual incoming vendor becomes the exchange fact for intake and pricing.
 - Refill price is recalculated using the actual same-size combination.
 - Any delta is recorded as an explicit adjustment.
-- If the recalculated price is higher than the original paid or COD amount due,
-  the delta is collected as a COD top-up.
+- If the recalculated price is higher than the original COD amount due, the
+  delta is collected as a COD adjustment.
 - Outlet Manager approval is required before PIN confirmation for a higher-price
   delta.
-- If the recalculated price is lower, unpaid/COD orders reduce the amount due.
-- If the recalculated price is lower for prepaid mobile-money orders, a cash
-  refund liability is created at financial closure.
+- If the recalculated price is lower, the amount due is reduced before COD
+  collection.
 - This path does not fail the order.
 
 ### Size Mismatch
@@ -412,7 +411,6 @@ photo NOT required when:
 Agents collect exact cash due. Cash due can include:
 
 - COD amount;
-- approved underpayment top-up;
 - delivery-fee delta;
 - conversion delta;
 - doorstep price-recalculation delta.
@@ -433,15 +431,14 @@ else                                             → Super Admin approval
 
 - Agents record cash collected.
 - Agents cannot modify the expected amount.
-- The expected amount is determined by order total and approved top-up or delta
-  records.
+- The expected amount is determined by order total and approved delta records.
 - A delivery run may contain orders with different collection needs only when
   the run manifest makes cash due explicit per order.
 - Delivery agents are responsible for one combined cash-due amount.
 - The business record preserves component amounts separately for reconciliation
   and audit.
-- Components include base COD amount, delivery fee delta, underpayment top-up,
-  conversion delta, and doorstep price-recalculation delta.
+- Components include base COD amount, delivery fee delta, conversion delta, and
+  doorstep price-recalculation delta.
 - The agent neither sees nor enters component breakdowns.
 - Customer receipts show the delta/payment breakdown after financial closure.
 
@@ -526,13 +523,10 @@ No delivery fee is charged on any failed delivery, regardless of failure reason.
 
 - For COD orders, the waived fee is not collected from the customer by the
   agent.
-- For prepaid mobile-money orders, the waived delivery fee becomes part of the
-  refund liability created when the order transitions to
-  `CANCELLED_PENDING_REFUND`.
 - Failed COD deliveries keep a zero-collection payment fact tied to the failed
   delivery reason.
-- Failed prepaid mobile-money deliveries create a cash refund liability for the
-  full paid amount until audited cash refund completion.
+- Failed deliveries do not create prepaid refund liabilities at launch because
+  online orders are not prepaid.
 
 ## F-03: Damaged or Unacceptable Returned Cylinder at Doorstep
 
@@ -552,7 +546,6 @@ No delivery fee is charged on any failed delivery, regardless of failure reason.
     by an authorized outlet return-receipt actor before run closure.
 11. The full order fails under all-or-nothing rule BI-09.
 12. No delivery fee is charged.
-13. Mobile-money prepayment becomes refund liability.
 
 ## F-06: Defective Outgoing Cylinder at Pickup
 
@@ -583,19 +576,17 @@ No delivery fee is charged on any failed delivery, regardless of failure reason.
 5. Agent confirms the size matches the outgoing cylinder.
 6. Refill price is recalculated using the actual incoming vendor, outgoing
    vendor, and cylinder size.
-7. If recalculated price is higher than original paid or COD amount due, a COD
-   top-up is required.
+7. If recalculated price is higher than original COD amount due, a COD delta is
+   required.
 8. Outlet Manager approval is required before PIN confirmation and delivery
-   completion for the top-up.
-9. If recalculated price is lower than original paid or COD amount due,
-   unpaid/COD orders reduce amount due.
-10. If recalculated price is lower for prepaid mobile-money orders, a cash refund
-    liability is created at financial closure.
-11. If recalculated price equals original paid or COD amount due, exchange
+   completion for the delta.
+9. If recalculated price is lower than original COD amount due, the amount due
+   is reduced before collection.
+10. If recalculated price equals original COD amount due, exchange
     proceeds normally with no delta.
-12. The actual incoming vendor becomes the exchange fact for intake and pricing.
-13. The original order line and price snapshot remain immutable.
-14. Any delta is recorded as an explicit adjustment.
+11. The actual incoming vendor becomes the exchange fact for intake and pricing.
+12. The original order line and price snapshot remain immutable.
+13. Any delta is recorded as an explicit adjustment.
 
 ## Permissions
 

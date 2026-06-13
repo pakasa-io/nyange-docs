@@ -25,7 +25,12 @@ YYYY-MM-DD-short-item-name.md
 
 | Item | Status |
 | --- | --- |
+| [Mobile-Money Payments](2026-06-13-mobile-money-payments.md) | Deferred |
 | [Support Case Management](2026-06-13-support-case-management.md) | Deferred |
+
+Revisit mobile-money payments when COD-only launch operations create a measured
+adoption, cash-risk, reconciliation, or customer-convenience problem that cannot
+be solved by cash-process controls within the MVP.
 
 Revisit support case management when direct owning-domain workflows cannot
 provide enough traceability for customer complaints, cross-domain exceptions,

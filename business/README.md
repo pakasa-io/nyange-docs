@@ -17,9 +17,11 @@ tests.
 - Customers can order online for outlet delivery or buy through walk-in POS.
 - Online orders can mix new cylinder purchases, refill exchanges, and accessory
   purchases in one cart.
-- Mobile-money orders are prepaid and staff-verified against a provider
-  reference.
-- Cash-on-delivery orders are collected by the delivery agent at the doorstep.
+- Online delivery orders are cash-on-delivery at launch and are collected by
+  the Delivery Agent at the doorstep.
+- Walk-in POS sales are immediate cash sales at the outlet.
+- Mobile-money payments are deferred from the mid-stage MVP; see
+  [../out-of-scope/2026-06-13-mobile-money-payments.md](../out-of-scope/2026-06-13-mobile-money-payments.md).
 - Delivery modes are express and batched.
 - Walk-in POS sales have no delivery leg.
 
@@ -28,8 +30,8 @@ tests.
 - Each outlet is a company-owned branch within the same legal entity.
 - Outlet independence is operational and reporting-oriented, not legal or
   financial separation.
-- Each outlet has its own inventory, pricing within guardrails, staff, payment
-  accounts, and cash ledger.
+- Each outlet has its own inventory, pricing within guardrails, staff, and cash
+  ledger.
 - Outlet cash is company cash.
 - Outlets are not franchisees or marketplace merchants.
 - Outlet stocking is vendor-specific and outlet-owned.
@@ -55,12 +57,12 @@ tests.
 | --- | --- | --- |
 | [identity-auth.md](identity-auth.md) | Identity & Authorization | Personas, access matrix, authentication, authorization, edge cases E-01-E-10 |
 | [catalog.md](catalog.md) | Catalog & Pricing | Refill pricing, bundle pricing, price guardrails, launch commercial programs |
-| [order.md](order.md) | Order | Order lifecycle, outlet allocation, cascade and reassignment, cart behavior, mobile-money expiry, POS rules |
-| [payment.md](payment.md) | Payment | Payment lifecycle, reference uniqueness, mobile-money verification, late payment references |
+| [order.md](order.md) | Order | Order lifecycle, outlet allocation, cascade and reassignment, cart behavior, COD fulfillment, POS rules |
+| [payment.md](payment.md) | Payment | COD cash collection, walk-in cash sales, zero-collection facts, payment boundaries |
 | [delivery.md](delivery.md) | Delivery | Delivery lifecycle, delivery fee rules, agent cash handling, failed-delivery fee waiver, cylinder exchange field leg |
 | [inventory.md](inventory.md) | Inventory | Reservation lifecycle, outlet transfer, vendor refill batch, cylinder exchange intake leg, stock counts, low-stock alerts |
 | [refund.md](refund.md) | Refund | Refund lifecycle, approval thresholds, collection codes, cash payout constraints |
-| [finance.md](finance.md) | Finance | Daily closing, expense controls, delivery cost reporting, internal settlements, forced financial closure |
+| [finance.md](finance.md) | Finance | Daily closing, expense controls, delivery cost reporting, deferred settlement boundary, forced financial closure |
 | [support.md](support.md) | Support | Launch support fallback boundaries and operational risk alerts |
 | [notifications.md](notifications.md) | Notifications | Notification channel boundaries and event-to-channel assignments |
 
@@ -70,9 +72,9 @@ tests.
   [delivery.md](delivery.md) owns the field leg from `PENDING` through
   `RETURN_RECORDED`. [inventory.md](inventory.md) owns the intake leg from
   `INTAKE_PENDING` through `COMPLETED` or `FAILED`.
-- `F-04 Post-Payment Outlet Reassignment` is in [finance.md](finance.md)
-  because its primary business effect is settlement. [order.md](order.md) and
-  [payment.md](payment.md) reference the flow but do not own settlement rules.
+- Mobile-money payment workflows, including post-payment outlet reassignment
+  settlement, are deferred in
+  [../out-of-scope/2026-06-13-mobile-money-payments.md](../out-of-scope/2026-06-13-mobile-money-payments.md).
 - `§7.15 Cart Behaviour` is in [order.md](order.md). [catalog.md](catalog.md)
   references it for catalog-change and price-change effects on open carts.
 - The complete access matrix is in [identity-auth.md](identity-auth.md). Each

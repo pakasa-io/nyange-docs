@@ -1,20 +1,21 @@
 # Finance
 
 **Intent**: Define launch financial operations for daily closing, expense
-controls, internal settlements, delivery cost reporting, and forced financial
-closure.
+controls, delivery cost reporting, and forced financial closure.
 
 **Reader task**: Use this document to determine how financial records are
 posted, sealed, reviewed, carried forward, or force-closed.
 
 **Sources**: §7.8 Daily Closing, §7.9 Expense Controls, §7.19 Delivery Cost
-Reporting, BI-13, BI-14, F-04, F-05
+Reporting, BI-14, F-05
 
 **Related**:
 [order.md](order.md) for reassignment and pending-closure behavior;
-[payment.md](payment.md) for payment attribution;
+[payment.md](payment.md) for cash payment facts;
 [refund.md](refund.md) for refund liabilities;
-[identity-auth.md](identity-auth.md) for the full access matrix.
+[identity-auth.md](identity-auth.md) for the full access matrix;
+[../out-of-scope/2026-06-13-mobile-money-payments.md](../out-of-scope/2026-06-13-mobile-money-payments.md)
+for deferred mobile-money payment and settlement scope.
 
 ## Invariants
 
@@ -37,21 +38,16 @@ Reporting, BI-13, BI-14, F-04, F-05
   adjustment/void record.
 - Post-closure activity must not alter the original closure or receipt.
 
-**BI-13 — Internal settlements are accounting entries only.**
+**BI-13 — Mobile-money settlement is not a launch workflow.**
 
-- When one outlet fulfills an order that another outlet was paid for, the
-  settlement between those outlets is an internal ledger allocation.
-- It does not represent a cash transfer between outlets.
-- The settlement balance remains open until a Finance Officer or Super Admin
-  acknowledges or offsets it, or a Super Admin approves voiding it, through an
-  audited process.
-- Settlement acknowledgement is a finance review marker, not a
-  customer-payment event or revenue-recognition gate.
-- Settlement offset nets the balance against another internal settlement
-  balance. It is not a customer payment or physical cash movement.
-- Outlet performance reports recognize revenue under the final fulfilling
-  outlet at financial closure and show settlement status alongside the revenue
-  view.
+- Launch online orders are COD cash, collected by the Delivery Agent for the
+  fulfilling outlet.
+- No launch workflow records one outlet as the mobile-money payment receiver and
+  another outlet as the fulfillment outlet.
+- Post-payment outlet reassignment settlement for mobile-money-paid orders is
+  deferred with mobile-money payments.
+- Future prepaid or cross-outlet payment workflows require explicit settlement
+  rules before they can enter scope.
 
 **BI-14 — Receipt numbers are permanent and sequential.**
 
@@ -73,14 +69,14 @@ Reporting, BI-13, BI-14, F-04, F-05
 - If a subject entity is archived or purged, its audit history remains.
 - Sensitive administrative changes must record actor, timestamp, reason where
   required, and before/after business values.
-- Audit logs must not store secrets or payment credentials.
+- Audit logs must not store authentication or financial secrets.
 
 **BI-25 — Launch currency is UGX only.**
 
-- All launch prices, cash due, refunds, settlements, expenses, receipts, and
-  financial reports are denominated in UGX.
-- Multi-currency sale, refund, settlement, or expense workflows are not
-  supported at launch.
+- All launch prices, cash due, refunds, expenses, receipts, and financial
+  reports are denominated in UGX.
+- Multi-currency sale, refund, or expense workflows are not supported at
+  launch.
 - Future currency expansion requires an explicit business policy decision.
 
 ## Daily Closing
@@ -95,8 +91,6 @@ Daily closing summarizes:
 - posted financial closures and receipts;
 - cash and ledger entries;
 - outstanding refund liabilities carried forward with Outlet Manager
-  acknowledgement;
-- internal settlement balances carried forward with Outlet Manager
   acknowledgement.
 
 ### Non-Requirements
@@ -104,7 +98,6 @@ Daily closing summarizes:
 Daily closing does not require:
 
 - every delivered order to reach `COMPLETED`;
-- every settlement to be resolved;
 - every refund liability to be resolved.
 
 ### Timing
@@ -128,21 +121,20 @@ if closing_overdue AND NOT super_admin_urgency_override:
   blocked:  large_inventory_adjustments
   blocked:  price_changes_outside_guardrail
   blocked:  manual_financial_ledger_adjustments
-  blocked:  manual_payment_reassignment
   blocked:  above_threshold_expense_approval  // >= 100,000 UGX at launch
   allowed:  online_order_placement, pos_walk_in_sales, inventory_reservation
   allowed:  order_acceptance, picking, batching, dispatch, delivery_agent_assignment
-  allowed:  cod_collection, mobile_money_verification, stock_intake
+  allowed:  cod_collection, stock_intake
   allowed:  within_guardrail_price_changes
 ```
 
 - Outlet Manager urgent override is allowed for cash refund payouts when policy
   permits it.
 
-### Liability and Settlement Recognition
+### Liability Recognition
 
 - Overdue daily closing does not block creation or posting of refund liabilities
-  or internal settlement records at financial closure.
+  at financial closure.
 - Those records capture business truth and must be posted even when the outlet
   is behind on closing.
 - The overdue-closing restriction applies to later cash payout or manual
@@ -150,19 +142,18 @@ if closing_overdue AND NOT super_admin_urgency_override:
 
 ### Carry-Forward
 
-- Daily closing lists outstanding customer refund liabilities separately from
-  internal settlement payables and receivables.
+- Daily closing lists outstanding customer refund liabilities separately.
 - Refund liabilities carry forward until paid, voided, or written off.
-- Settlement balances carry forward until acknowledged, offset, or voided.
-- Neither category blocks daily closing.
+- Open refund liabilities do not block daily closing.
 
-### Post-Payment Reassignment Reporting
+### Deferred Payment Settlement Reporting
 
-- The outlet that received mobile-money payment lists that receipt, any refund
-  liability it owns, and the settlement payable.
-- The final fulfilling outlet lists the sale, delivery work, direct
-  COD/top-up/delta collections it received, inventory or estimated COGS where
-  configured, and the settlement receivable.
+- Mobile-money payment receipts, merchant-account attribution, and
+  post-payment outlet reassignment settlement are not launch reporting
+  requirements.
+- The fulfilling outlet reports COD collections, delivery work, inventory or
+  estimated COGS where configured, refund liabilities it owns, and cash
+  reconciliation facts.
 
 ## Expense Controls
 
@@ -236,21 +227,13 @@ Expense records capture:
 
 ## Internal Settlements
 
-Settlement states: `POSTED`, `ACKNOWLEDGED`, `OFFSET`, `VOIDED`.
+Internal settlement for mobile-money-paid post-payment reassignment is deferred
+from launch scope. See
+[../out-of-scope/2026-06-13-mobile-money-payments.md](../out-of-scope/2026-06-13-mobile-money-payments.md).
 
-See also [F-04](#f-04-post-payment-outlet-reassignment-settled-by-finance).
-
-### Business Rules
-
-- Internal settlements between outlets are accounting entries only.
-- Internal settlements do not represent cash transfers between outlets.
-- A Finance Officer may acknowledge, query, and offset internal settlements.
-- Voiding a settlement requires Super Admin approval with explicit reason and
-  audit record.
-- A Finance Officer cannot void a settlement unilaterally.
-- Outlet performance reports recognize revenue under the final fulfilling
-  outlet at financial closure and show settlement status alongside the revenue
-  view.
+No ordinary launch workflow creates a cross-outlet customer-payment settlement
+because online delivery payment is COD cash collected for the fulfilling
+outlet.
 
 ## Delivery Cost Reporting
 
@@ -277,48 +260,6 @@ governed by [order.md](order.md), [catalog.md](catalog.md), and
 - Reports using delivery cost must label resulting margin or profitability
   values as estimated unless accounting-grade costing and expense controls are
   approved.
-
-## F-04: Post-Payment Outlet Reassignment Settled by Finance
-
-Cross-references:
-[order.md](order.md) for reassignment conditions and
-[payment.md](payment.md) for payment receipt attribution.
-
-1. Customer pays mobile money to Outlet A's merchant account.
-2. After payment verification, Outlet A cannot fulfill and the order is
-   reassigned to Outlet B with unchanged customer-visible terms or after the
-   customer accepts changed terms.
-3. Outlet B fulfills successfully.
-4. At financial closure, the original payment remains attributed to Outlet A and
-   its payment account.
-5. Outlet B holds the revenue from fulfillment because it successfully completed
-   the order.
-6. An internal settlement entry is created only for the prepaid mobile-money
-   value actually received by Outlet A and owed to Outlet B.
-7. COD deltas, underpayment top-ups, conversion deltas, doorstep
-   price-recalculation deltas, and delivery-fee increases collected by Outlet B
-   post directly to Outlet B's financial ledger.
-8. Those Outlet B collections are not settled from Outlet A.
-9. If the reassigned paid order fails or is cancelled before successful
-   completion, no internal outlet settlement is created.
-10. Any refund liability remains with Outlet A as the paid-to outlet.
-11. Finance Officer or Super Admin reviews and acknowledges the settlement.
-12. No cash transfer between outlets occurs at launch.
-13. Any reassignment-driven prepaid overage refund liability belongs to Outlet A.
-14. The overage liability is created only after financial closure determines the
-    final amount due.
-15. Before financial closure, the customer may see only a pending refund
-    calculation, not a collectible refund.
-16. The customer collects that refund from Outlet A only.
-17. Cross-outlet refund payout is not supported at launch.
-18. For reassigned prepaid orders, the customer receipt reflects the fulfillment
-    outlet, payment-receiving outlet, and refund-collection outlet when
-    applicable.
-19. The customer receipt does not expose internal settlement status or
-    mechanics.
-20. Permissioned Outlet Managers, Area Managers, Finance Officers, and Super
-    Admins may see internal settlement status within their reporting or
-    financial-view scope.
 
 ## F-05: Forced Financial Closure
 
@@ -373,7 +314,6 @@ Trimmed access matrix rows relevant to finance. Full matrix:
 | --- | --- | --- | --- | --- |
 | Daily cash closing | Scoped | - | - | Full |
 | Financial ledger view | Scoped | Read assigned outlets | Full | Full |
-| Internal settlement management | - | - | Acknowledge / Offset | Full |
 | Expense submission | Scoped | - | - | Full |
 | Expense approval | Scoped threshold | - | - | Full |
 | Forced financial closure | - | - | - | Full |

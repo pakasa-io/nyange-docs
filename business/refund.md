@@ -11,7 +11,7 @@ liability.
 
 **Related**:
 [order.md](order.md) for cancellation paths that create refund liabilities;
-[payment.md](payment.md) for overpayment and underpayment;
+[payment.md](payment.md) for cash collection and zero-collection facts;
 [delivery.md](delivery.md) for failed-delivery fee waiver;
 [finance.md](finance.md) for daily closing and liability reporting;
 [identity-auth.md](identity-auth.md) for the full access matrix.
@@ -22,9 +22,9 @@ liability.
 
 - A refund owed to a customer remains open until a cash payout event is recorded
   or a Super Admin-approved void/write-off path resolves it.
-- Supported liability sources include overpayment, failed delivery,
-  pre-delivery cancellation of paid orders, reassignment-driven prepaid overage,
-  prepaid doorstep price-recalculation overage, and post-delivery return.
+- Supported launch liability sources include approved cash over-collection
+  correction, approved post-collection price adjustment, and post-delivery
+  return.
 - Code expiry, daily closing, and time passing do not discharge the liability.
 - An open liability does not convert to revenue.
 - Open refund liabilities appear in the owning outlet's daily closing and
@@ -48,7 +48,7 @@ liability.
 
 - Refund owns the customer cash-refund liability and payout lifecycle.
 - Refund does not reopen cancelled orders, rewrite payment records, or create
-  provider-issued mobile-money refunds.
+  electronic refund workflows.
 - Refund payout is an outlet cash event reported through finance and daily
   closing.
 
@@ -89,24 +89,19 @@ WRITTEN_OFF
 
 ### Cash-Only Refunds
 
-- All customer refunds are cash-only at launch, regardless of original payment
-  method.
-- Provider-issued refunds, customer wallet credit, and mobile-money refund
-  workflows are not supported.
-- When the original customer payment was mobile money, the cash refund is an
-  outlet cash payout against that mobile-money-paid order for closing and
-  reporting.
-- A cash refund does not create a provider refund, customer credit, or internal
-  transfer.
+- All customer refunds are cash-only at launch.
+- Electronic refunds, customer wallet credit, and provider refund workflows are
+  not supported.
+- A cash refund does not create customer credit or an internal transfer.
 
-### Pre-Dispatch Cancellation of Paid Mobile-Money Orders
+### No Prepaid Cancellation Refunds at Launch
 
-- When a paid mobile-money order is cancelled before dispatch, a refund
-  liability is created immediately.
-- The order moves to `CANCELLED_PENDING_REFUND`.
-- The refund lifecycle begins from `LIABILITY_OPEN`.
-- The order reaches `REFUNDED` only after cash payout is recorded and the
-  liability is discharged.
+- Launch online orders are not prepaid.
+- Cancellation before doorstep COD collection does not create a refund
+  liability.
+- Failed delivery does not create a prepaid refund liability.
+- If a separate approved post-collection adjustment creates a refund liability,
+  the refund lifecycle begins from `LIABILITY_OPEN`.
 
 ### Approval Thresholds
 
@@ -194,9 +189,9 @@ Launch defaults:
 
 ### Outlet Responsibility
 
-- The outlet that received the original payment is responsible for disbursing
-  the refund.
-- Another outlet cannot pay the refund on the payment-receiving outlet's behalf.
+- The outlet that collected the original cash payment is responsible for
+  disbursing the refund.
+- Another outlet cannot pay the refund on the collecting outlet's behalf.
 
 ### Post-Delivery Returns
 

@@ -1,7 +1,7 @@
 # Order
 
 **Intent**: Define launch order behavior for placement, lifecycle state,
-allocation, reassignment, cancellation, cart behavior, mobile-money expiry,
+allocation, reassignment, cancellation, cart behavior, COD fulfillment,
 post-delivery returns, and walk-in POS.
 
 **Reader task**: Use this document to decide whether an order can be placed,
@@ -9,16 +9,18 @@ assigned, accepted, changed, cancelled, reassigned, delivered, refunded, or
 financially closed.
 
 **Sources**: §6.1 Order Lifecycle, §7.1 Outlet Allocation, §7.6 Cascade &
-Reassignment, §7.13 Mobile Money Order Expiry, §7.15 Cart Behaviour, F-01, F-02
+Reassignment, §7.15 Cart Behaviour, F-01, F-02
 
 **Related**:
 [catalog.md](catalog.md) for pricing and catalog rules;
-[payment.md](payment.md) for payment lifecycle;
+[payment.md](payment.md) for cash payment lifecycle;
 [delivery.md](delivery.md) for delivery lifecycle;
 [inventory.md](inventory.md) for reservation lifecycle;
 [refund.md](refund.md) for refund liabilities;
-[finance.md](finance.md) for post-payment reassignment settlement and forced
-closure; [identity-auth.md](identity-auth.md) for the full access matrix.
+[finance.md](finance.md) for forced closure;
+[identity-auth.md](identity-auth.md) for the full access matrix;
+[../out-of-scope/2026-06-13-mobile-money-payments.md](../out-of-scope/2026-06-13-mobile-money-payments.md)
+for deferred mobile-money payment scope.
 
 ## Invariants
 
@@ -27,14 +29,14 @@ closure; [identity-auth.md](identity-auth.md) for the full access matrix.
 - When an order is placed, prices in effect at that moment are captured and
   frozen on the order.
 - Subsequent pricing-rule changes do not alter historical orders.
-- Downstream financial calculations, including receipts, refunds, and
-  settlements, derive from the frozen snapshot, not current rules.
+- Downstream financial calculations, including receipts and refunds, derive
+  from the frozen snapshot, not current rules.
 
-**BI-07 — COD orders never require payment verification before fulfillment
-begins.**
+**BI-07 — Launch online orders never require payment verification before
+fulfillment begins.**
 
-- For COD orders, outlet acceptance, picking, batching, dispatch, and
-  delivery-agent assignment may begin without any payment action.
+- Outlet acceptance, picking, batching, dispatch, and delivery-agent assignment
+  may begin without any payment action.
 - Payment is collected at the doorstep by the delivery agent.
 
 **BI-09 — Fulfilled orders have no partial completion state.**
@@ -51,8 +53,8 @@ begins.**
 check.**
 
 - Before an order is assigned to an outlet, the outlet's policies are evaluated.
-- Relevant policies include payment method support, delivery mode support,
-  refill vendor acceptance, and same-vendor refill capability.
+- Relevant policies include delivery mode support, refill vendor acceptance,
+  and same-vendor refill capability.
 - An order cannot be assigned to an outlet that does not meet its requirements.
 
 **BI-20 — Order totals are immutable after placement.**
@@ -83,21 +85,18 @@ A cancellation missing any required field is a data integrity violation.
 
 - An outlet cannot be set inactive or disabled while it has any non-terminal
   orders.
-- Terminal states for this rule are `COMPLETED`, `CANCELLED`, `FAILED` for COD
-  orders with no open refund liability, and `REFUNDED`.
-- `CANCELLED_PENDING_REFUND` is non-terminal because the financial liability is
-  still open.
+- Terminal states for this rule are `COMPLETED`, `CANCELLED`, and `FAILED`
+  when no open closure blocker remains.
 - Disablement is allowed only after every order is completed, cancelled, failed
-  as COD with no open refund liability, refunded, or reassigned.
+  with no open closure blocker, or reassigned.
 
 **BI-23 — Critical mutations are idempotent.**
 
 - Critical one-time state transitions require idempotency keyed by actor,
   endpoint, and client key.
-- Covered transitions include order creation, cancellation, payment reference
-  submission or reuse, payment verification, refunds, delivery completion,
-  inventory reservation/adjustment/transfer, cash reconciliation, receipt
-  generation, and comparable mutations.
+- Covered transitions include order creation, cancellation, delivery
+  completion, inventory reservation/adjustment/transfer, cash reconciliation,
+  refund payout, receipt generation, and comparable mutations.
 - Identical replays return the original result.
 - Same-key/different-body replays are rejected.
 - In-progress duplicates return a retryable response.
@@ -109,7 +108,7 @@ A cancellation missing any required field is a data integrity violation.
 - Order owns the order request, placement, assignment, cancellation,
   reassignment, customer-visible order state, and order-level immutable price
   snapshot.
-- Order does not own payment verification, delivery execution, stock ledger
+- Order does not own cash payment facts, delivery execution, stock ledger
   movement, refund payout, or financial closure ledger posting.
 - Other aggregates may observe or act on order state but must not rewrite the
   placed order request or price snapshot.
@@ -119,39 +118,25 @@ A cancellation missing any required field is a data integrity violation.
 ```
 DRAFT
   └─► PLACED
-        ├─► [Mobile Money]
-        │     AWAITING_CUSTOMER_PAYMENT
-        │       └─► AWAITING_STAFF_VERIFICATION
-        │             └─► STAFF_VERIFIED
-        │                   └─► ASSIGNED_TO_OUTLET
-        │
-        └─► [COD]
-              ASSIGNED_TO_OUTLET
-                    │
-        ┌───────────┘
-        ▼
-  AWAITING_OUTLET_ACCEPTANCE
-        ├─► ACCEPTED_BY_OUTLET
-        │     └─► PICKING
-        │           └─► READY_FOR_DISPATCH
-        │                 └─► OUT_FOR_DELIVERY
-        │                       ├─► DELIVERED ──► COMPLETED
-        │                       └─► FAILED
-        │                             └─► [if mobile-money prepaid] CANCELLED_PENDING_REFUND
-        │                                                                  └─► REFUNDED
-        │
-        └─► [Cascade / Reassignment]
-              ├─► AWAITING_CUSTOMER_REASSIGNMENT_ACCEPTANCE
-              │     ├─► ACCEPTED_BY_OUTLET
-              │     └─► CANCELLED or CANCELLED_PENDING_REFUND or REQUIRES_ADMIN_INTERVENTION
-              │
-              └─► REQUIRES_ADMIN_INTERVENTION
+        └─► ASSIGNED_TO_OUTLET
+              └─► AWAITING_OUTLET_ACCEPTANCE
                     ├─► ACCEPTED_BY_OUTLET
-                    └─► CANCELLED or CANCELLED_PENDING_REFUND
+                    │     └─► PICKING
+                    │           └─► READY_FOR_DISPATCH
+                    │                 └─► OUT_FOR_DELIVERY
+                    │                       ├─► DELIVERED ──► COMPLETED
+                    │                       └─► FAILED
+                    │
+                    └─► [Cascade / Reassignment]
+                          ├─► AWAITING_CUSTOMER_REASSIGNMENT_ACCEPTANCE
+                          │     ├─► ACCEPTED_BY_OUTLET
+                          │     └─► CANCELLED or REQUIRES_ADMIN_INTERVENTION
+                          │
+                          └─► REQUIRES_ADMIN_INTERVENTION
+                                ├─► ACCEPTED_BY_OUTLET
+                                └─► CANCELLED
 
 CANCELLED
-CANCELLED_PENDING_REFUND
-  └─► REFUNDED
 FAILED
 COMPLETED
 ```
@@ -160,21 +145,16 @@ COMPLETED
 | --- | --- |
 | `DRAFT` | Customer-derived order draft before placement. |
 | `PLACED` | Order request created with frozen price snapshot. |
-| `AWAITING_CUSTOMER_PAYMENT` | Mobile-money order awaits customer reference submission. |
-| `AWAITING_STAFF_VERIFICATION` | Reference submitted; outlet verification pending. |
-| `STAFF_VERIFIED` | Authorized outlet actor manually confirmed provider reference. |
 | `ASSIGNED_TO_OUTLET` | Order has serving outlet assignment. |
-| `AWAITING_OUTLET_ACCEPTANCE` | Shared fulfillment entry state for mobile-money and COD paths. |
+| `AWAITING_OUTLET_ACCEPTANCE` | Fulfillment entry state after outlet assignment. |
 | `ACCEPTED_BY_OUTLET` | Outlet accepted order under active acceptance policy. |
 | `PICKING` | Authorized actor is picking stock. |
 | `READY_FOR_DISPATCH` | Picked and ready for delivery assignment/dispatch. |
 | `OUT_FOR_DELIVERY` | Delivery-run custody has begun. |
 | `DELIVERED` | Customer-facing delivery complete; financial closure may still be pending. |
 | `COMPLETED` | Internal financial closure complete; terminal. |
-| `FAILED` | Terminal for COD orders; prepaid mobile-money moves to refund path. |
-| `CANCELLED` | Terminal order cancelled before payment, or COD cancelled. |
-| `CANCELLED_PENDING_REFUND` | Operationally cancelled but refund liability remains open. |
-| `REFUNDED` | Terminal after cash refund payout is recorded and posted. |
+| `FAILED` | Terminal failed delivery or failed fulfillment outcome after zero-collection and return/custody requirements. |
+| `CANCELLED` | Terminal order cancelled before completion. |
 | `REQUIRES_ADMIN_INTERVENTION` | All candidate outlets exhausted; Super Admin intervention required. |
 
 ## State Rules
@@ -201,32 +181,22 @@ COMPLETED
 - Approved delivery-conversion, mismatch, refund, or reassignment-delta paths
   are exception adjustments, not edits to the original order request.
 
-### Assignment and Payment Gates
+### Assignment and Fulfillment Gates
 
 - All orders receive outlet assignment and reserve inventory at placement.
-- For mobile-money orders, status does not transition to `ASSIGNED_TO_OUTLET`
-  until payment reaches `STAFF_VERIFIED` and the payment gate permits
-  fulfillment.
-- Before mobile-money `ASSIGNED_TO_OUTLET`, the assigned outlet may see the order
-  for payment instructions and payment verification only.
-- Before mobile-money `ASSIGNED_TO_OUTLET`, the outlet may not accept, pick,
-  batch, dispatch, or assign a delivery agent.
-- COD orders transition to `ASSIGNED_TO_OUTLET` immediately after placement.
-- `STAFF_VERIFIED` and `PAID` are distinct. `STAFF_VERIFIED` means provider
-  reference was manually confirmed; `PAID` means payment is posted and
-  confirmed.
-- An underpayment holds payment at `PARTIALLY_PAID` while COD top-up is arranged.
-- Operational progress for mobile-money orders is blocked until
-  `STAFF_VERIFIED` and any required payment-gate resolution.
-- Required payment-gate resolution includes Outlet Manager approval of COD
-  top-up for underpayment.
+- Launch online orders transition to `ASSIGNED_TO_OUTLET` immediately after
+  placement.
+- No customer prepayment, payment-reference submission, or staff payment
+  verification is required before fulfillment begins.
+- Outlet acceptance, picking, batching, dispatch, and delivery-agent assignment
+  are governed by fulfillment eligibility and outlet policy, not by a prepaid
+  payment gate.
+- COD cash is collected at the doorstep before customer PIN confirmation.
 
 ### Outlet Acceptance
 
 - `AWAITING_OUTLET_ACCEPTANCE` is the shared entry state for all order paths.
-- Mobile-money orders enter it after `STAFF_VERIFIED`, `ASSIGNED_TO_OUTLET`, and
-  required payment-gate resolution.
-- COD orders enter it directly from `ASSIGNED_TO_OUTLET`.
+- Orders enter it directly from `ASSIGNED_TO_OUTLET`.
 - Outlet acceptance follows the active outlet acceptance policy.
 - Launch default requires an actor with explicit order-acceptance permission to
   manually accept or reject the order.
@@ -290,20 +260,16 @@ COMPLETED
 
 ### Failed and Refunded Outcomes
 
-- For COD orders, `FAILED` is terminal.
-- For mobile-money prepaid orders, `CANCELLED_PENDING_REFUND` is required after
-  `FAILED`.
-- Failed prepaid delivery remains financially open until the full prepaid amount
-  is refunded in cash.
+- For online delivery orders, `FAILED` is terminal after required physical goods
+  return and custody facts are recorded.
 - The delivery fee is waived for failed delivery.
-- `REFUNDED` is the true terminal for failed prepaid deliveries.
-- When a paid mobile-money order is cancelled before dispatch, it moves to
-  `CANCELLED_PENDING_REFUND`.
-- A refund liability is created immediately for paid mobile-money pre-dispatch
-  cancellation.
-- The order reaches `REFUNDED` only after cash payout is recorded and posted.
-- Unpaid mobile-money orders cancelled before dispatch and COD orders cancelled
-  at any point move directly to `CANCELLED`.
+- Failed delivery records a zero-collection payment fact because no launch
+  online order is prepaid.
+- Cancellation before delivery collection moves directly to `CANCELLED`.
+- Failed delivery or cancellation does not create a prepaid refund liability.
+- Refund liabilities may still be created by separate post-collection workflows,
+  such as approved post-delivery returns or approved cash over-collection
+  corrections.
 
 ## Outlet Allocation
 
@@ -330,7 +296,6 @@ outlet eligible :=
   AND (express_order  → outlet_currently_operating
        batched_order  → has_valid_future_delivery_window)
   AND supports_delivery_mode
-  AND supports_payment_method
   AND sufficient_available_stock
   AND (refill_order → accepts_incoming_vendor)
   AND (same_vendor_requested → same_vendor_policy_enabled AND filled_stock_available)
@@ -352,8 +317,8 @@ outlet eligible :=
 - Batched orders do not require the outlet to be currently operating at
   placement.
 - Inventory is reserved at placement regardless.
-- COD and mobile money are enabled by default unless outlet policy overrides.
-- An outlet with no active payment method is ineligible for all orders.
+- Payment-method support is not an outlet-allocation criterion at launch.
+- Active online-fulfillment outlets are expected to support COD cash.
 - Stock availability is required for all order items.
 - For refill orders, stock checks include outgoing filled cylinders and
   accessories only.
@@ -464,9 +429,8 @@ Customer notification and acceptance are required when reassignment creates:
    new outlet.
 10. If the customer accepts, the previous outlet's reservation is released.
 11. If the customer rejects or does not respond, the new outlet hold is released.
-12. The normal outcome after rejection or timeout is cancellation and any
-    pre-payment creates a refund liability, unless active reassignment policy
-    requires escalation.
+12. The normal outcome after rejection or timeout is cancellation, unless
+    active reassignment policy requires escalation.
 
 ### Reassignment Rules
 
@@ -481,8 +445,6 @@ Customer notification and acceptance are required when reassignment creates:
 - Stock hold by itself is not outlet acceptance.
 - If no provisional outlet acceptance exists, the order remains in or returns to
   `AWAITING_OUTLET_ACCEPTANCE`.
-- For post-payment reassignment, the customer is not notified merely because the
-  internal fulfilling outlet changed.
 - Customer notification is required only when customer-visible details change.
 
 ### Candidate Skip Records
@@ -493,8 +455,8 @@ Customer notification and acceptance are required when reassignment creates:
 - Candidate skip records are diagnostic, not full reassignment attempts.
 - Launch retention is 180 days after record creation.
 - After retention, skip records may be archived or summarized.
-- Terminal order, financial, settlement, refund, and audit records remain
-  durable under their own retention rules.
+- Terminal order, financial, refund, and audit records remain durable under
+  their own retention rules.
 
 ### Reassignment Attempt Records
 
@@ -508,8 +470,8 @@ Customer notification and acceptance are required when reassignment creates:
 
 ### Stock Reservation on Reassignment
 
-- For paid or otherwise active reassignment, the candidate outlet hold must be
-  secured before the previous outlet reservation is released.
+- For active reassignment, the candidate outlet hold must be secured before the
+  previous outlet reservation is released.
 - If the previous reservation cannot release after the new hold succeeds, the
   previous reservation remains unavailable as `PENDING_RELEASE`.
 - `PENDING_RELEASE` stock is reported separately from normal reserved stock
@@ -521,17 +483,12 @@ Customer notification and acceptance are required when reassignment creates:
   recorded against the order and reassignment record.
 - Delivery-fee adjustments comply with BI-20.
 - A lower delivery fee does not require customer acceptance.
-- For unpaid or COD orders, the lower fee reduces amount due.
-- For prepaid mobile-money orders, the lower-fee difference becomes a refund
-  liability created at financial closure.
+- A lower delivery fee reduces amount due before COD collection.
 - The customer is notified of a reduction but does not need to act.
 - A higher delivery fee requires customer notification and acceptance before
   reassignment activates.
-- After customer acceptance, COD orders collect the increase as part of COD due
-  at delivery.
-- For prepaid mobile-money orders, the accepted increase is collected by the
-  delivery agent as a COD delta/top-up at delivery.
-- The COD delta/top-up remains distinct from the original prepaid amount.
+- After customer acceptance, the increase is collected as part of COD due at
+  delivery.
 
 ### Post-Picking Block
 
@@ -570,32 +527,14 @@ Customer notification and acceptance are required when reassignment creates:
 - A Customer Support Agent may relay an extension need to Super Admin, but
   cannot execute the extension.
 
-## Mobile Money Order Expiry
+## Payment Expiry
 
-Unpaid mobile-money orders have a two-stage configurable expiry window. The
-clock starts when the order reaches `AWAITING_CUSTOMER_PAYMENT`.
-
-Launch durations are global defaults. Changes or outlet/payment-method
-overrides require Product Manager approval plus the operations approval
-authority required by active policy.
-
-```
-t = 0    → clock starts; order at AWAITING_CUSTOMER_PAYMENT; reservation active
-t = 30m  → warning sent; reservation still active
-t = 60m  → if no reference submitted  → CANCELLED; reservation released
-           if reference submitted      → clock stops permanently
-```
-
-- Submitting a reference before cancellation stops the expiry clock.
-- Submission moves the order to `AWAITING_STAFF_VERIFICATION`.
-- The expiry path is permanently closed once a reference is submitted.
-- This is true regardless of verification outcome.
-- Payment-verification delay does not trigger stock release under unpaid-expiry
-  policy.
-- COD orders do not have payment expiry.
-- COD orders may time out through outlet acceptance workflow if the outlet does
-  not accept within the acceptance window.
-- No payment deadline applies to COD orders.
+- Launch online orders do not have payment-reference expiry because no
+  customer prepayment or reference submission exists in launch scope.
+- Orders may time out through outlet acceptance, reassignment, or escalation
+  workflows when the relevant fulfillment actor does not act within the active
+  window.
+- No payment deadline applies before doorstep COD collection.
 
 ## Cart Behaviour
 
@@ -650,7 +589,7 @@ Launch post-delivery returns require all conditions below.
 8. A condition-rejected return does not create a refund or change inventory
    availability.
 9. Post-delivery return refunds are cash-only at the outlet.
-10. No mobile-money or alternative refund method applies.
+10. No electronic or alternative refund method applies.
 
 Return eligibility, approved condition, refund amount, drop-off requirement, and
 approval role are controlled by active product-type return policy. Later policy
@@ -686,9 +625,7 @@ requirements.
 - If the customer refuses conversion, the transaction does not proceed.
 - Anonymous walk-in customers are permitted.
 - Refunds, returns, and support follow-up require customer identity.
-- Anonymous walk-in mobile-money payments still require provider, transaction
-  reference, and verified amount capture.
-- The same per-provider payment reference uniqueness rules apply.
+- Walk-in POS sales are cash-only at launch.
 
 ## F-01: Online Order to Delivery
 
@@ -698,39 +635,33 @@ requirements.
 2. Serving outlet is selected from outlets that serve the address and meet all
    allocation criteria.
 3. Stock for all order items is reserved at the selected outlet.
-4. For mobile money, customer pays independently, submits reference, authorized
-   outlet payment-verification actor verifies, and required payment-gate
-   resolution completes before outlet acceptance.
-5. For COD, order proceeds directly to outlet acceptance.
-6. Outlet accepts.
-7. Authorized outlet picking actor picks items.
-8. Delivery-agent assignment and delivery-run creation follow active outlet
+4. Order proceeds directly to outlet acceptance.
+5. Outlet accepts.
+6. Authorized outlet picking actor picks items.
+7. Delivery-agent assignment and delivery-run creation follow active outlet
    delivery policy.
-9. Default assignment policy applies unless Dispatcher or Outlet Manager
+8. Default assignment policy applies unless Dispatcher or Outlet Manager
    manually assigns or overrides before pickup within outlet scope.
-10. Outlet handover confirmation and agent receipt confirmation are both
+9. Outlet handover confirmation and agent receipt confirmation are both
     recorded.
-11. Custody transfers to agent.
-12. At customer door for refill orders, agent records every expected returned
+10. Custody transfers to agent.
+11. At customer door for refill orders, agent records every expected returned
     cylinder's vendor, size, condition, approved conversion, COD delta or cash
     collection, and delivery exception before PIN confirmation.
-13. Customer confirms with PIN only when final delivered order and amount due are
+12. Customer confirms with PIN only when final delivered order and amount due are
     correct.
-14. PIN confirmation atomically commits delivery status, order status, outgoing
+13. PIN confirmation atomically commits delivery status, order status, outgoing
     stock commitment, returned-cylinder field recording, cash collection
     recording, and payment status.
-15. For refill orders, returned-cylinder intake actor confirms intake for every
+14. For refill orders, returned-cylinder intake actor confirms intake for every
     expected returned cylinder or failed intake receives approved exception.
-16. For all online deliveries, financial closure waits until delivery-run
+15. For all online deliveries, financial closure waits until delivery-run
     custody is closed, intake/exception outcomes are complete, and no unresolved
     closure blockers remain.
-17. Normal financial closure occurs from recorded business facts, generates the
+16. Normal financial closure occurs from recorded business facts, generates the
     receipt, and seals the order.
 
 ## F-02: Reassignment with Changed Terms
-
-Cross-reference: [finance.md](finance.md) for F-04 when reassignment follows a
-mobile-money prepayment.
 
 1. Order is assigned to Outlet A.
 2. Outlet A rejects, its acceptance window expires, or it marks cannot-fulfill
@@ -753,8 +684,8 @@ mobile-money prepayment.
     B.
 13. Outlet A's reservation is released.
 14. If customer rejects or does not respond, Outlet B stock hold is released.
-15. The normal outcome is order cancellation and any pre-payment becomes refund
-    liability, unless active reassignment policy requires escalation.
+15. The normal outcome is order cancellation, unless active reassignment policy
+    requires escalation.
 
 ## Permissions
 

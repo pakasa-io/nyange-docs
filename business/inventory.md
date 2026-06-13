@@ -93,8 +93,8 @@ PENDING_RELEASE
 - Only available stock can be reserved.
 - Reservation age alone does not release stock.
 - Stock release occurs only through an explicit policy-defined lifecycle, such
-  as unpaid mobile-money cancellation, failed delivery return, order
-  cancellation, or another audited release workflow.
+  as failed delivery return, order cancellation, reassignment hold release, or
+  another audited release workflow.
 - A reservation that cannot be committed because delivery failed must be
   released, not left open.
 - Incoming customer cylinders from refill delivery are tracked separately as
@@ -149,8 +149,7 @@ REJECTED
   and reason where applicable.
 - Inter-outlet stock transfers do not involve financial settlement.
 - No financial settlement entry is created between outlets for a stock transfer.
-- This differs from post-payment order reassignment, which creates an internal
-  settlement at financial closure.
+- Launch outlet transfers do not create internal settlement records.
 
 ## Vendor Refill Batch Lifecycle
 

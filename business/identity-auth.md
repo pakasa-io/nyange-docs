@@ -43,10 +43,10 @@ may hold multiple permission bundles across one or more outlets.
 - Uses the authenticated customer experience to track status and access
   customer-visible notices.
 - May have multiple saved addresses.
-- Pays by mobile money or cash.
+- Pays cash for launch online delivery and walk-in POS transactions.
 - Collects cash refunds in person at the outlet.
-- Cannot manage outlet operations, view other customers' data, approve payments,
-  access financial records, or override business rules or policy controls.
+- Cannot manage outlet operations, view other customers' data, access financial
+  records, or override business rules or policy controls.
 
 ### P-02 Delivery Agent
 
@@ -56,19 +56,18 @@ may hold multiple permission bundles across one or more outlets.
 - Performs required field actions during active delivery.
 - Collects COD cash, records returned cylinders, enters customer-provided
   delivery PINs, reports failures, and submits cash handover.
-- Cannot reassign orders, view other agents' assignments, verify mobile-money
-  references, modify inventory, issue refunds, or access financial records.
+- Cannot reassign orders, view other agents' assignments, modify inventory,
+  issue refunds, or access financial records.
 
 ### P-03 Outlet Cashier
 
 - Outlet staff responsible for walk-in POS transactions.
-- Records walk-in sales and accepts walk-in cash or mobile money.
-- May verify outlet mobile-money references when explicitly permissioned.
+- Records walk-in sales and accepts walk-in cash.
 - May assist with delivery PIN fallback when explicitly permissioned.
 - Issues walk-in receipts.
 - Has no delivery responsibilities.
 - Online-order responsibilities are limited to explicitly permissioned
-  payment-verification and PIN-fallback workflows.
+  PIN-fallback workflows.
 - Cannot manage online orders, approve refunds, adjust inventory, or access
   another outlet's data.
 
@@ -79,8 +78,8 @@ may hold multiple permission bundles across one or more outlets.
   returned-cylinder intake, initiates outlet transfer requests, and records
   vendor refill movements.
 - Works within assigned outlet only.
-- Cannot accept/reject orders, verify payments, issue refunds, access financial
-  records, or approve their own adjustment requests.
+- Cannot accept/reject orders, collect customer cash, issue refunds, access
+  financial records, or approve their own adjustment requests.
 
 ### P-05 Dispatcher
 
@@ -89,14 +88,13 @@ may hold multiple permission bundles across one or more outlets.
 - Assigns delivery agents to orders and runs.
 - Tracks delivery progress.
 - May reassign agents before pickup within outlet active delivery policy.
-- Cannot verify payments, approve refunds, adjust inventory, access financial
-  records, or modify outlet policies.
+- Cannot collect customer cash, approve refunds, adjust inventory, access
+  financial records, or modify outlet policies.
 
 ### P-06 Outlet Manager
 
 - Operational owner of a single outlet.
 - Accepts or rejects orders.
-- May verify mobile-money payment references when explicitly permissioned.
 - Reconciles daily cash.
 - Approves in-scope refund liabilities according to active approval policy.
 - Submits above-threshold inventory adjustments for approval.
@@ -129,16 +127,14 @@ may hold multiple permission bundles across one or more outlets.
 - Has read access to outlet operations, inventory, and financial summaries for
   assigned outlets.
 - Does not perform direct outlet operations.
-- Cannot accept orders, verify payments, adjust inventory, view or manage
+- Cannot accept orders, collect cash, adjust inventory, view or manage
   operational risk alerts, access outlets outside assignment, or override Super
   Admin controls.
 
 ### P-09 Finance Officer
 
-- Financial operations role with ledger and settlement visibility.
+- Financial operations role with ledger visibility.
 - Reviews financial ledger entries.
-- Reconciles internal settlements between outlets.
-- Acknowledges settlement records.
 - Reviews daily closing summaries, expense reporting, and policy outcomes.
 - Works across all outlets.
 - Cannot mutate order, delivery, or inventory state.
@@ -170,8 +166,7 @@ may hold multiple permission bundles across one or more outlets.
 | Own | Access to own records only |
 | Request | Can initiate but not approve |
 | Approve | Can approve requests from others; cannot approve own |
-| Acknowledge | Can record review/acknowledgement of settlement or closing records without voiding them |
-| Offset | Can offset internal settlement records within authority |
+| Acknowledge | Can record review/acknowledgement of closing records without voiding them |
 | Threshold | Authority limited by configured financial or quantity threshold |
 | - | No access |
 
@@ -188,9 +183,6 @@ may hold multiple permission bundles across one or more outlets.
 | Failed-order return receipt | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | - | Full |
 | Run-level returned-cylinder receipt | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | - | Full |
 | POS / walk-in sales | - | - | Scoped with explicit permission | - | - | Scoped with explicit permission | - | - | - | Full |
-| Mobile money verification | - | - | Scoped with explicit permission | - | - | Scoped with explicit permission | - | - | - | Full |
-| Payment account administration | - | - | - | - | - | - | - | - | - | Full |
-| Payment reference submission | Own | - | - | - | - | - | - | - | - | Full |
 | Delivery assignment | - | - | - | - | Scoped | Scoped | - | - | - | Full |
 | Delivery batch management | - | - | - | - | Scoped | Scoped | - | - | - | Full |
 | Delivery execution pickup, PIN, COD | - | Own | - | - | - | - | - | - | - | Full |
@@ -215,7 +207,6 @@ may hold multiple permission bundles across one or more outlets.
 | Refund collection code management | - | - | - | - | - | - | Scoped with explicit permission | - | - | Full |
 | Daily cash closing | - | - | - | - | - | Scoped | - | - | - | Full |
 | Financial ledger view | - | - | - | - | - | Scoped | - | Read assigned outlets | Full | Full |
-| Internal settlement management | - | - | - | - | - | - | - | - | Acknowledge / Offset | Full |
 | Expense submission | - | - | - | - | - | Scoped | - | - | - | Full |
 | Expense approval | - | - | - | - | - | Scoped threshold | - | - | - | Full |
 | Notification template administration | - | - | - | - | - | - | - | - | - | Full |
@@ -314,32 +305,16 @@ may hold multiple permission bundles across one or more outlets.
 - It does not allow approving, paying, voiding, or writing off a refund
   liability.
 
-### Internal Settlement Authority
-
-- A Finance Officer may acknowledge, query, and offset internal settlements.
-- Voiding a settlement requires Super Admin approval with explicit reason and
-  audit record.
-- Finance Officer cannot void unilaterally.
-
 ### Outlet Configuration vs. Price Rules
 
 - `Outlet configuration & policies` covers settings that only Super Admin may
   change: service zone, vendor acceptance list, delivery mode support,
-  operating-hours policy, payment method support, workload/capacity limits, max
-  batch size, and outlet priority score.
+  operating-hours policy, workload/capacity limits, max batch size, and outlet
+  priority score.
 - `Outlet price rules within guardrail` covers outlet-scoped product, refill,
   accessory prices, delivery-fee overrides, and express-fee multipliers.
 - Outlet Managers have write access to price rules within configured guardrails.
 - Outlet Managers do not have write access to broader outlet configuration.
-
-### Payment Account Administration
-
-- Creating, changing, deactivating, or setting the default mobile-money merchant
-  account requires explicit payment-account administration permission.
-- Writes require an audit reason.
-- Ordinary reads expose only masked merchant-account details.
-- Outlet/default constraints remain per outlet/provider.
-- Account changes do not alter already-recorded payment attribution.
 
 ### Order Reassignment
 
@@ -375,8 +350,8 @@ outlet scope or business authority.
 - After privileged authentication succeeds, the authenticated context may include
   customer capabilities and privileged capabilities allowed by explicit
   permissions, outlet scopes, policy, and session assurance.
-- Normal checkout and late-payment-reference reuse do not require extra OTP
-  beyond the authenticated customer session.
+- Normal checkout does not require extra OTP beyond the authenticated customer
+  session.
 
 ### Recovery
 
@@ -398,7 +373,7 @@ outlet scope or business authority.
 - The recovery record must identify the subject account, affected credential or
   recovery factor, initiating actor, co-approving actor, reason code, note,
   timestamp, before/after account-status and credential-readiness values, and
-  confirmation that no secrets or payment credentials are stored.
+  confirmation that no authentication secrets are stored.
 
 ### Credential Readiness
 
@@ -463,9 +438,10 @@ outlet scope or business authority.
 
 ## Authorization Edge Cases
 
-**E-01**: A payment-verification actor cannot verify a mobile-money payment for
-an order assigned to a different outlet, even if both outlets are in the same
-city.
+**E-01**: No launch actor can submit, verify, reuse, or administer a
+mobile-money payment reference. Mobile-money payments are deferred from launch
+scope and require explicit scope re-entry before any related permission can be
+granted.
 
 **E-02**: A Delivery Agent can see the customer's phone number only while an
 order is assigned to them and active. They lose this access when the delivery
@@ -479,7 +455,7 @@ issue type, priority, or customer complaint.
 
 **E-04**: An Area Manager can view reports and operational data for assigned
 outlets, but cannot view operational risk alerts or perform outlet actions such
-as accepting orders, verifying payments, approving refunds, or adjusting
+as accepting orders, collecting customer cash, approving refunds, or adjusting
 inventory.
 
 **E-05**: Refund liabilities at or above the approval-required threshold require
