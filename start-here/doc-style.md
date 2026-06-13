@@ -295,6 +295,44 @@ t = 60m  → if no reference submitted  → CANCELLED, reservation released
            if reference submitted      → clock stops permanently
 ```
 
+**Priority ranking** — ordered multi-criteria sort where the output is a ranking,
+not a yes/no decision. Use for allocation tie-breaking, queue ordering, and
+assignment policies. List criteria in priority order; earlier criteria take
+precedence over later ones.
+
+```
+rank outlets by:
+  1. distance_to_customer     ASC
+  2. delivery_fee             ASC
+  3. active_order_load        ASC
+  4. outlet_priority_score    DESC
+```
+
+**Atomic commitment group** — a set of state changes that must all succeed or all
+fail together. Use to make the boundary of an atomic operation explicit. List
+every participant; add a comment stating the all-or-nothing constraint.
+
+```
+PIN confirmation commits atomically:
+  delivery_status
+  order_status
+  stock_commitment
+  returned_cylinder_recording
+  cash_collection
+  payment_status
+// all succeed or none do
+```
+
+**Windowed / rolling-window threshold** — threshold on a count or sum within a
+resetting time window, not on a point value. Use for rate limits, rolling caps,
+and alert thresholds. Distinguish the window duration from the threshold value.
+
+```
+if count(invalid_attempts, window=15min) >= 5  → lockout(15min)
+if lockout_count >= 2
+   OR count(lifetime_invalid_attempts) >= 10   → fallback required
+```
+
 ## ID Guidance
 
 IDs are useful when content needs traceability. Avoid IDs for disposable notes or
