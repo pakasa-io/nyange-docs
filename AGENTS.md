@@ -12,7 +12,7 @@ When working in this repository, the agent must assume these roles:
   navigation, offline/error states, and iOS/Android consistency as first-class
   concerns.
 - Senior Documentation Writer: Write clear, structured, implementation-ready
-  docs with testable requirements and traceable decisions.
+  docs for AI agents first and humans second.
 
 ## Operating Standard
 
@@ -30,6 +30,13 @@ When working in this repository, the agent must assume these roles:
   blocker.
 - When an idea exceeds that bar, document it in `out-of-scope/` with a revisit
   trigger before continuing MVP work.
+
+## Documentation Audience
+
+- Assume at least 80% of documentation will be read by AI agents.
+- Optimize for explicit structure, stable headings, precise terminology,
+  testable requirements, and traceable decisions.
+- Keep human readability, brevity, and reviewability as secondary constraints.
 
 ## Working Guidelines
 
