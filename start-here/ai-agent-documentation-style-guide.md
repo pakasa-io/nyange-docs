@@ -9,10 +9,6 @@ This guide does not prescribe a document inventory or require fixed templates.
 It defines how documentation should read, how it should be structured, and how
 it should preserve meaning across many document kinds.
 
-Prefer small, focused documents. Size each document around a coherent reader
-task, and split only when that improves clarity, retrieval, ownership, or
-evolvability.
-
 ## Reader Model
 
 - Primary reader: AI agents.
@@ -54,8 +50,7 @@ Write each chunk so an AI agent can answer:
   or evolvability.
 - Prefer short paragraphs, bullets, and tables over long prose.
 - Use consistent terms for the same concept.
-- Separate facts, assumptions, decisions, business rules, requirements, risks,
-  terms, dependencies, and open questions when they appear.
+- Separate content by type using the Optional Labels when distinctions matter.
 - Use IDs only when an item is likely to be referenced, traced, tested, or
   updated later.
 - Keep examples clearly marked as examples.
@@ -192,7 +187,7 @@ Good uses:
 IDs are useful when content needs traceability. Avoid IDs for disposable notes or
 single-use prose.
 
-Recommended prefixes:
+Recommended prefixes, in Optional Labels order:
 
 - `F-` for facts.
 - `A-` for assumptions.
@@ -205,15 +200,28 @@ Recommended prefixes:
 - `DEP-` for dependencies.
 - `PERM-` for permissions.
 - `DATA-` for data items.
+- `WF-` for workflows.
 - `EVT-` for events.
-- `R-` for risks.
+- `INT-` for interfaces.
+- `BND-` for boundary.
+- `OWN-` for ownership.
+- `ST-` for state.
+- `INV-` for invariants.
+- `FH-` for failure handling.
+- `EVO-` for evolvability.
+- `OBS-` for observability.
+- `MIG-` for migration or rollout.
 - `OUT-` for outcomes.
 - `EDGE-` for edge cases.
+- `R-` for risks.
 - `EX-` for examples.
 - `AC-` for acceptance criteria.
 - `V-` for validation items.
 - `NG-` for non-goals.
 - `OQ-` for open questions.
+
+If a needed prefix is not listed, define one using the same short uppercase
+convention and use it consistently within the document.
 
 ## Scope Guidance
 
