@@ -9,6 +9,10 @@ This guide does not prescribe a document inventory or require fixed templates.
 It defines how documentation should read, how it should be structured, and how
 it should preserve meaning across many document kinds.
 
+Prefer small, focused documents. Size each document around a coherent reader
+task, and split only when that improves clarity, retrieval, ownership, or
+evolvability.
+
 ## Reader Model
 
 - Primary reader: AI agents.
@@ -45,6 +49,9 @@ Write each chunk so an AI agent can answer:
 - State the chunk's intent near the top.
 - Use stable Markdown headings.
 - Include only sections that add clarity.
+- Keep each document focused around a coherent reader task.
+- Split or index material when doing so improves clarity, retrieval, ownership,
+  or evolvability.
 - Prefer short paragraphs, bullets, and tables over long prose.
 - Use consistent terms for the same concept.
 - Separate facts, assumptions, decisions, business rules, requirements, risks,
@@ -67,6 +74,49 @@ Most chunks should follow this lightweight shape:
 6. Links or source references when useful
 
 Short chunks may use fewer sections. Dense or high-impact chunks may use more.
+If a chunk needs many sections, apply the document sizing algorithm before
+adding more structure.
+
+## Document Sizing
+
+Use this algorithm when creating, expanding, or refactoring documentation.
+
+1. Identify the reader task.
+   State what the next AI agent or human should be able to do after reading the
+   document.
+2. Find atomic units.
+   Mark the independently useful concepts, decisions, workflows, rules,
+   interfaces, examples, risks, and open questions.
+3. Assess cohesion.
+   Keep units together when they share the same reader task, source context,
+   ownership, lifecycle, and change cadence.
+4. Assess coupling.
+   Split units when they can change independently, have different owners,
+   target different reader tasks, or require different levels of detail.
+5. Choose the document shape.
+   Use one focused document, multiple sibling documents, or a short index that
+   links focused documents.
+6. Preserve local context.
+   Each split document must explain its own intent, key assumptions, and links
+   to related documents.
+7. Validate navigability.
+   A reader should know where to start, what to read next, and which document is
+   authoritative for each decision or rule.
+
+Prefer splitting when:
+
+- A reader must skim around unrelated sections to complete one task.
+- Different sections have different owners or change at different speeds.
+- Stable decisions are mixed with exploratory proposals.
+- Reference material is mixed with workflow or implementation guidance.
+- One section needs frequent updates while the rest should remain stable.
+
+Prefer keeping content together when:
+
+- The parts are only useful together.
+- Splitting would force readers to jump between files to understand one idea.
+- The document is short, cohesive, and easy to update.
+- The same owner, source context, and lifecycle apply to all sections.
 
 ## Optional Labels
 
@@ -177,5 +227,6 @@ A chunk follows this style when:
 - It uses precise, stable terms.
 - It distinguishes known facts from assumptions and decisions.
 - It avoids unnecessary structure.
+- It is small and focused, or explicitly split into linked documents.
 - It preserves enough context for future agents to continue the work.
 - It is easy to update without rewriting unrelated content.

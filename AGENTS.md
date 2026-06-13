@@ -45,6 +45,9 @@ When working in this repository, the agent must assume these roles:
 - Use the canonical style for every documentation chunk, regardless of size,
   type, or location. It defines shared style and tone; it does not prescribe a
   fixed document set.
+- Prefer small, focused documents. Size each document around a coherent reader
+  task, and split only when that improves clarity, retrieval, ownership, or
+  evolvability.
 - Express technical details using the optional labels and technical-detail
   guidance in the canonical style guide.
 
