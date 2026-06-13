@@ -41,13 +41,16 @@ When working in this repository, the agent must assume these roles:
 ## Documentation Style
 
 - Default style:
-  `documentation-style-variants/online-invoicing-service/01-ai-agent-contract.md`.
+  `start-here/ai-agent-documentation-style-guide.md`.
 - Fallback style:
-  `documentation-style-variants/online-invoicing-service/03-engineering-spec.md`.
+  `start-here/engineering-detail-fallback-style-guide.md`.
+- Use the default style for all repository documentation: product,
+  architecture, module, API, workflow, UX, QA, runbook, release, planning, and
+  decision docs.
 - Use the fallback only when a document needs implementation contracts, state,
-  invariants, failure handling, or reliability detail.
-- When the two styles overlap, keep the AI-agent contract structure and add only
-  the engineering detail needed for implementation readiness.
+  invariants, failure handling, reliability detail, or evolvability constraints.
+- When the two styles overlap, keep the default structure and add only the
+  engineering detail needed for implementation readiness.
 
 ## Working Guidelines
 
