@@ -256,6 +256,45 @@ express_fee        := base_zone_fee × express_multiplier
 express_multiplier := outlet_override ?? global_default (1.5)
 ```
 
+**Blocked/allowed set** — a condition that gates multiple independent operations.
+Use when a flag or status suspends a list of actions rather than routing a
+single value to a single outcome.
+
+```
+if closing_overdue AND NOT super_admin_override:
+  blocked:  cash_refund_payouts
+  blocked:  outside_guardrail_price_changes
+  blocked:  manual_ledger_adjustments
+  allowed:  order_placement, picking, dispatch, cod_collection
+```
+
+**Conditional requirements** — output is a field or action obligation (required /
+optional / prohibited), not a state or value. Use for evidence rules, validation
+gates, and audit obligations.
+
+```
+GPS required when:
+  action IN [arrival, failed_delivery, doorstep_defect]
+  AND device_can_provide_gps
+
+photo required when:
+  damaged_returned_cylinder AND physical_cylinder_present
+  OR defective_outgoing_cylinder
+
+photo NOT required when:
+  missing_cylinder  // time + location facts + reason note instead
+```
+
+**Time-sequence / expiry** — ordered time offsets as triggers. Use for expiry
+windows, SLA escalation, rate-limit resets, and retention deadlines.
+
+```
+t = 0    → clock starts; reservation active
+t = 30m  → warning sent; reservation still active
+t = 60m  → if no reference submitted  → CANCELLED, reservation released
+           if reference submitted      → clock stops permanently
+```
+
 ## ID Guidance
 
 IDs are useful when content needs traceability. Avoid IDs for disposable notes or
