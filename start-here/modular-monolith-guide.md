@@ -44,6 +44,34 @@ context or a distinct business capability. A well-scoped module:
 - Exposes commands and queries for the things it controls.
 - Does not depend on the internals of other modules.
 
+### Finding Boundaries
+
+Identify module boundaries by asking:
+
+- **What business capability does this serve?** Group behavior whose
+  terminology, rules, and lifecycle are coherent and self-consistent — a
+  bounded context is a natural candidate.
+- **Who owns it?** A module should map to a clear ownership unit. If two teams
+  both need to change the same module frequently, the boundary is wrong.
+- **What is its change rate?** Stable policy and core domain rules change
+  slowly; operational workflows and integrations change faster. When stable and
+  volatile code must change together, consider splitting.
+
+Signals the boundary is correct:
+- A team can own and evolve it without coordinating writes to other modules.
+- Business terminology and rules are internally consistent.
+- Lifecycle state transitions belong entirely within the module.
+
+Signals the boundary is wrong:
+- Two modules claim the same record or state.
+- A command must mutate records in more than one module directly.
+- A lifecycle's states are spread across modules.
+- Every change requires a parallel change to another module.
+
+When uncertain, prefer fewer, larger modules and split only when a clear seam
+emerges: a different owner, a different change rate, or a lifecycle that is
+fully self-contained.
+
 ### What a Module Owns
 
 | Owned by this module                                | Not owned                                |
@@ -59,6 +87,25 @@ context or a distinct business capability. A well-scoped module:
 Maintain a canonical module catalog or boundary map as the authoritative
 ownership index. When a boundary or ownership decision changes, update the
 catalog first, then every affected module specification.
+
+### Dependency Direction
+
+Module dependencies must be acyclic. If module A depends on module B, module B
+must not depend on module A.
+
+Direction flows from orchestration toward core domain:
+
+| Layer | Responsibility | Depends On |
+|---|---|---|
+| **External adapters** | Integrate third-party systems | Domain modules |
+| **Orchestration** | Coordinate multi-module workflows | Core + supporting domain |
+| **Supporting domain** | Cross-cutting capabilities (auth, audit, notifications) | Core domain |
+| **Core domain** | Fundamental records, rules, lifecycles | Nothing above |
+
+A module must never import another module's internal implementation. All access
+goes through published contracts. A dependency cycle signals a misplaced
+boundary or a missing abstraction — resolve it by extracting the shared concept
+into its own module or reversing the direction with an event.
 
 ## Cross-Module Interaction
 
@@ -197,18 +244,20 @@ A complete module specification covers:
 
 1. Module identity and owner.
 2. Boundary — what the module owns and does not own.
-3. Records and data model.
-4. Business rules and policies.
-5. Lifecycle state machine.
-6. Commands — inputs the module accepts.
-7. Queries — read access it exposes.
-8. Events — committed facts it emits.
-9. REST endpoints — HTTP routes, methods, request/response shapes, auth
-   requirements, and error responses exposed to external clients.
-10. Projections it maintains from other modules.
-11. Cross-module contracts.
-12. Failure handling.
-13. Open questions.
+3. Dependencies — other modules this module depends on: events subscribed,
+   commands invoked, queries made, and projections maintained.
+4. Records and data model.
+5. Business rules and policies.
+6. Lifecycle state machine.
+7. Commands — inputs the module accepts.
+8. Queries — read access it exposes.
+9. Events — committed facts it emits.
+10. REST endpoints — HTTP routes, methods, request/response shapes, auth
+    requirements, and error responses exposed to external clients.
+11. Projections it maintains from other modules.
+12. Cross-module contracts.
+13. Failure handling.
+14. Open questions.
 
 Each specification must be self-contained. Do not rely on "see catalog" or
 "handled elsewhere" as the only explanation of ownership, lifecycle, or
