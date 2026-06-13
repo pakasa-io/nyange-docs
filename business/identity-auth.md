@@ -438,10 +438,9 @@ outlet scope or business authority.
 
 ## Authorization Edge Cases
 
-**E-01**: No launch actor can submit, verify, reuse, or administer a
-mobile-money payment reference. Mobile-money payments are deferred from launch
-scope and require explicit scope re-entry before any related permission can be
-granted.
+**E-01**: No launch actor can submit, verify, reuse, or administer an external
+payment reference. External prepayment rails are outside launch scope and
+require explicit scope re-entry before any related permission can be granted.
 
 **E-02**: A Delivery Agent can see the customer's phone number only while an
 order is assigned to them and active. They lose this access when the delivery

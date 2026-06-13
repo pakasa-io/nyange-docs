@@ -20,8 +20,6 @@ tests.
 - Online delivery orders are cash-on-delivery at launch and are collected by
   the Delivery Agent at the doorstep.
 - Walk-in POS sales are immediate cash sales at the outlet.
-- Mobile-money payments are deferred from the mid-stage MVP; see
-  [../out-of-scope/2026-06-13-mobile-money-payments.md](../out-of-scope/2026-06-13-mobile-money-payments.md).
 - Delivery modes are express and batched.
 - Walk-in POS sales have no delivery leg.
 
@@ -72,9 +70,8 @@ tests.
   [delivery.md](delivery.md) owns the field leg from `PENDING` through
   `RETURN_RECORDED`. [inventory.md](inventory.md) owns the intake leg from
   `INTAKE_PENDING` through `COMPLETED` or `FAILED`.
-- Mobile-money payment workflows, including post-payment outlet reassignment
-  settlement, are deferred in
-  [../out-of-scope/2026-06-13-mobile-money-payments.md](../out-of-scope/2026-06-13-mobile-money-payments.md).
+- Deferred customer prepayment workflows, including post-payment outlet
+  reassignment settlement, are tracked outside the launch business documents.
 - `§7.15 Cart Behaviour` is in [order.md](order.md). [catalog.md](catalog.md)
   references it for catalog-change and price-change effects on open carts.
 - The complete access matrix is in [identity-auth.md](identity-auth.md). Each

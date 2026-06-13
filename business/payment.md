@@ -1,8 +1,7 @@
 # Payment
 
 **Intent**: Define launch payment behavior for cash-on-delivery, walk-in cash
-sales, zero-collection facts, and payment boundaries after mobile-money
-deferral.
+sales, zero-collection facts, and payment boundaries.
 
 **Reader task**: Use this document to decide whether a cash collection or
 zero-collection fact can satisfy an order payment requirement, and which
@@ -15,9 +14,7 @@ exceptions hand off to delivery, refund, or finance.
 [delivery.md](delivery.md) for doorstep cash collection and PIN commit;
 [refund.md](refund.md) for cash refund liabilities;
 [finance.md](finance.md) for daily closing and cash ledger posting;
-[identity-auth.md](identity-auth.md) for the full access matrix;
-[../out-of-scope/2026-06-13-mobile-money-payments.md](../out-of-scope/2026-06-13-mobile-money-payments.md)
-for deferred mobile-money payment scope.
+[identity-auth.md](identity-auth.md) for the full access matrix.
 
 ## Invariants
 
@@ -25,11 +22,11 @@ for deferred mobile-money payment scope.
 
 - Online delivery orders are cash-on-delivery at launch.
 - Walk-in POS sales are immediate cash sales at launch.
-- Mobile-money, wallet, card, bank transfer, provider reference reuse, and
-  merchant-account settlement are not launch payment methods.
-- A provider reference cannot satisfy an order payment requirement in launch
-  scope.
-- Reintroducing mobile-money payments requires an explicit scope decision and
+- Electronic prepayment, wallet, card, bank transfer, provider reference reuse,
+  and merchant-account settlement are not launch payment methods.
+- An external provider reference cannot satisfy an order payment requirement in
+  launch scope.
+- Adding any external prepayment rail requires an explicit scope decision and
   coordinated updates to order, payment, refund, finance, delivery, and
   authorization rules.
 
@@ -41,7 +38,7 @@ for deferred mobile-money payment scope.
 - Delivery owns agent field collection and the PIN-confirmation commit point.
 - Finance owns cash handover, daily closing, ledger posting, and receipts.
 - Refund owns customer refund liabilities and payout lifecycle.
-- Payment does not own mobile-money reference submission, provider
+- Payment does not own external payment reference submission, provider
   verification, merchant-account configuration, provider refunds, customer
   wallets, or stored external payment credentials at launch.
 
@@ -67,7 +64,7 @@ PENDING_COLLECTION
 
 - Online delivery orders use COD cash.
 - Walk-in POS sales use immediate cash collected at sale completion.
-- No mobile-money instruction, merchant-account selection, transaction
+- No external payment instruction, merchant-account selection, transaction
   reference field, provider statement check, or late-reference reuse exists in
   launch customer, staff, or admin workflows.
 - Outlet payment-method support is not an allocation criterion at launch.
@@ -124,7 +121,7 @@ Trimmed access matrix rows relevant to payment. Full matrix:
 
 ## Authorization Edge Cases
 
-**E-01**: Any launch attempt to submit, verify, reuse, or administer a
-mobile-money payment reference is denied because mobile-money payments are out
+**E-01**: Any launch attempt to submit, verify, reuse, or administer an
+external payment reference is denied because external prepayment rails are out
 of scope. Runtime authorization treats those capabilities as absent, not as
 hidden fallback permissions.

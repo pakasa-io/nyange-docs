@@ -18,9 +18,7 @@ Reassignment, §7.15 Cart Behaviour, F-01, F-02
 [inventory.md](inventory.md) for reservation lifecycle;
 [refund.md](refund.md) for refund liabilities;
 [finance.md](finance.md) for forced closure;
-[identity-auth.md](identity-auth.md) for the full access matrix;
-[../out-of-scope/2026-06-13-mobile-money-payments.md](../out-of-scope/2026-06-13-mobile-money-payments.md)
-for deferred mobile-money payment scope.
+[identity-auth.md](identity-auth.md) for the full access matrix.
 
 ## Invariants
 

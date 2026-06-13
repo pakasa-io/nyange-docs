@@ -13,9 +13,7 @@ Reporting, BI-14, F-05
 [order.md](order.md) for reassignment and pending-closure behavior;
 [payment.md](payment.md) for cash payment facts;
 [refund.md](refund.md) for refund liabilities;
-[identity-auth.md](identity-auth.md) for the full access matrix;
-[../out-of-scope/2026-06-13-mobile-money-payments.md](../out-of-scope/2026-06-13-mobile-money-payments.md)
-for deferred mobile-money payment and settlement scope.
+[identity-auth.md](identity-auth.md) for the full access matrix.
 
 ## Invariants
 
@@ -38,14 +36,14 @@ for deferred mobile-money payment and settlement scope.
   adjustment/void record.
 - Post-closure activity must not alter the original closure or receipt.
 
-**BI-13 — Mobile-money settlement is not a launch workflow.**
+**BI-13 — Prepayment settlement is not a launch workflow.**
 
 - Launch online orders are COD cash, collected by the Delivery Agent for the
   fulfilling outlet.
-- No launch workflow records one outlet as the mobile-money payment receiver and
+- No launch workflow records one outlet as the external prepayment receiver and
   another outlet as the fulfillment outlet.
-- Post-payment outlet reassignment settlement for mobile-money-paid orders is
-  deferred with mobile-money payments.
+- Post-payment outlet reassignment settlement for externally prepaid orders is
+  outside launch scope.
 - Future prepaid or cross-outlet payment workflows require explicit settlement
   rules before they can enter scope.
 
@@ -146,11 +144,10 @@ if closing_overdue AND NOT super_admin_urgency_override:
 - Refund liabilities carry forward until paid, voided, or written off.
 - Open refund liabilities do not block daily closing.
 
-### Deferred Payment Settlement Reporting
+### Deferred Prepayment Settlement Reporting
 
-- Mobile-money payment receipts, merchant-account attribution, and
-  post-payment outlet reassignment settlement are not launch reporting
-  requirements.
+- External payment receipts, merchant-account attribution, and post-payment
+  outlet reassignment settlement are not launch reporting requirements.
 - The fulfilling outlet reports COD collections, delivery work, inventory or
   estimated COGS where configured, refund liabilities it owns, and cash
   reconciliation facts.
@@ -227,9 +224,8 @@ Expense records capture:
 
 ## Internal Settlements
 
-Internal settlement for mobile-money-paid post-payment reassignment is deferred
-from launch scope. See
-[../out-of-scope/2026-06-13-mobile-money-payments.md](../out-of-scope/2026-06-13-mobile-money-payments.md).
+Internal settlement for externally prepaid post-payment reassignment is outside
+launch scope.
 
 No ordinary launch workflow creates a cross-outlet customer-payment settlement
 because online delivery payment is COD cash collected for the fulfilling
