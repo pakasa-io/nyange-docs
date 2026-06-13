@@ -44,13 +44,13 @@ When working in this repository, the agent must assume these roles:
   `start-here/ai-agent-documentation-style-guide.md`.
 - Fallback style:
   `start-here/engineering-detail-fallback-style-guide.md`.
-- Use the default style for all repository documentation: product,
-  architecture, module, API, workflow, UX, QA, runbook, release, planning, and
-  decision docs.
-- Use the fallback only when a document needs implementation contracts, state,
+- Use the default style for every documentation chunk, regardless of size, type,
+  or location. It defines shared style and tone; it does not prescribe a fixed
+  document set.
+- Use the fallback only when a chunk needs implementation contracts, state,
   invariants, failure handling, reliability detail, or evolvability constraints.
-- When the two styles overlap, keep the default structure and add only the
-  engineering detail needed for implementation readiness.
+- When the two styles overlap, keep the default voice and add only the
+  engineering detail needed for clarity.
 
 ## Working Guidelines
 

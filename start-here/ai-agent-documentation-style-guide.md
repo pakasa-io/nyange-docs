@@ -2,229 +2,121 @@
 
 ## Purpose
 
-Use this as the default documentation style for this repository.
+Use this as the default style and tone for every documentation chunk in this
+repository.
 
-The style makes any software project document easy for AI agents to parse,
-compare, update, and use as implementation context while remaining readable for
-humans.
+This guide does not prescribe a document inventory or require fixed templates.
+It defines how documentation should read, how it should be structured, and how
+it should preserve meaning across many document kinds.
 
-## Applies To
+## Reader Model
 
-Use this guide for:
+- Primary reader: AI agents.
+- Secondary readers: humans reviewing, editing, or implementing from the docs.
 
-- Repository overviews and onboarding docs.
-- Product requirements and scope docs.
-- Business domain and workflow docs.
-- Architecture and ADR docs.
-- Module, API, data, and integration docs.
-- Mobile UX, screen flow, and interaction docs.
-- QA, test strategy, and acceptance docs.
-- Runbooks, operations, release, and support docs.
-- Planning, decision, risk, and out-of-scope docs.
-
-## Audience
-
-- Primary: AI agents.
-- Secondary: engineers, product owners, designers, QA, operators, and reviewers.
+Assume an AI agent may read one chunk in isolation. Each chunk should provide
+enough local context to be useful without forcing the reader to infer intent.
 
 ## Tone
 
 - Precise.
-- Bounded.
+- Concise.
 - Direct.
-- Implementation-ready.
+- Neutral.
 - Source-grounded.
+- Implementation-aware.
 
-Avoid narrative filler, persuasion, marketing language, and vague qualifiers.
+Avoid narrative filler, persuasion, marketing language, hidden assumptions, and
+large prose blocks.
 
-## Format Rules
+## Core Rule
 
+Write each chunk so an AI agent can answer:
+
+- What is this about?
+- What is known?
+- What is decided?
+- What is required or constrained?
+- What remains unresolved?
+- How should this be used by the next agent or contributor?
+
+## Universal Style Rules
+
+- State the chunk's intent near the top.
 - Use stable Markdown headings.
-- State the document purpose in the first two sections.
-- Prefer short sections over long prose.
-- Use IDs for facts, requirements, decisions, risks, open questions, workflows,
-  interfaces, and rules when they may be referenced later.
+- Include only sections that add clarity.
+- Prefer short paragraphs, bullets, and tables over long prose.
+- Use consistent terms for the same concept.
 - Separate facts, assumptions, decisions, requirements, risks, and open
-  questions.
-- Prefer tables for inventories, ownership, state, interfaces, and comparison.
-- Prefer bullets for constraints, requirements, rules, and acceptance criteria.
-- Mark examples clearly as examples.
-- Keep links relative for repository-local references.
+  questions when they appear.
+- Use IDs only when an item is likely to be referenced, traced, tested, or
+  updated later.
+- Keep examples clearly marked as examples.
+- Use relative links for repository-local references.
+- Do not add boilerplate sections just to satisfy a template.
 
-## Default Document Shape
+## Chunk Shape
 
-Use this order unless the document type needs a more specific shape:
+Most chunks should follow this lightweight shape:
 
-1. Title
-2. Document Intent
-3. Metadata
-4. Context
-5. Scope
-6. Source-Grounded Facts
-7. Requirements or Expected Behavior
-8. Workflows, Interfaces, or Structure
-9. Decisions
-10. Risks
-11. Validation or Acceptance Criteria
-12. Open Questions
+1. Heading
+2. Intent
+3. Context needed to understand the chunk
+4. Main content
+5. Decisions, constraints, risks, or open questions when present
+6. Links or source references when useful
 
-## Metadata Fields
+Short chunks may use fewer sections. Dense or high-impact chunks may use more.
 
-Use only fields that matter:
+## Optional Labels
 
-- Status:
-- Owner:
-- Audience:
-- Product stage:
-- Related docs:
-- Source inputs:
-- Last reviewed:
+Use these labels when they help clarify the content:
 
-## Common Section Guidance
+- `Facts`: Source-grounded statements treated as true.
+- `Assumptions`: Statements used for progress but not yet proven.
+- `Decisions`: Chosen direction or settled interpretation.
+- `Requirements`: Observable behavior or implementation obligations.
+- `Constraints`: Limits, boundaries, or rules that narrow valid solutions.
+- `Workflows`: Ordered actions, actors, triggers, and outcomes.
+- `Interfaces`: Inputs, outputs, events, schemas, or contracts.
+- `Risks`: What can go wrong, why it matters, and what reduces the risk.
+- `Acceptance Criteria`: Checks that prove the work or document is satisfied.
+- `Open Questions`: Unresolved items that materially affect future work.
 
-### Context
+Use only the labels that match the chunk.
 
-Explain the problem, system area, workflow, decision, or operational concern the
-document covers.
+## ID Guidance
 
-### Scope
-
-Separate in-scope and out-of-scope items. Keep mid-stage MVP scope limited to
-core user value, correctness, reliability, evolvability, operational support,
-and implementation blockers.
-
-### Source-Grounded Facts
-
-Facts must come from source material or explicit user input.
-
-Recommended ID prefix: `F-`.
-
-### Requirements or Expected Behavior
-
-Requirements must describe observable behavior, implementation obligations, or
-acceptance conditions.
+IDs are useful when content needs traceability. Avoid IDs for disposable notes or
+single-use prose.
 
 Recommended prefixes:
 
-- `FR-` for functional requirements.
-- `NFR-` for non-functional requirements.
-- `CR-` for correctness requirements.
-- `RR-` for reliability requirements.
-- `ER-` for evolvability requirements.
-- `UX-` for user experience requirements.
+- `F-` for facts.
+- `A-` for assumptions.
+- `D-` for decisions.
+- `REQ-` for requirements.
+- `C-` for constraints.
+- `R-` for risks.
+- `AC-` for acceptance criteria.
+- `OQ-` for open questions.
 
-### Workflows, Interfaces, or Structure
+## Scope Guidance
 
-Choose the representation that fits the document:
+Treat scope as a constraint, not a required section.
 
-- Workflows: ordered steps, actors, triggers, and outcomes.
-- Interfaces: inputs, outputs, events, schemas, operations, and contracts.
-- Structure: modules, files, ownership, dependencies, or information hierarchy.
-
-### Decisions
-
-Record decisions separately from facts and requirements.
-
-Recommended ID prefix: `D-`.
-
-### Risks
-
-State what can go wrong, why it matters, and what reduces the risk.
-
-Recommended ID prefix: `R-`.
-
-### Validation or Acceptance Criteria
-
-Define how a reader or agent can verify the document has been implemented,
-followed, or satisfied.
-
-Recommended ID prefix: `AC-`.
-
-### Open Questions
-
-Use open questions only for unresolved items that block or materially shape
-future work.
-
-Recommended ID prefix: `OQ-`.
-
-## Document Profiles
-
-Use these profiles as starting points.
-
-### Product or Requirements Doc
-
-- Context
-- Users or actors
-- Scope
-- Requirements
-- User workflows
-- Acceptance criteria
-- Out of scope
-- Open questions
-
-### Architecture or ADR Doc
-
-- Context
-- Decision
-- Options considered
-- Consequences
-- Ownership
-- Risks
-- Validation
-- Follow-up
-
-### Module or API Doc
-
-- Context
-- Boundary
-- Ownership
-- Capabilities
-- Interfaces
-- Data contracts
-- Requirements
-- Risks
-- Open questions
-
-### Workflow or UX Doc
-
-- Context
-- Actors
-- Entry points
-- Flow steps
-- States and error states
-- UX requirements
-- Acceptance criteria
-- Open questions
-
-### Operations or Runbook Doc
-
-- Context
-- Ownership
-- Triggers
-- Procedure
-- Expected outcomes
-- Failure modes
-- Rollback or recovery
-- Verification
-
-### QA or Test Doc
-
-- Context
-- Scope
-- Test objectives
-- Test matrix
-- Acceptance criteria
-- Known risks
-- Coverage gaps
+When scope appears, keep mid-stage MVP scope limited to core user value,
+correctness, reliability, evolvability, operational support, and implementation
+blockers. Move ideas that exceed that bar to `out-of-scope/` with a revisit
+trigger.
 
 ## Quality Bar
 
-A document follows this style when:
+A chunk follows this style when:
 
-- An AI agent can identify the document purpose within the first two sections.
-- Scope boundaries are explicit.
-- Requirements or expected behavior are testable.
-- Terms and owners are stable.
-- Decisions are not mixed with facts or assumptions.
-- Open questions are actionable.
-- Future changes can reference stable headings or IDs.
+- Its purpose is clear without outside explanation.
+- It uses precise, stable terms.
+- It distinguishes known facts from assumptions and decisions.
+- It avoids unnecessary structure.
+- It preserves enough context for future agents to continue the work.
+- It is easy to update without rewriting unrelated content.

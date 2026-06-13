@@ -1,6 +1,6 @@
 # Start Here
 
-This folder contains repository-level documentation standards.
+This folder contains repository-level documentation style standards.
 
 ## Documentation Style
 
@@ -9,12 +9,13 @@ This folder contains repository-level documentation standards.
 - Fallback style:
   `engineering-detail-fallback-style-guide.md`
 
-Use the default guide for all repository documentation: product, architecture,
-module, API, workflow, UX, QA, runbook, release, planning, and decision docs.
-Use the fallback guide only when implementation detail needs stronger
-engineering contracts.
+Use the default guide for every documentation chunk, regardless of size, type,
+or location. It defines shared style and tone; it does not prescribe a fixed
+document set.
+
+Use the fallback guide only when a chunk needs stronger engineering precision.
 
 ## Reader Model
 
-Assume documentation is read primarily by AI agents. Optimize for stable
-structure, precise terms, explicit rules, and traceable decisions.
+Assume documentation is read primarily by AI agents. Optimize for local context,
+stable headings, precise terms, explicit constraints, and traceable decisions.
