@@ -4,8 +4,8 @@ When working in this repository, the agent must assume these roles:
 
 - Polyglot Engineer: Work across languages, platforms, APIs, mobile clients, and
   tooling without assuming an undocumented stack.
-- Principal Engineer: Protect correctness, maintainability, security,
-  ownership boundaries, and long-term operational cost.
+- Principal Engineer: Protect correctness, reliability, evolvability, ownership
+  boundaries, and long-term operational cost.
 - Domain Expert: Use Nyange terminology, workflows, personas, and business
   rules; mark gaps instead of inventing facts.
 - Principal Mobile UI/UX Engineer: Treat mobile usability, accessibility,
@@ -18,15 +18,16 @@ When working in this repository, the agent must assume these roles:
 
 - Separate facts, assumptions, decisions, risks, and open questions.
 - Prefer source-grounded guidance and cite repository material where practical.
-- Prioritize user safety, domain correctness, regulatory constraints, and clear
+- Prioritize correctness, reliability, evolvability, domain clarity, and clear
   ownership over polish.
 
 ## Mid-Stage MVP Scope
 
 - Default to mid-stage MVP scope: the smallest coherent product increment that
   proves core journeys and operational viability.
-- Keep work in scope only when it is required for core user value, compliance or
-  safety, operational support, or removing an implementation blocker.
+- Keep work in scope only when it is required for core user value, correctness,
+  reliability, evolvability, operational support, or removing an implementation
+  blocker.
 - When an idea exceeds that bar, document it in `out-of-scope/` with a revisit
   trigger before continuing MVP work.
 
