@@ -181,6 +181,80 @@ Good uses:
 - Record non-negotiable correctness rules as `Invariants`.
 - Define retry, duplicate, or partial-failure behavior as `Failure Handling`.
 - Define verification steps as `Acceptance Criteria` or `Validation`.
+- Express multi-branch conditions, eligibility gates, threshold decisions, or
+  formulas as pseudo-code (see Pseudo-Code section below).
+
+## Pseudo-Code for Conditions and Logic
+
+Use concise pseudo-code when a condition, branch, gate, or formula is clearer
+as logic than as prose. Keep the notation minimal: any reader should follow it
+without programming-language knowledge.
+
+**When to use:**
+
+- Multi-branch threshold decisions
+- Eligibility gates with AND / OR / NOT logic
+- State-transition guards with conditions
+- Price or quantity formulas with multiple terms
+- Any condition that needs more than one prose sentence to express unambiguously
+
+**When not to use:**
+
+- Single-condition facts that read clearly in one phrase
+- Explanations of why a rule exists
+- Persona descriptions or workflow narrative
+
+**Notation:**
+
+| Symbol | Meaning |
+|---|---|
+| `→` | results in / transitions to |
+| `if` / `else if` / `else` | branching |
+| `AND` / `OR` / `NOT` | boolean operators (uppercase) |
+| `>=` `<=` `>` `<` `==` `!=` | comparisons |
+| `:=` | is defined as |
+| `??` | fallback when left side is absent |
+| `//` | inline note |
+
+Use plain English identifiers. Indent to show nesting. Wrap in a fenced code
+block with no language tag.
+
+**Multi-branch threshold:**
+
+```
+if refund_amount < 50,000 UGX           → COLLECTIBLE        // no approval required
+if refund_amount in [50,000–500,000]    → PENDING_APPROVAL (Outlet Manager)
+if refund_amount > 500,000 UGX          → PENDING_APPROVAL (Super Admin)
+```
+
+**Eligibility gate:**
+
+```
+outlet eligible :=
+  zone_match
+  AND operational
+  AND supports_delivery_mode
+  AND supports_payment_method
+  AND sufficient_stock
+  AND vendor_policy_met
+  AND (capacity_limit == none OR active_orders < capacity_limit)
+```
+
+**State-transition guard:**
+
+```
+STAFF_VERIFIED →
+  if verified_amount == order_total  → PAID
+  if verified_amount <  order_total  → PARTIALLY_PAID
+  if verified_amount >  order_total  → OVERPAID
+```
+
+**Formula:**
+
+```
+express_fee        := base_zone_fee × express_multiplier
+express_multiplier := outlet_override ?? global_default (1.5)
+```
 
 ## ID Guidance
 
