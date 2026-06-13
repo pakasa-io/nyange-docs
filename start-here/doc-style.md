@@ -214,15 +214,23 @@ without programming-language knowledge.
 
 **Notation:**
 
-| Symbol | Meaning |
-|---|---|
-| `→` | results in / transitions to |
-| `if` / `else if` / `else` | branching |
-| `AND` / `OR` / `NOT` | boolean operators (uppercase) |
-| `>=` `<=` `>` `<` `==` `!=` | comparisons |
-| `:=` | is defined as |
-| `??` | fallback when left side is absent |
-| `//` | inline note |
+| Symbol | Meaning | Pattern |
+|---|---|---|
+| `→` | results in / transitions to | all |
+| `if` / `else if` / `else` | branching | all |
+| `AND` / `OR` / `NOT` | boolean operators (uppercase) | all |
+| `>=` `<=` `>` `<` `==` `!=` | comparisons | all |
+| `:=` | is defined as | all |
+| `//` | inline note | all |
+| `??` | fallback when left side is absent | formula |
+| `×` | multiplication | formula |
+| `in [a–b]` | range / interval | threshold |
+| `none` | absent / not configured | eligibility gate, formula |
+| `IN [...]` / `NOT IN [...]` | set membership / exclusion | conditional requirements |
+| `blocked:` / `allowed:` | operations gated by a condition | blocked/allowed set |
+| `ASC` / `DESC` | sort direction | priority ranking |
+| `count(x, window=T)` | rolling aggregate within a time window | windowed threshold |
+| `t = X` | time offset from a reference point | time-sequence |
 
 Use plain English identifiers. Indent to show nesting. Wrap in a fenced code
 block with no language tag.
