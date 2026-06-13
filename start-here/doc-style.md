@@ -207,8 +207,10 @@ without programming-language knowledge.
 **When not to use:**
 
 - Single-condition facts that read clearly in one phrase
-- Explanations of why a rule exists
-- Persona descriptions or workflow narrative
+- Explanations of why a rule exists or business rationale for a decision
+- Persona descriptions or sequential workflow steps with no branching
+- Simple item lists or required-field enumerations (use a table or bullets instead)
+- Information already captured cleanly in a table (permission matrix, fee schedule, field list)
 
 **Notation:**
 
