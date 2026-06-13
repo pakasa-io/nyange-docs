@@ -84,24 +84,29 @@ Use this algorithm when creating, expanding, or refactoring documentation.
 1. Identify the reader task.
    State what the next AI agent or human should be able to do after reading the
    document.
-2. Find atomic units.
-   Mark the independently useful concepts, decisions, workflows, rules,
-   interfaces, examples, risks, and open questions.
-3. Assess cohesion.
-   Keep units together when they share the same reader task, source context,
-   ownership, lifecycle, and change cadence.
-4. Assess coupling.
-   Split units when they can change independently, have different owners,
+2. List atomic units.
+   Identify each independently useful concept, decision, workflow, rule,
+   interface, example, risk, or open question.
+3. Assess cohesion and coupling.
+   Keep units together when they share the same reader task, owner, lifecycle,
+   and change cadence.
+   Separate units when they can change independently, have different owners,
    target different reader tasks, or require different levels of detail.
-5. Choose the document shape.
-   Use one focused document, multiple sibling documents, or a short index that
-   links focused documents.
-6. Preserve local context.
-   Each split document must explain its own intent, key assumptions, and links
-   to related documents.
-7. Validate navigability.
-   A reader should know where to start, what to read next, and which document is
-   authoritative for each decision or rule.
+4. Choose the document shape.
+   - One document: all units serve one task and belong to one owner.
+   - Sibling documents: units are independent but peers — link them to each
+     other.
+   - Index + focused documents: many siblings exist and a reader needs
+     orientation first.
+5. Verify navigability.
+   A reader should know where to start, what to read next, and which document
+   is authoritative for each decision or rule. If not, return to step 4.
+
+After splitting, each new document must:
+
+- State its own intent near the top.
+- Include key assumptions the reader needs.
+- Link to related documents.
 
 Prefer splitting when:
 
