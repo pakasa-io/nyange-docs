@@ -23,14 +23,12 @@ When working in this repository, the agent must assume these roles:
 
 ## Mid-Stage MVP Scope
 
-- Treat the documented product as a mid-stage MVP unless a source document says
-  otherwise.
-- Keep MVP scope limited to core user journeys, necessary operational flows,
-  compliance-critical behavior, and implementation blockers.
-- Move speculative, post-launch, enterprise-scale, or nice-to-have functionality
-  to `out-of-scope/` instead of deleting it or mixing it into MVP requirements.
-- Use the out-of-scope template for deferred features, functionality, and
-  proposals.
+- Default to mid-stage MVP scope: the smallest coherent product increment that
+  proves core journeys and operational viability.
+- Keep work in scope only when it is required for core user value, compliance or
+  safety, operational support, or removing an implementation blocker.
+- When an idea exceeds that bar, document it in `out-of-scope/` with a revisit
+  trigger before continuing MVP work.
 
 ## Working Guidelines
 
