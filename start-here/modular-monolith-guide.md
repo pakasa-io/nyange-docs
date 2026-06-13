@@ -46,12 +46,12 @@ context or a distinct business capability. A well-scoped module:
 
 ### What a Module Owns
 
-| Owned by this module | Not owned |
-|---|---|
-| Its canonical records and fields | Records owned by another module |
-| Its business rules and policies | Business rules of another domain |
-| Its lifecycle state transitions | Canonical state of another lifecycle |
-| The events it emits | Events emitted by another module |
+| Owned by this module                                | Not owned                                |
+|-----------------------------------------------------|------------------------------------------|
+| Its canonical records and fields                    | Records owned by another module          |
+| Its business rules and policies                     | Business rules of another domain         |
+| Its lifecycle state transitions                     | Canonical state of another lifecycle     |
+| The events it emits                                 | Events emitted by another module         |
 | Validation, authorization, and mutation of its data | Direct writes to another module's tables |
 
 ### Module Catalog
@@ -64,13 +64,13 @@ catalog first, then every affected module specification.
 
 ### Interaction Patterns
 
-| Pattern | Use When |
-|---|---|
-| **Command** | You need another module to decide or mutate; expects a response |
-| **Query** | You need read-only data from another module |
-| **Domain Event** | You are publishing a committed fact; consumers decide what to do |
-| **Projection / Read Model** | You need a local read-only copy of another module's data |
-| **Coordinator** | You are orchestrating a multi-module workflow without owning participant records |
+| Pattern                     | Use When                                                                         |
+|-----------------------------|----------------------------------------------------------------------------------|
+| **Command**                 | You need another module to decide or mutate; expects a response                  |
+| **Query**                   | You need read-only data from another module                                      |
+| **Domain Event**            | You are publishing a committed fact; consumers decide what to do                 |
+| **Projection / Read Model** | You need a local read-only copy of another module's data                         |
+| **Coordinator**             | You are orchestrating a multi-module workflow without owning participant records |
 
 ### Events vs Commands
 
@@ -112,16 +112,16 @@ when it is frozen, and what happens when the source changes.
 
 Every cross-module interaction requires a complete contract:
 
-| Field | Required |
-|---|---|
-| Contract Type | yes |
-| Provider / Consumer | yes |
-| Trigger | yes |
-| Payload / Command / Event | yes |
-| Consistency Model | yes |
-| Idempotency / Retry | yes |
-| Failure Handling | yes |
-| Source Citation | yes |
+| Field                     | Required |
+|---------------------------|----------|
+| Contract Type             | yes      |
+| Provider / Consumer       | yes      |
+| Trigger                   | yes      |
+| Payload / Command / Event | yes      |
+| Consistency Model         | yes      |
+| Idempotency / Retry       | yes      |
+| Failure Handling          | yes      |
+| Source Citation           | yes      |
 
 Avoid vague verbs ("uses," "syncs," "notifies," "consumes facts") without a
 backed contract.
@@ -145,11 +145,11 @@ backed contract.
 
 ### Canonical vs Derived
 
-| Kind | Characteristics |
-|---|---|
-| **Canonical** | Mutable; owned by one module; source of truth |
-| **Snapshot** | Immutable copy frozen at a point in time |
-| **Projection** | Read model derived from events; rebuilt from source |
+| Kind                        | Characteristics                                                  |
+|-----------------------------|------------------------------------------------------------------|
+| **Canonical**               | Mutable; owned by one module; source of truth                    |
+| **Snapshot**                | Immutable copy frozen at a point in time                         |
+| **Projection**              | Read model derived from events; rebuilt from source              |
 | **Participant-local state** | Local status in a non-owning module; not the canonical lifecycle |
 
 Every duplicated field must state its source module and whether it is
@@ -203,10 +203,12 @@ A complete module specification covers:
 6. Commands — inputs the module accepts.
 7. Queries — read access it exposes.
 8. Events — committed facts it emits.
-9. Projections it maintains from other modules.
-10. Cross-module contracts.
-11. Failure handling.
-12. Open questions.
+9. REST endpoints — HTTP routes, methods, request/response shapes, auth
+   requirements, and error responses exposed to external clients.
+10. Projections it maintains from other modules.
+11. Cross-module contracts.
+12. Failure handling.
+13. Open questions.
 
 Each specification must be self-contained. Do not rely on "see catalog" or
 "handled elsewhere" as the only explanation of ownership, lifecycle, or
