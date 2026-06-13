@@ -47,8 +47,8 @@ Write each chunk so an AI agent can answer:
 - Include only sections that add clarity.
 - Prefer short paragraphs, bullets, and tables over long prose.
 - Use consistent terms for the same concept.
-- Separate facts, assumptions, decisions, requirements, risks, and open
-  questions when they appear.
+- Separate facts, assumptions, decisions, business rules, requirements, risks,
+  terms, dependencies, and open questions when they appear.
 - Use IDs only when an item is likely to be referenced, traced, tested, or
   updated later.
 - Keep examples clearly marked as examples.
@@ -74,10 +74,18 @@ Use these labels when they help clarify the content:
 
 - `Facts`: Source-grounded statements treated as true.
 - `Assumptions`: Statements used for progress but not yet proven.
+- `Terms`: Canonical vocabulary, definitions, aliases, or forbidden synonyms.
+- `Actors`: Users, systems, agents, services, or teams involved.
 - `Decisions`: Chosen direction or settled interpretation.
+- `Business Rules`: Domain or product constraints that define valid behavior.
 - `Requirements`: Observable behavior or implementation obligations.
 - `Constraints`: Limits, boundaries, or rules that narrow valid solutions.
+- `Dependencies`: Required upstream docs, systems, APIs, decisions, or
+  assumptions.
+- `Permissions`: Who can perform or access something.
+- `Data`: Records, fields, payloads, or stored information.
 - `Workflows`: Ordered actions, actors, triggers, and outcomes.
+- `Events`: Domain, system, or workflow events worth naming.
 - `Interfaces`: Inputs, outputs, events, schemas, or contracts.
 - `Boundary`: What the subject owns and does not own.
 - `Ownership`: The source of truth for data, behavior, decisions, or
@@ -94,10 +102,14 @@ Use these labels when they help clarify the content:
   needed to understand behavior.
 - `Migration or Rollout`: Sequencing, compatibility, rollback, migration, and
   verification needs.
+- `Outcomes`: Expected end states, results, or externally visible effects.
+- `Edge Cases`: Boundary scenarios that clarify behavior.
 - `Risks`: What can go wrong, why it matters, and what reduces the risk.
+- `Examples`: Concrete examples that clarify abstract rules or edge cases.
 - `Acceptance Criteria`: Checks that prove the work or document is satisfied.
 - `Validation`: Tests, checks, fixtures, review criteria, or verification steps
   that prove correctness.
+- `Non-Goals`: Explicitly excluded intent when `Out of Scope` is too broad.
 - `Open Questions`: Unresolved items that materially affect future work.
 
 Use only the labels that match the chunk.
@@ -129,12 +141,23 @@ Recommended prefixes:
 
 - `F-` for facts.
 - `A-` for assumptions.
+- `T-` for terms.
+- `ACT-` for actors.
 - `D-` for decisions.
+- `BR-` for business rules.
 - `REQ-` for requirements.
 - `C-` for constraints.
+- `DEP-` for dependencies.
+- `PERM-` for permissions.
+- `DATA-` for data items.
+- `EVT-` for events.
 - `R-` for risks.
+- `OUT-` for outcomes.
+- `EDGE-` for edge cases.
+- `EX-` for examples.
 - `AC-` for acceptance criteria.
 - `V-` for validation items.
+- `NG-` for non-goals.
 - `OQ-` for open questions.
 
 ## Scope Guidance
