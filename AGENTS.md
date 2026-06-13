@@ -33,6 +33,23 @@ proves core journeys and operational viability. When an idea exceeds that bar,
 document it in `out-of-scope/` with a revisit trigger before continuing MVP
 work.
 
+## Architecture
+
+The project uses a modular monolith. Module ownership and boundary integrity
+are first-class constraints in every documentation decision.
+
+Core invariants:
+
+- Every business lifecycle has exactly one owning module — the only source of
+  truth for that lifecycle's state transitions.
+- Every durable record, policy decision, approval rule, and write-side invariant
+  has exactly one owning module.
+- Other modules may observe, project, cache, coordinate, or consume events —
+  but must not co-own mutable state.
+
+For the full set of boundary and editing constraints, see
+`start-here/edit-guardrails.md`.
+
 ## Documentation
 
 - Canonical style: `start-here/ai-agent-documentation-style-guide.md`. Apply it
