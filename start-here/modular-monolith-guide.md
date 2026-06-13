@@ -287,7 +287,7 @@ Each specification must be self-contained. Do not rely on "see catalog" or
 contract behavior.
 
 Write module specifications following the canonical documentation style:
-`start-here/ai-agent-documentation-style-guide.md`.
+`start-here/doc-style.md`.
 
 ### Editing Discipline
 

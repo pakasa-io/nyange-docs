@@ -5,7 +5,7 @@ This folder contains repository-level documentation style standards.
 ## Documentation Style
 
 - Canonical style:
-  `ai-agent-documentation-style-guide.md`
+  `doc-style.md`
 
 Use the canonical guide for every documentation chunk, regardless of size, type,
 or location. It defines shared style and tone; it does not prescribe a fixed

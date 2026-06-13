@@ -52,7 +52,7 @@ For the full design and documentation guide, see
 
 ## Documentation
 
-- Canonical style: `start-here/ai-agent-documentation-style-guide.md`. Apply it
+- Canonical style: `start-here/doc-style.md`. Apply it
   to every documentation chunk regardless of size, type, or location.
 - Assume at least 80% of documentation will be read by AI agents; keep human
   readability, brevity, and reviewability as secondary constraints.
