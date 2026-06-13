@@ -1,10 +1,10 @@
 # Delivery
 
-**Intent**: Define the delivery lifecycle, agent cash handling, failed delivery fee waiver, field evidence requirements, and the field leg of the cylinder exchange request lifecycle.
+**Intent**: Define the delivery lifecycle, delivery fee rules, agent cash handling, failed delivery fee waiver, field evidence requirements, and the field leg of the cylinder exchange request lifecycle.
 
-**Sources**: §6.3 Delivery Lifecycle, §6.9 Refill Exchange Request Lifecycle (field leg), §7.7 Agent Cash Handling, §7.12 Failed Delivery Fee Waiver, F-03, F-06, F-07
+**Sources**: §6.3 Delivery Lifecycle, §6.9 Refill Exchange Request Lifecycle (field leg), §7.5 Express Delivery Fee, §7.7 Agent Cash Handling, §7.12 Failed Delivery Fee Waiver, F-03, F-06, F-07
 
-**Related**: [inventory.md](inventory.md) — §6.9 intake leg (INTAKE_PENDING through COMPLETED/FAILED); [order.md](order.md) — order lifecycle and F-01; [finance.md](finance.md) — F-05 forced financial closure; [identity-auth.md](identity-auth.md) — full access matrix
+**Related**: [inventory.md](inventory.md) — §6.9 intake leg (INTAKE_PENDING through COMPLETED/FAILED); [order.md](order.md) — order lifecycle and F-01; [catalog.md](catalog.md) — product/refill price guardrails; [finance.md](finance.md) — F-05 forced financial closure; [identity-auth.md](identity-auth.md) — full access matrix
 
 ---
 
@@ -217,6 +217,39 @@ Agents collect exact cash due (COD amount plus any approved underpayment top-up,
 - An open cash discrepancy or an unaccounted item blocks full shift close. The Outlet Manager must resolve or explicitly approve each open item before the shift can be fully closed.
 - At launch, custody discrepancies within the Outlet Manager threshold are limited to one accessory item or one non-saleable/damaged cylinder discrepancy when documented custody facts identify the item and impact; missing saleable filled cylinders always require Super Admin approval.
 - Discrepancies above threshold require Super Admin approval with reason, notes, stock/cash impact, and audit before the shift can fully close.
+
+---
+
+## Delivery Fee Rules (§7.5)
+
+The base delivery fee is determined by the assigned outlet's active service zone for the customer address.
+
+**Fee calculation:**
+
+1. Each active outlet service zone maps to a global zone template.
+2. The template's default fee applies unless the outlet has an active service-zone fee override.
+3. Express delivery fee applies a global default multiplier of **1.5** against that service-zone base fee.
+4. This multiplier is configurable per outlet and per service zone.
+5. Outlet Managers may adjust the multiplier within the configured guardrail.
+
+**Launch zone defaults:**
+
+| Zone     | Radius                   | Base delivery fee |
+|----------|--------------------------|-------------------|
+| CORE     | 0 km ≤ distance < 5 km   | UGX 3,000         |
+| STANDARD | 5 km ≤ distance < 10 km  | UGX 5,000         |
+| EXTENDED | 10 km ≤ distance < 15 km | UGX 8,000         |
+
+These fees apply unless an outlet has an active service-zone fee override.
+
+**Guardrail (at launch):** Delivery-fee changes — smaller of 15% or UGX 2,000 from the current approved basis. Outlet Managers may change the multiplier within this guardrail; above-guardrail changes require Super Admin approval.
+
+**Additional rules:**
+
+- The express fee premium is presented to the customer at checkout and is reflected in the order total.
+- For cascaded orders where the reassigned outlet has a different service zone or base fee, the express fee is recalculated using the new outlet's rate.
+- The delivery fee is a separate customer-visible charge component in the order total; it is not folded into product, refill, or accessory prices.
+- Delivery-fee adjustments are explicit commercial adjustments; any money movement follows payment, refund, and financial-ledger rules and does not rewrite the placed order's original charge.
 
 ---
 

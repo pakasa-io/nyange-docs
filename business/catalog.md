@@ -1,12 +1,10 @@
 # Catalog & Pricing
 
-**Intent**: Define the refill pricing matrix, bundle pricing rules, outlet price guardrails, and express delivery fee
-rules that govern product prices on the Nyange platform.
+**Intent**: Define the refill pricing matrix, bundle pricing rules, and outlet price guardrails for product prices on the Nyange platform.
 
-**Sources**: §7.2 Refill Pricing Matrix, §7.3 Bundle Pricing, §7.4 Price Guardrails, §7.5 Express Delivery Fee
+**Sources**: §7.2 Refill Pricing Matrix, §7.3 Bundle Pricing, §7.4 Price Guardrails
 
-**Related**: [order.md](order.md) — cart behaviour and price-change effects on open carts (
-§7.15); [identity-auth.md](identity-auth.md) — full access matrix
+**Related**: [delivery.md](delivery.md) — express delivery fee and fee waiver rules (§7.5, §7.12); [order.md](order.md) — cart behaviour and price-change effects on open carts (§7.15); [identity-auth.md](identity-auth.md) — full access matrix
 
 ---
 
@@ -145,10 +143,11 @@ start time, or the active global/default rule when no outlet rule exists.
 
 **Launch defaults:**
 
-| Price type                        | Guardrail                                                   |
-|-----------------------------------|-------------------------------------------------------------|
+| Price type                        | Guardrail                                                    |
+|-----------------------------------|--------------------------------------------------------------|
 | Product, refill, accessory prices | Smaller of 10% or UGX 5,000 from the current approved basis |
-| Delivery-fee changes              | Smaller of 15% or UGX 2,000 from the current approved basis |
+
+Delivery-fee guardrail: see [delivery.md](delivery.md).
 
 **Always require Super Admin approval regardless of amount:**
 
@@ -169,40 +168,6 @@ start time, or the active global/default rule when no outlet rule exists.
 
 **Cart effects of pricing changes:** see [order.md §7.15](order.md) — catalog or pricing changes affecting cart lines
 require customer review and acknowledgement before cart quote or checkout can proceed.
-
----
-
-## Express Delivery Fee
-
-The base delivery fee is determined by the assigned outlet's active service zone for the customer address.
-
-**Fee calculation:**
-
-1. Each active outlet service zone maps to a global zone template.
-2. The template's default fee applies unless the outlet has an active service-zone fee override.
-3. Express delivery fee applies a global default multiplier of **1.5** against that service-zone base fee.
-4. This multiplier is configurable per outlet and per service zone.
-5. Outlet Managers may adjust the multiplier within the configured guardrail.
-
-**Launch zone defaults:**
-
-| Zone     | Radius                   | Base delivery fee |
-|----------|--------------------------|-------------------|
-| CORE     | 0 km ≤ distance < 5 km   | UGX 3,000         |
-| STANDARD | 5 km ≤ distance < 10 km  | UGX 5,000         |
-| EXTENDED | 10 km ≤ distance < 15 km | UGX 8,000         |
-
-These fees apply unless an outlet has an active service-zone fee override.
-
-**Additional rules:**
-
-- The express fee premium is presented to the customer at checkout and is reflected in the order total.
-- For cascaded orders where the reassigned outlet has a different service zone or base fee, the express fee is
-  recalculated using the new outlet's rate.
-- The delivery fee remains a separate customer-visible charge component in the order total; it is not folded into
-  product, refill, or accessory prices.
-- Delivery-fee adjustments are explicit commercial adjustments, and any actual money movement follows the payment,
-  refund, and financial-ledger rules rather than rewriting the placed order's original charge.
 
 ## Permissions
 
