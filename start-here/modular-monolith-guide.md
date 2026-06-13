@@ -236,6 +236,28 @@ outcomes.
   If an invariant exists in source material, all affected modules must preserve
   it.
 
+### Observability
+
+Each module owns its observability surface: the logs, metrics, traces, and
+audit records it emits. Observability ownership follows the same rule as data
+ownership — the module that performs an action owns the observable record of
+that action.
+
+Each module's observability surface should be sufficient to answer:
+
+- Did the operation succeed or fail, and why?
+- Which actor or system triggered it?
+- Which records were affected?
+- How long did it take?
+
+For cross-module workflows, each participating module emits its own span and
+includes a shared correlation ID so the full workflow can be reconstructed
+across module boundaries.
+
+Audit records — immutable logs of who did what to which record and when — are
+owned by the module that performed the mutation. Do not delegate audit
+responsibility to a shared logging layer.
+
 ## Documentation
 
 ### Module Specification Shape
@@ -257,7 +279,8 @@ A complete module specification covers:
 11. Projections it maintains from other modules.
 12. Cross-module contracts.
 13. Failure handling.
-14. Open questions.
+14. Observability — logs, metrics, traces, and audit records the module emits.
+15. Open questions.
 
 Each specification must be self-contained. Do not rely on "see catalog" or
 "handled elsewhere" as the only explanation of ownership, lifecycle, or
