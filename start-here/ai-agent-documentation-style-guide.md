@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Use this as the default style and tone for every documentation chunk in this
+Use this as the canonical style and tone for every documentation chunk in this
 repository.
 
 This guide does not prescribe a document inventory or require fixed templates.
@@ -79,11 +79,46 @@ Use these labels when they help clarify the content:
 - `Constraints`: Limits, boundaries, or rules that narrow valid solutions.
 - `Workflows`: Ordered actions, actors, triggers, and outcomes.
 - `Interfaces`: Inputs, outputs, events, schemas, or contracts.
+- `Boundary`: What the subject owns and does not own.
+- `Ownership`: The source of truth for data, behavior, decisions, or
+  integrations.
+- `State`: Allowed states, derived states, valid transitions, invalid
+  transitions, and terminal states.
+- `Invariants`: Conditions that must always remain true.
+- `Failure Handling`: Expected behavior for retries, duplicates, stale data,
+  partial failure, missing dependencies, invalid transitions, or corrupted
+  input.
+- `Evolvability`: Boundaries, extension points, or model choices that preserve
+  future change without rewriting core concepts.
+- `Observability`: Logs, metrics, traces, audit records, or review signals
+  needed to understand behavior.
+- `Migration or Rollout`: Sequencing, compatibility, rollback, migration, and
+  verification needs.
 - `Risks`: What can go wrong, why it matters, and what reduces the risk.
 - `Acceptance Criteria`: Checks that prove the work or document is satisfied.
+- `Validation`: Tests, checks, fixtures, review criteria, or verification steps
+  that prove correctness.
 - `Open Questions`: Unresolved items that materially affect future work.
 
 Use only the labels that match the chunk.
+
+## Technical Detail Guidance
+
+Use technical detail blocks only when they make a specific piece of information
+clearer than prose would.
+
+Do not add technical sections just because a chunk mentions architecture, APIs,
+data, operations, reliability, or evolvability. Those topics still use the same
+default style. Add technical blocks only where they remove ambiguity.
+
+Good uses:
+
+- State owned vs. not owned responsibilities as a `Boundary`.
+- Express an input/output expectation as an `Interface`.
+- List valid and invalid lifecycle movement as `State`.
+- Record non-negotiable correctness rules as `Invariants`.
+- Define retry, duplicate, or partial-failure behavior as `Failure Handling`.
+- Define verification steps as `Acceptance Criteria` or `Validation`.
 
 ## ID Guidance
 
@@ -99,6 +134,7 @@ Recommended prefixes:
 - `C-` for constraints.
 - `R-` for risks.
 - `AC-` for acceptance criteria.
+- `V-` for validation items.
 - `OQ-` for open questions.
 
 ## Scope Guidance

@@ -40,17 +40,13 @@ When working in this repository, the agent must assume these roles:
 
 ## Documentation Style
 
-- Default style:
+- Canonical style:
   `start-here/ai-agent-documentation-style-guide.md`.
-- Fallback style:
-  `start-here/engineering-detail-fallback-style-guide.md`.
-- Use the default style for every documentation chunk, regardless of size, type,
-  or location. It defines shared style and tone; it does not prescribe a fixed
-  document set.
-- Use the fallback only when a chunk needs implementation contracts, state,
-  invariants, failure handling, reliability detail, or evolvability constraints.
-- When the two styles overlap, keep the default voice and add only the
-  engineering detail needed for clarity.
+- Use the canonical style for every documentation chunk, regardless of size,
+  type, or location. It defines shared style and tone; it does not prescribe a
+  fixed document set.
+- Express technical details using the optional labels and technical-detail
+  guidance in the canonical style guide.
 
 ## Working Guidelines
 
