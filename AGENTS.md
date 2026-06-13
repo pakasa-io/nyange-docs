@@ -47,8 +47,8 @@ Core invariants:
 - Other modules may observe, project, cache, coordinate, or consume events —
   but must not co-own mutable state.
 
-For the full set of boundary and editing constraints, see
-`start-here/edit-guardrails.md`.
+For the full design and documentation guide, see
+`start-here/modular-monolith-guide.md`.
 
 ## Documentation
 
