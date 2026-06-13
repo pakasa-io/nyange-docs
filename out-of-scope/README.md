@@ -20,3 +20,13 @@ Use short, stable filenames:
 ```text
 YYYY-MM-DD-short-item-name.md
 ```
+
+## Index
+
+| Item | Status |
+| --- | --- |
+| [Support Case Management](2026-06-13-support-case-management.md) | Deferred |
+
+Revisit support case management when direct owning-domain workflows cannot
+provide enough traceability for customer complaints, cross-domain exceptions,
+SLA handling, or support workload management.

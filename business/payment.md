@@ -119,8 +119,8 @@ STAFF_VERIFIED →
 - It clears only through an Outlet Manager-approved COD top-up for the full
   shortfall, or a Super Admin-approved exception adjustment that records an
   explicit adjustment path.
-- Customer Support Agents may route the review but cannot clear payment
-  directly.
+- Customer Support Agents may relay the review need to the owning Outlet Manager
+  or Super Admin path, but cannot clear payment directly.
 
 ### Overpayment
 
@@ -155,8 +155,8 @@ STAFF_VERIFIED →
 
 - Payment discrepancy resolution is a durable business workflow for top-up
   approval, COD short/over collection exceptions, and refund-liability handoff.
-- Customer Support Agents may route review through support, but cannot mutate
-  payment state.
+- Customer Support Agents may relay review context to the owning workflow, but
+  cannot mutate payment state.
 - High-risk approvals and overrides require audit.
 
 ## Late Payment References

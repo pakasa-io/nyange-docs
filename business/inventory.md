@@ -223,10 +223,8 @@ CANCELLED
   `INTAKE_PENDING`.
 - Financial closure for a refill order is blocked until all exchange requests
   reach `COMPLETED` or `FAILED` with approved exception.
-- A `FAILED` intake creates an inventory exception and may supply default
-  support-case context.
-- No support case exists until a permissioned Customer Support Agent, in-scope
-  Outlet Manager, or Super Admin creates it.
+- A `FAILED` intake creates an inventory exception and may supply operational
+  escalation context.
 - A failed intake does not by itself undo completed customer delivery.
 
 ### Intake Correction

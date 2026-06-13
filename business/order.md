@@ -183,7 +183,7 @@ COMPLETED
 
 - Customer cancellation is allowed up to and including `PICKING`.
 - `READY_FOR_DISPATCH` cancellation is a pre-custody exception for an explicitly
-  permissioned in-scope Customer Support Agent or Super Admin.
+  permissioned support fallback actor or Super Admin.
 - `READY_FOR_DISPATCH` cancellation requires override acknowledgement, reason,
   note, audit, and pick-reversal handling when stock has already been picked.
 - Once delivery-run custody or `OUT_FOR_DELIVERY` begins, normal cancellation is
@@ -192,9 +192,8 @@ COMPLETED
   audited financial-adjustment workflows carry the outcome.
 - Outlet staff without explicit cancellation permission cannot use normal
   cancellation after `PICKING`.
-- Those actors use cannot-fulfill, pick-reversal, failed-delivery, Customer
-  Support Agent escalation, or Super Admin handling according to fulfillment
-  state.
+- Those actors use cannot-fulfill, pick-reversal, failed-delivery, owning
+  manager escalation, or Super Admin handling according to fulfillment state.
 - After placement, customer-requested changes to items, delivery address, or
   original pricing are not supported as order modifications.
 - If the customer wants a different order before fulfillment, the existing order
@@ -241,8 +240,8 @@ COMPLETED
 - If an accepted outlet marks an order cannot-fulfill before `PICKING`, the
   order re-enters cascade/reassignment.
 - After `PICKING`, cannot-fulfill is a post-picking exception and must use pick
-  reversal, cancellation/refund, failed-delivery, Customer Support Agent
-  routing, or Super Admin handling according to custody state.
+  reversal, cancellation/refund, failed-delivery, owning manager escalation, or
+  Super Admin handling according to custody state.
 
 ### Delivery and Financial Closure
 
@@ -563,13 +562,13 @@ Customer notification and acceptance are required when reassignment creates:
   allocation.
 - For refill vendor-policy exhaustion, intervention may include Super Admin or
   permissioned Customer Support Agent contacting the customer through approved
-  support or notification paths to offer cancellation-and-reorder alternatives,
-  such as buying a new cylinder.
+  notification paths to offer cancellation-and-reorder alternatives, such as
+  buying a new cylinder.
 - Intervention does not permit editing the placed order.
 - Exhausted-candidate intervention window may be extended only by Super Admin
   with reason and audit.
-- A Customer Support Agent may request an extension through support action
-  request, but cannot execute the extension.
+- A Customer Support Agent may relay an extension need to Super Admin, but
+  cannot execute the extension.
 
 ## Mobile Money Order Expiry
 

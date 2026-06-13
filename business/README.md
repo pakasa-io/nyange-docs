@@ -61,7 +61,7 @@ tests.
 | [inventory.md](inventory.md) | Inventory | Reservation lifecycle, outlet transfer, vendor refill batch, cylinder exchange intake leg, stock counts, low-stock alerts |
 | [refund.md](refund.md) | Refund | Refund lifecycle, approval thresholds, collection codes, cash payout constraints |
 | [finance.md](finance.md) | Finance | Daily closing, expense controls, delivery cost reporting, internal settlements, forced financial closure |
-| [support.md](support.md) | Support | Support case lifecycle, support action boundary, operational risk alerts |
+| [support.md](support.md) | Support | Launch support fallback boundaries and operational risk alerts |
 | [notifications.md](notifications.md) | Notifications | Notification channel boundaries and event-to-channel assignments |
 
 ## Cross-Aggregate Ownership

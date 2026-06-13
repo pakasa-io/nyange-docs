@@ -130,16 +130,17 @@ t = 24h  → if code not used  → CODE_EXPIRED; liability remains open
 - A permissioned Customer Support Agent or Super Admin can regenerate an expired
   code with audit.
 - Regeneration when the customer loses access requires customer verification
-  through a linked support case with reason and audit.
+  through an audited fallback-action record with reason and audit.
 - The refund liability itself does not expire.
 
 ### Collection Eligibility
 
 - Only the original account holder may collect a refund at launch.
 - Delegated or proxy collection is not a standard supported workflow.
-- Any exceptional override requires a linked support case, Customer Support
-  Agent routing or Super Admin handling under the active exception policy,
-  explicit reason and evidence notes, and full audit trail.
+- Any exceptional override requires an audited exception record, Super Admin
+  handling or explicitly permissioned Customer Support Agent fallback under the
+  active exception policy, explicit reason and evidence notes, and full audit
+  trail.
 - Outlet Managers cannot independently approve proxy collection.
 
 ### Payout Process

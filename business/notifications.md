@@ -24,7 +24,7 @@ use and to confirm that notification delivery does not control business state.
 - Customer-configurable notification preferences are not launch behavior.
 - Notification types are classified as transactional or non-transactional for
   future policy use.
-- Support-triggered customer communications must use approved transactional
+- Customer Support Agent notification requests must use approved transactional
   notification templates or events with safe structured parameters.
 - Support-authored freeform message bodies are not supported.
 

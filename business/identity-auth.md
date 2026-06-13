@@ -109,21 +109,18 @@ may hold multiple permission bundles across one or more outlets.
 
 ### P-07 Customer Support Agent
 
-- Handles complaints, escalations, and exceptions.
-- Opens and manages support cases.
-- Views case-linked, outlet-scoped order, delivery, payment, and inventory
-  details needed for investigation.
-- Requests approved workflows on behalf of a resolution.
-- Performs support-only fallback actions when explicitly permissioned, such as
-  delivery PIN fallback and refund collection-code regeneration, unlock, or
-  audited customer-verified reveal.
-- Logs customer communication summaries.
+- Handles launch support fallback actions when explicitly permissioned.
+- May perform delivery PIN fallback and refund collection-code regeneration,
+  unlock, or audited customer-verified reveal when granted those permissions.
+- May request approved transactional customer notifications when explicitly
+  permissioned.
+- May relay operational escalation needs to the owning Outlet Manager or Super
+  Admin path.
 - Cannot directly mutate orders, payments, inventory, or financial records
   outside explicitly permissioned fallback actions.
 - Cannot approve, pay, void, or write off refunds.
-- Cannot approve their own action requests.
-- Cannot view cases outside outlet scope unless explicitly granted cross-outlet
-  access.
+- Cannot access another outlet's fallback actions or operational records unless
+  explicitly granted cross-outlet access.
 
 ### P-08 Area Manager
 
@@ -221,14 +218,8 @@ may hold multiple permission bundles across one or more outlets.
 | Internal settlement management | - | - | - | - | - | - | - | - | Acknowledge / Offset | Full |
 | Expense submission | - | - | - | - | - | Scoped | - | - | - | Full |
 | Expense approval | - | - | - | - | - | Scoped threshold | - | - | - | Full |
-| Support case creation | - | - | - | - | - | Scoped | Scoped | - | - | Full |
-| Support case management | - | - | - | - | - | Scoped | Scoped | - | - | Full |
-| Support queue configuration | - | - | - | - | - | - | - | - | - | Full |
 | Notification template administration | - | - | - | - | - | - | - | - | - | Full |
-| Support communication logging | - | - | - | - | - | Scoped | Scoped | - | - | Full |
 | Customer notification requests | - | - | - | - | - | Scoped approved transactional only | Scoped approved transactional only | - | - | Full |
-| Support action requests create/request | - | - | - | - | - | Scoped | Scoped | - | - | Full |
-| Support action requests execute | - | - | - | - | - | Scoped | - | - | - | Full |
 | Audit log viewing | - | - | - | - | - | Scoped | - | Read assigned outlets | Read | Full |
 | Operational risk alerts | - | - | - | - | - | Scoped with explicit permission | - | - | - | Full |
 | Low-stock alerts | - | - | - | - | - | Scoped | - | Read assigned outlets | - | Full |
@@ -246,18 +237,18 @@ may hold multiple permission bundles across one or more outlets.
 - A persona assigned to Outlet A has no visibility into Outlet B unless Super
   Admin explicitly grants additional access.
 - Area Managers have read access to their assigned outlet set, not all outlets.
-- Customer Support Agents are outlet-scoped by default.
-- Cross-outlet support access requires explicit Super Admin grant.
+- Customer Support Agent fallback actions are outlet-scoped by default.
+- Cross-outlet support fallback access requires explicit Super Admin grant.
 
-### Support Action Boundary
+### Support Fallback Boundary
 
-- Creating or requesting support action requests belongs to scoped support case
-  management.
-- The `execute` row means the authorized owner of the affected workflow may
-  accept or complete the requested action.
+- Customer Support Agents can perform only explicitly permissioned fallback
+  actions.
+- The authorized owner of the affected domain workflow remains responsible for
+  accepting, rejecting, or completing that workflow.
 - Customer Support Agents do not directly approve refunds, pay refunds, post
   ledger entries, mutate orders, adjust inventory, or complete delivery
-  workflows through support action requests.
+  workflows through a support-owned workflow.
 
 ### Inventory Adjustment Threshold
 
@@ -316,7 +307,7 @@ may hold multiple permission bundles across one or more outlets.
 
 - This permission covers regenerating expired codes.
 - It covers regenerating codes when the customer loses access after verification
-  through a linked support case with reason and audit.
+  through an audited fallback-action record with reason and audit.
 - It covers unlocking or regenerating rate-limited codes.
 - It covers audited reveal by a permissioned Customer Support Agent or Super
   Admin after customer verification.
@@ -430,8 +421,8 @@ outlet scope or business authority.
 - Experiences are not separate account types.
 - Selecting an experience never grants new permissions, outlet scope, or
   business authority.
-- Outlet rosters, work queues, case queues, and operational projections may
-  organize work or explain visibility.
+- Outlet rosters, work queues, and operational projections may organize work or
+  explain visibility.
 - Those projections are not authorization sources and cannot grant permission or
   outlet scope beyond explicit assignments.
 - Only the latest approved and valid authorization policy may grant business
@@ -481,9 +472,10 @@ order is assigned to them and active. They lose this access when the delivery
 reaches a terminal state. Phone-number access is scoped to the active assignment
 and is audit-sensitive under the active audit policy.
 
-**E-03**: Customer Support Agents cannot view another outlet's cases unless a
-Super Admin has granted explicit cross-outlet support access. There is no
-implicit cross-outlet access based on case type or priority.
+**E-03**: Customer Support Agents cannot access another outlet's fallback
+actions or operational records unless a Super Admin has granted explicit
+cross-outlet support access. There is no implicit cross-outlet access based on
+issue type, priority, or customer complaint.
 
 **E-04**: An Area Manager can view reports and operational data for assigned
 outlets, but cannot view operational risk alerts or perform outlet actions such
