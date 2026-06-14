@@ -1,10 +1,10 @@
 # Refund
 
-**Intent**: Define the customer refund liability lifecycle, collection-code
-rules, and cash payout constraints.
+**Intent**: Define the customer refund liability lifecycle, customer-presented
+collection code checks, and cash payout constraints.
 
 **Reader task**: Use this document to decide when a refund liability exists, who
-can pay it, and why collection-code expiry never discharges the liability.
+can pay it, and how customer-presented collection codes authorize payout.
 
 **Source**: §6.6 Refund Lifecycle
 
@@ -24,22 +24,16 @@ can pay it, and why collection-code expiry never discharges the liability.
 - The supported launch liability source is an authorized and posted
   Finance-owned cash over-collection correction.
 - Post-collection price adjustment is not a launch refund-liability source.
-- Code expiry, daily closing, and time passing do not discharge the liability.
+- Daily closing and time passing do not discharge the liability.
 - An open liability does not convert to revenue.
 - Open refund liabilities appear in the owning outlet's daily closing and
   liability reports until paid, voided, or written off.
 
-**BI-18 — A refund collection code is single-use and perishable.**
+**BI-18 — A refund collection code is single-use.**
 
-- A collection code has a finite validity window.
-- At launch, the code validity window is 24 hours after issuance.
 - The code is invalidated on first successful presentation.
 - Failed attempts are audit-logged with actor, outlet, refund ID, timestamp, and
   safe failure reason.
-- Failed verification attempts do not lock the collection code or refund record
-  at launch.
-- Collection-code lockout, failed-attempt rate limiting, and cooldown workflows
-  are not launch behavior.
 
 ## Boundary
 
@@ -57,11 +51,9 @@ PENDING_CREATION
         └─► COLLECTIBLE
 
 COLLECTIBLE
-  ├─► PAID
-  └─► CODE_EXPIRED
-        └─► COLLECTIBLE
+  └─► PAID
 
-LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED
+LIABILITY_OPEN|COLLECTIBLE
   ├─► VOIDED
   └─► WRITTEN_OFF
 ```
@@ -72,7 +64,6 @@ LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED
 | `LIABILITY_OPEN` | Refund is owed and eligible for collection-code issuance; no currently usable collection code exists. |
 | `COLLECTIBLE` | Code issued; customer can present it at the owning outlet. |
 | `PAID` | Terminal successful cash payout. |
-| `CODE_EXPIRED` | Code expired; liability remains open and a new code can be issued. |
 | `VOIDED` | Terminal Super Admin-approved void with reason, note, and audit. |
 | `WRITTEN_OFF` | Terminal Super Admin-approved write-off with reason, note, and audit. |
 
@@ -97,8 +88,7 @@ LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED
 
 - `VOIDED` and `WRITTEN_OFF` are terminal Super Admin-approved exception
   outcomes.
-- Eligible source states are `LIABILITY_OPEN`, `COLLECTIBLE`, and
-  `CODE_EXPIRED`.
+- Eligible source states are `LIABILITY_OPEN` and `COLLECTIBLE`.
 - The transition requires actor identity, actor role, reason code, reason note,
   timestamp, and audit trail.
 - A void or write-off discharges the refund liability for daily-closing and
@@ -121,20 +111,6 @@ LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED
   collection code without amount-band hold.
 - Payout permission remains separate from liability creation and collection-code
   issuance.
-
-### Collection Code Expiry and Regeneration
-
-```
-t = 0    → code issued; refund COLLECTIBLE
-t = 24h  → if code not used  → CODE_EXPIRED; liability remains open
-           // new code can be issued from CODE_EXPIRED
-```
-
-- A Super Admin can regenerate an expired code with audit.
-- Regeneration when the customer loses access requires customer verification
-  through an audited exception record with reason and audit.
-- Failed verification attempts do not block a later valid presentation.
-- The refund liability itself does not expire.
 
 ### Collection Eligibility
 
@@ -174,15 +150,13 @@ At payout, the Outlet Manager or explicitly permissioned Outlet Cashier must:
 - When a delivery fails, they record the failure and return physical goods.
 - Any refund remains in the outlet cash-refund lifecycle.
 
-### Collection Code Reveal
+### Collection Code Handling
 
-- The collection code is revealed only through the authenticated customer
-  experience or audited reveal by a Super Admin after customer verification.
+- The collection code is available only through the authenticated customer
+  experience.
 - The code must not appear in push notifications, email bodies, or SMS.
 - An Outlet Manager or explicitly permissioned Outlet Cashier may verify a
   customer-presented code.
-- Outlet Managers and Outlet Cashiers cannot reveal the active code to the
-  customer.
 
 ### Daily Closing
 
@@ -205,7 +179,6 @@ Trimmed access matrix rows relevant to refunds. Full matrix:
 | --- | --- | --- | --- | --- |
 | Refund initiation | Own request | - | Scoped | Full |
 | Refund payout cash at outlet | - | Scoped with explicit permission | Scoped | Full |
-| Refund collection code management | - | - | - | Full |
 
 ## Authorization Edge Cases
 

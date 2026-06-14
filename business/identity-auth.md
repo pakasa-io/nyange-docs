@@ -182,7 +182,6 @@ may hold multiple permission bundles across one or more outlets.
 | Global pricing & catalog | - | - | - | - | - | - | - | - | Full |
 | Refund initiation | Own request | - | - | - | - | Scoped | - | - | Full |
 | Refund payout cash at outlet | - | - | Scoped with explicit permission | - | - | Scoped | - | - | Full |
-| Refund collection code management | - | - | - | - | - | - | - | - | Full |
 | Daily cash closing | - | - | - | - | - | Scoped | - | - | Full |
 | Financial ledger view | - | - | - | - | - | Scoped | Read assigned outlets | Full | Full |
 | Expense submission | - | - | - | - | - | Scoped | - | - | Full |
@@ -236,15 +235,6 @@ may hold multiple permission bundles across one or more outlets.
 - Payout is the separate cash-disbursement event.
 - Payout permission does not authorize creating, voiding, or writing off a
   refund liability.
-
-### Refund Collection Code Management
-
-- This permission covers Super Admin regeneration of expired codes.
-- It covers Super Admin regeneration when the customer loses access after
-  verification through an audited exception record with reason and audit.
-- It covers audited reveal by a Super Admin after customer verification.
-- It does not allow creating, paying, voiding, or writing off a refund
-  liability.
 
 ### Outlet Configuration
 

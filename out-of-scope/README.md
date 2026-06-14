@@ -32,6 +32,7 @@ YYYY-MM-DD-short-item-name.md
 | [Competitive Outlet Claiming](2026-06-14-competitive-outlet-claiming.md) | Deferred |
 | [Delivery Assignment Ranking](2026-06-14-delivery-assignment-ranking.md) | Deferred |
 | [Advanced Stock Counts and Low-Stock Alerts](2026-06-14-stock-counts-low-stock-alerts.md) | Deferred |
+| [Refund Code Expiry and Regeneration](2026-06-14-refund-code-expiry-regeneration.md) | Deferred |
 | [Post-Collection Price Adjustments](2026-06-14-post-collection-price-adjustments.md) | Deferred |
 
 Revisit express delivery fee when the Product Manager approves a customer-facing
@@ -60,6 +61,10 @@ measured dispatch delays, uneven agent workload, or avoidable missed deliveries.
 Revisit advanced stock counts and low-stock alerts when manual inventory review
 causes repeated stockouts, stale inventory decisions, or avoidable failed
 fulfillment acceptance.
+
+Revisit refund code expiry and regeneration when expired, lost, or inaccessible
+codes create repeated payout support cases that cannot be handled by ordinary
+customer authentication and outlet verification.
 
 Revisit post-collection price adjustments when the Product Manager approves a
 post-delivery adjustment policy with source owner, authorization, posting,

@@ -46,8 +46,6 @@ Launch channels are assigned by event type, not customer preference.
 - A notification may identify the collection outlet.
 - A notification may direct the customer to the authenticated customer
   experience.
-- A Super Admin may perform audited code reveal only after customer
-  verification.
 
 ## Non-Goals
 
