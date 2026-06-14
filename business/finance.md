@@ -52,7 +52,8 @@ assurance, permission-grant facts, and outlet-scope facts.
   sale.
 - Later events do not rewrite the original receipt.
 - Later financial activity is allowed only as a separate linked business record,
-  such as an approved refund liability or approved adjustment/void record.
+  such as a Refund-owned liability created from a Finance-owned cash
+  over-collection correction or an approved POS void record.
 - Later activity must not alter the original delivered online sale, completed
   POS sale, or receipt.
 
@@ -248,7 +249,12 @@ if closing_overdue:
 ### Liability Recognition
 
 - Overdue daily closing does not block creation or posting of refund liabilities
-  at `DELIVERED` or from an approved adjustment.
+  from an authorized and posted Finance-owned cash over-collection correction
+  source event.
+- That source event may be posted as part of delivery-completion financial
+  effects when an approved over-collection variance exists.
+- `DELIVERED` alone and generic approved adjustments do not create Refund
+  liabilities at launch.
 - Those records capture business truth and must be posted even when the outlet
   is behind on closing.
 - The overdue-closing restriction applies to later cash payout or manual
