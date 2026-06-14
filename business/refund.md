@@ -141,8 +141,29 @@ At payout, the actor must be an Outlet Manager or Outlet Cashier with explicit
 refund-payout permission. The actor must:
 
 1. Verify the one-time collection code.
-2. Confirm the collector is the original account holder tied to the order.
-3. Confirm the customer/order phone matches before cash is marked paid.
+2. Confirm the collector is the original account holder tied to the source order
+   by matching the collector's Identity account to the immutable customer
+   account ID captured on the refund/order snapshot.
+3. Confirm the phone presented for collection matches the immutable
+   refund/order phone snapshot before cash is marked paid.
+
+### Payout Identity Facts
+
+- Refund owns payout eligibility and uses immutable refund/order identity facts
+  as the payout authority.
+- The payout identity facts are refund ID, source order ID, original customer
+  account ID, and the customer/order phone snapshot captured before placement.
+- The current Identity verified phone is authentication and contact context. It
+  is not the payout authority and cannot replace refund/order snapshot facts.
+- Identity account recovery, phone relink, or authentication-link changes do not
+  rewrite the refund/order payout identity facts.
+- If the current Identity verified phone differs from the refund/order phone
+  snapshot, normal payout fails closed. A payout may proceed only through an
+  audited Super Admin identity-mismatch exception with reason, evidence, before
+  and after identity facts, and the approving actor recorded.
+- If the collector's current Identity account cannot be linked to the original
+  customer account ID, the case is treated as proxy or exceptional collection
+  and follows the collection exception policy.
 
 ### Payout Authorization
 
@@ -157,9 +178,12 @@ refund-payout permission. The actor must:
 ### Payout Records
 
 - Every payout attempt captures actor, role, outlet, amount, order/refund ID,
-  reason, source record status, active source policy version, and timestamp.
-- Paid cash events also capture the customer/order identity snapshot and
-  attestation note.
+  reason, source record status, active source policy version, current Identity
+  account ID when available, current verified phone when available, and
+  timestamp.
+- Paid cash events also capture the immutable refund/order identity snapshot,
+  collection-code verification result, attestation note, and any approved
+  identity-mismatch exception reference.
 
 ### Delivery Agents
 

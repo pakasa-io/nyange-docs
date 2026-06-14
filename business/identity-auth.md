@@ -240,6 +240,17 @@ may hold multiple permission bundles across one or more outlets.
 
 ### Refund Payout Permission
 
+- When a customer context is used for refund payout, Identity supplies current
+  account-status, Identity account ID, Cognito subject, verified phone, and
+  authentication-link facts.
+- Refund decides payout eligibility from the immutable refund/order identity
+  snapshot. Current Identity phone or authentication-link facts are context, not
+  the payout authority.
+- Identity phone relink, Cognito-subject relink, or account recovery does not
+  rewrite historical order or refund payout identity facts.
+- If current Identity facts conflict with refund/order snapshot facts, Refund
+  fails payout closed unless Refund-owned exception policy authorizes a recorded
+  identity-mismatch exception.
 - An Outlet Cashier with explicit refund-payout permission may verify the
   customer's collection code and disburse collectible refunds within their
   outlet scope.
