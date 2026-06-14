@@ -42,8 +42,8 @@ assurance, permission-grant facts, and outlet-scope facts.
 - Refund owns the customer cash-refund liability and payout lifecycle.
 - Refund does not reopen cancelled orders, rewrite payment records, or create
   electronic refund workflows.
-- Refund payout is an outlet cash event reported through finance and daily
-  closing.
+- Refund payout is a Refund-coordinated outlet cash event posted through
+  Finance-owned cash custody, ledger, and daily-closing records.
 
 ## State
 
@@ -154,6 +154,21 @@ refund-payout permission. The actor must:
 3. Confirm the phone presented for collection matches the immutable
    refund/order phone snapshot before cash is marked paid.
 
+Refund coordinates payout because payout is the `COLLECTIBLE -> PAID` lifecycle
+transition. Participant ownership remains module-scoped:
+
+| Participant | Owned mutation in the payout commit |
+| --- | --- |
+| Refund | Verify payout eligibility, verify the collection code, invalidate the code, and move the refund `COLLECTIBLE -> PAID`. |
+| Finance | Record outlet cash custody decrease, cash ledger entry, financial ledger basis, payout daily-closing reference, and Finance-owned audit fields. |
+
+- Refund payout commits atomically with Finance cash and ledger effects.
+- The same idempotency key and correlation ID apply to Refund and Finance
+  participant mutations in the payout commit.
+- If Finance rejects the payout participant mutation or the transaction fails
+  before commit, the refund remains `COLLECTIBLE`, the collection code remains
+  usable, and no cash or ledger mutation is posted.
+
 ### Payout Identity Facts
 
 - Refund owns payout eligibility and uses immutable refund/order identity facts
@@ -189,7 +204,8 @@ refund-payout permission. The actor must:
   account ID when available, current verified phone when available, and
   timestamp.
 - Paid cash events also capture the immutable refund/order identity snapshot,
-  collection-code verification result, attestation note, and any approved
+  collection-code verification result, attestation note, payout idempotency key,
+  correlation ID, Finance cash/ledger reference, and any approved
   identity-mismatch exception reference.
 
 ### Delivery Agents

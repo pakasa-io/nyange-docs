@@ -107,6 +107,9 @@ assurance, permission-grant facts, and outlet-scope facts.
   closing, receipt records, expense controls, and delivery cost reporting.
 - Finance owns the short/over COD collection variance policy and the variance
   records linked from Payment.
+- Finance owns the cash custody decrease, cash ledger entry, financial ledger
+  basis, daily-closing reference, and audit fields for Refund-coordinated cash
+  payouts.
 - Delivery owns doorstep collection evidence, delivery task state, field facts,
   and handover submission evidence.
 - Payment owns expected COD amount, collected cash fact, zero-collection fact,
@@ -193,6 +196,23 @@ else                                             -> Super Admin approval
 - POS void cash returned to the customer is a same-day void reversal, not a
   Refund-owned payout.
 
+### Refund Payout Participation
+
+Refund coordinates customer cash-refund payout. Finance participates in the
+payout commit because outlet cash custody and ledger records are Finance-owned.
+
+- Finance validates that the payout outlet has sufficient outlet cash custody for
+  the Refund-owned payout amount.
+- Finance records the outlet cash custody decrease.
+- Finance posts the cash ledger entry and financial ledger basis for the payout.
+- Finance records the payout daily-closing reference and Finance-owned audit
+  fields.
+- The same idempotency key and correlation ID apply to Refund and Finance
+  participant mutations in the payout commit.
+- If Finance rejects the payout participant mutation or the transaction fails
+  before commit, no Finance cash custody, ledger, or daily-closing mutation is
+  posted.
+
 ## Daily Closing
 
 Daily closing is the outlet's end-of-day financial reconciliation.
@@ -206,6 +226,7 @@ Daily closing summarizes:
 - completed POS sales and POS voids;
 - issued receipts;
 - cash and ledger entries;
+- refund payouts posted through Finance-owned cash and ledger records;
 - outstanding refund liabilities carried forward with Outlet Manager
   acknowledgement.
 
