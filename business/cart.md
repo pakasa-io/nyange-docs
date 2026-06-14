@@ -34,10 +34,9 @@ pricing, and price rules;
 ```
 ACTIVE
   -> CHECKED_OUT
+  -> CLEARED
   -> ABANDONED
       -> SUMMARY_RETAINED
-
-CLEARED
 ```
 
 | State | Meaning |
