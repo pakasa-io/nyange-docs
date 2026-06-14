@@ -19,7 +19,8 @@ E-07-E-09, MVP authentication simplification decision on 2026-06-14
 - Any action requiring approval cannot be approved by the same individual who
   submitted or requested it.
 - This applies regardless of role.
-- Covered examples include expense above threshold and inventory adjustment.
+- Covered examples include expense at or above threshold and inventory
+  adjustment.
 
 **BI-17 — Authorization is enforced by the owning boundary.**
 

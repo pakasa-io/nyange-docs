@@ -267,7 +267,7 @@ if closing_overdue:
   blocked unless owning_policy_action_specific_urgency_override:
             large_inventory_adjustments
             manual_financial_ledger_adjustments
-            above_threshold_expense_approval  // >= 100,000 UGX at launch
+            above_threshold_expense_approval  // label means >= active expense threshold; 100,000 UGX at launch
   allowed:  online_order_placement, order_claiming, inventory_reservation_for_claim
   allowed:  claim_block_marking, claim_block_reopening, unclaimable_closure
   allowed:  ready_for_pickup, delivery_agent_assignment, pickup, cod_collection
@@ -285,6 +285,8 @@ if closing_overdue:
   are `PENDING_APPROVAL` under Inventory's launch threshold policy: loss,
   missing-source adjustment, manual correction, positive available-stock
   increase, or absolute delta greater than one unit.
+- For this gate, `above_threshold_expense_approval` is the existing action label
+  for approving expenses at or above the active Finance-owned expense threshold.
 - Finance owns the overdue-closing condition and exposes it to Inventory;
   Inventory remains the owner of adjustment lifecycle, approval, and inventory
   ledger posting.
@@ -327,8 +329,8 @@ if expense_amount >= 100,000 UGX  → requires approval AND receipt attachment
 ### Business Rules
 
 - Posting without separate review applies only when the active policy allows it.
-- Receipt attachments are required above the active threshold and optional below
-  it.
+- Receipt attachments are required at or above the active threshold and optional
+  below it.
 - The active expense approval policy starts from global defaults and may define
   outlet/category overrides.
 - Expense categories are globally configured.
