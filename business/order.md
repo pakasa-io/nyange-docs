@@ -173,7 +173,7 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 | `OUT_FOR_DELIVERY` | Delivery agent has picked up the whole order and holds outgoing goods custody. |
 | `DELIVERED` | Delivery succeeded; COD fact, stock commitment, claim completion, task state, order state, and returned-cylinder field facts committed together. |
 | `CUSTOMER_CANCELLED` | Customer cancellation completed before pickup; the order is terminal and never returns to the pending pool. |
-| `DELIVERY_FAILED` | Delivery failed after pickup; goods and custody were returned or resolved and zero collection was recorded. |
+| `DELIVERY_FAILED` | Delivery failed after pickup; picked-up goods custody was resolved by physical return or approved custody exception, and zero collection was recorded. |
 
 ## State Rules
 
@@ -276,9 +276,12 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
   claim, cancels any pre-pickup delivery task, records required cancellation
   attribution, and marks the order `CUSTOMER_CANCELLED`.
 - A customer-cancelled order never returns to the pending pool.
-- Delivery failure after pickup returns all picked-up outgoing goods custody to
-  outlet stock, records a zero-collection payment fact, completes the claim,
-  marks the task `FAILED`, and marks the order `DELIVERY_FAILED`.
+- Delivery failure after pickup resolves all picked-up outgoing goods custody by
+  physical outlet return or approved custody exception, records a
+  zero-collection payment fact, completes the claim, marks the task `FAILED`,
+  and marks the order `DELIVERY_FAILED`.
+- Failed delivery does not by itself make custody-exception goods available for
+  new sale.
 
 ## Main Flow
 

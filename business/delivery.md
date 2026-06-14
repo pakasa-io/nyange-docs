@@ -216,7 +216,12 @@ Transition to `PICKED_UP` requires both:
 - Delivery agents may mark a delivery `FAILED` after pickup.
 - A controlled reason code and audit trail are required.
 - An optional note may be added.
-- Failed delivery returns all picked-up outgoing goods custody to outlet stock.
+- Failed delivery requires every picked-up outgoing goods custody row to be
+  resolved by physical return to the outlet or by approved custody exception.
+- Physically returned goods may be receipted back to outlet stock through
+  Inventory.
+- Goods covered by custody exception do not become available stock through the
+  failed-delivery action.
 - Failed delivery records a zero-collection payment fact.
 - Failed delivery completes the active order claim.
 - Failed delivery marks the order `DELIVERY_FAILED`.

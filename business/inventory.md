@@ -92,8 +92,10 @@ TRANSFER_HOLD
 - Stock release occurs only through an explicit lifecycle event.
 - Outlet claim cancellation before pickup releases the reservation.
 - Customer cancellation before pickup releases the reservation.
-- Delivery failure after pickup releases stock only after picked-up goods return
-  to outlet stock or are covered by an approved custody exception.
+- Delivery failure after pickup releases physically returned goods to
+  availability only after outlet return receipt.
+- Goods covered by an approved custody exception remain non-available until
+  Inventory posts the appropriate adjustment or resolution record.
 - Delivery success commits reserved outgoing stock.
 - Incoming customer cylinders from refill delivery are tracked separately as
   `INTAKE_PENDING`.
