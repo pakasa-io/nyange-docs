@@ -74,7 +74,7 @@ tests.
 
 | File | Aggregate | Authoritative for |
 | --- | --- | --- |
-| [identity-auth.md](identity-auth.md) | Identity & Authorization | Personas, access matrix, authentication, authorization, edge cases E-02-E-09 |
+| [identity-auth.md](identity-auth.md) | Identity & Authorization Facts | Personas, authentication, account state, authentication-link facts, permission-grant facts, outlet-scope facts, and cross-aggregate authorization edge cases E-02-E-09 |
 | [catalog.md](catalog.md) | Catalog & Pricing | Refill pricing, bundle pricing, global online pricing, launch commercial programs |
 | [cart.md](cart.md) | Cart | Customer cart state, quote readiness, catalog-change handling, checkout readiness, abandoned-cart cleanup |
 | [order.md](order.md) | Order | Order placement, lifecycle state, outlet claiming, COD fulfillment, and cancellation |
@@ -101,9 +101,14 @@ tests.
   states.
 - Catalog orderability and priceability rules are referenced by [cart.md](cart.md)
   for quote readiness and by [order.md](order.md) for placement revalidation.
-- The complete access matrix is in [identity-auth.md](identity-auth.md). Each
-  aggregate file includes only the permission rows directly relevant to that
-  aggregate.
+- Authorization is decentralized. [identity-auth.md](identity-auth.md) owns
+  authentication, actor identity, account state, authentication-link facts,
+  permission-grant facts, outlet-scope facts, and grant-combination constraints.
+  Each aggregate owns the authorization rules for commands and reads at its own
+  boundary.
+- Aggregate permission sections are authoritative for the aggregate's actions.
+  The matrix in [identity-auth.md](identity-auth.md) is a cross-aggregate
+  orientation index, not a central override of aggregate-owned rules.
 
 ## Use Rules
 

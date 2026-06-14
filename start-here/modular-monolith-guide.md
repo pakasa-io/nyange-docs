@@ -211,12 +211,17 @@ source-owned read APIs; they must not imply shared mutable tables.
 
 ### Authorization vs Business Policy
 
-- Authorization modules own: identity, permission, scope, session assurance,
-  and separation-of-duty checks.
-- Domain modules own: business eligibility, thresholds, approval requirements,
-  state transitions, and policy outcomes.
-- Do not move business policy into access control just because permission is
-  also required.
+- Identity/Auth owns authentication, actor identity, authentication context,
+  permission-grant facts, outlet-scope facts, and grant-combination or
+  separation-of-duty constraints that are independent of one business
+  lifecycle.
+- Domain modules own local authorization decisions for their own commands and
+  reads, including required grant facts, scope checks, business eligibility,
+  thresholds, approval requirements, state transitions, policy outcomes, and
+  audit basis.
+- Keep authorization enforcement close to the boundary receiving the command or
+  read. Do not centralize domain-specific authorization rules in Identity/Auth
+  just because the decision consumes identity, permission, or scope facts.
 
 ### Infrastructure Boundary
 

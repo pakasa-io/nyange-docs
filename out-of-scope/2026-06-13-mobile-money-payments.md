@@ -235,5 +235,5 @@ payment references in one module without the full cross-module lifecycle.
 
 - Launch payment behavior is defined in [../business/payment.md](../business/payment.md).
 - Refund behavior remains cash-only in [../business/refund.md](../business/refund.md).
-- This item does not defer customer SMS OTP, notification, or phone-number
+- This item does not defer human SMS OTP, notification, or phone-number
   authentication behavior.

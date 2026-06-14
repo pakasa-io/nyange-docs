@@ -14,7 +14,8 @@ can pay it, and how customer-presented collection codes authorize payout.
 [payment.md](payment.md) for cash collection and zero-collection facts;
 [delivery.md](delivery.md) for failed-delivery fee waiver;
 [finance.md](finance.md) for daily closing and liability reporting;
-[identity-auth.md](identity-auth.md) for the full access matrix.
+[identity-auth.md](identity-auth.md) for personas, authentication, session
+assurance, permission-grant facts, and outlet-scope facts.
 
 ## Invariants
 
@@ -213,8 +214,10 @@ refund-payout permission. The actor must:
 
 ## Permissions
 
-Trimmed access matrix rows relevant to refunds. Full matrix:
-[identity-auth.md](identity-auth.md).
+Refund owns authorization decisions for Refund-owned commands and reads. Related
+rows are shown here for context; rows enforced by another aggregate remain with
+that aggregate. Identity supplies actor, account, grant, and outlet-scope facts
+from [identity-auth.md](identity-auth.md).
 
 | Capability | P-01 | P-03 | P-06 | P-10 |
 | --- | --- | --- | --- | --- |

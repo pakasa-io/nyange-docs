@@ -17,7 +17,8 @@ Lifecycle intake leg
 recognition;
 [delivery.md](delivery.md) for the refill exchange field leg and delivery
 custody;
-[identity-auth.md](identity-auth.md) for the full access matrix.
+[identity-auth.md](identity-auth.md) for personas, authentication, session
+assurance, permission-grant facts, and outlet-scope facts.
 
 ## Invariants
 
@@ -418,8 +419,10 @@ INTAKE_PENDING
 
 ## Permissions
 
-Trimmed access matrix rows relevant to inventory. Full matrix:
-[identity-auth.md](identity-auth.md).
+Inventory owns authorization decisions for Inventory-owned commands and reads.
+Related rows are shown here for context; rows enforced by another aggregate
+remain with that aggregate. Identity supplies actor, account, grant, and
+outlet-scope facts from [identity-auth.md](identity-auth.md).
 
 | Capability | P-04 | P-06 | P-08 | P-10 |
 | --- | --- | --- | --- | --- |

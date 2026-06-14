@@ -33,8 +33,9 @@ YYYY-MM-DD-short-item-name.md
 | [Advanced Stock Counts and Low-Stock Alerts](2026-06-14-stock-counts-low-stock-alerts.md) | Deferred |
 | [Refund Code Expiry and Regeneration](2026-06-14-refund-code-expiry-regeneration.md) | Deferred |
 | [Delivery Field Proof Policy](2026-06-14-delivery-field-proof-policy.md) | Deferred |
-| [Authorization Policy Co-Approval](2026-06-14-authorization-policy-co-approval.md) | Deferred |
+| [Authorization Change Co-Approval](2026-06-14-authorization-policy-co-approval.md) | Deferred |
 | [Post-Collection Price Adjustments](2026-06-14-post-collection-price-adjustments.md) | Deferred |
+| [Advanced Authentication Controls](2026-06-14-advanced-auth-controls.md) | Deferred |
 
 Revisit express delivery fee when the Product Manager approves a customer-facing
 priority delivery offer with service-level promise, eligibility, capacity, fee,
@@ -67,9 +68,15 @@ Revisit delivery field proof policy when delivery disputes, safety incidents, or
 cash/cylinder custody exceptions require GPS, photo, note, fallback-code, or
 evidence-retention rules beyond live field recording.
 
-Revisit authorization policy co-approval when runtime permission-policy changes
-become frequent or sensitive enough that Super Admin audit alone is insufficient.
+Revisit authorization change co-approval when runtime grant, scope,
+grant-combination, or aggregate-owned authorization-rule changes become frequent
+or sensitive enough that Super Admin audit alone is insufficient.
 
 Revisit post-collection price adjustments when the Product Manager approves a
 post-delivery adjustment policy with source owner, authorization, posting,
 receipt, reporting, and Refund handoff rules.
+
+Revisit advanced authentication controls when production risk, compliance
+requirements, account-takeover incidents, staff onboarding volume, device trust
+requirements, or audit investigations show that passwordless SMS OTP plus
+current Identity fact checks is insufficient for privileged operations.

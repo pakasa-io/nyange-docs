@@ -19,7 +19,7 @@ use and to confirm that notification delivery does not control business state.
 ## Business Rules
 
 - General business notifications use push and email at launch.
-- SMS is reserved for customer authentication OTP only.
+- SMS is reserved for human authentication OTP only.
 - WhatsApp is not launch behavior.
 - Customer-configurable notification preferences are not launch behavior.
 - Notification types are classified as transactional or non-transactional for
@@ -53,12 +53,14 @@ Launch channels are assigned by event type, not customer preference.
 
 - WhatsApp integration.
 - Customer-configurable channel preferences.
-- SMS for anything other than customer authentication OTP.
+- SMS for anything other than human authentication OTP.
 
 ## Permissions
 
-Trimmed access matrix rows relevant to notifications. Full matrix:
-[identity-auth.md](identity-auth.md).
+Notifications owns authorization decisions for Notifications-owned commands and
+reads. Related rows are shown here for context; rows enforced by another
+aggregate remain with that aggregate. Identity supplies actor, account, grant,
+and outlet-scope facts from [identity-auth.md](identity-auth.md).
 
 | Capability | P-06 | P-10 |
 | --- | --- | --- |

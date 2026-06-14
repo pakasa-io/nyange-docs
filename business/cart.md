@@ -13,7 +13,8 @@ created, changed, quoted, checked out, abandoned, or cleaned up.
 pricing, and price rules;
 [order.md](order.md) for order placement and immutable order snapshots;
 [inventory.md](inventory.md) for reservation behavior after outlet claim;
-[identity-auth.md](identity-auth.md) for the full access matrix.
+[identity-auth.md](identity-auth.md) for personas, authentication, session
+assurance, permission-grant facts, and outlet-scope facts.
 
 ## Boundary
 
@@ -156,8 +157,10 @@ business requirements before creating the order snapshot.
 
 ## Permissions
 
-Trimmed access matrix rows relevant to carts. Full matrix:
-[identity-auth.md](identity-auth.md).
+Cart owns authorization decisions for Cart-owned commands and reads. Related
+rows are shown here for context; rows enforced by another aggregate remain with
+that aggregate. Identity supplies actor, account, grant, and outlet-scope facts
+from [identity-auth.md](identity-auth.md).
 
 | Capability | P-01 | P-10 |
 | --- | --- | --- |

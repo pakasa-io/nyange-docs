@@ -25,7 +25,8 @@ and payout lifecycle;
 [finance.md](finance.md) for cash handover, counted-cash acceptance, outlet
 cash custody, variance records, and receipts;
 [notifications.md](notifications.md) for notification fanout side effects;
-[identity-auth.md](identity-auth.md) for the full access matrix.
+[identity-auth.md](identity-auth.md) for personas, authentication, session
+assurance, permission-grant facts, and outlet-scope facts.
 
 ## Invariants
 
@@ -483,8 +484,10 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
 
 ## Permissions
 
-Trimmed access matrix rows relevant to orders. Full matrix:
-[identity-auth.md](identity-auth.md).
+Order owns authorization decisions for Order-owned commands and reads. Related
+rows are shown here for context; rows enforced by another aggregate remain with
+that aggregate. Identity supplies actor, account, grant, and outlet-scope facts
+from [identity-auth.md](identity-auth.md).
 
 | Capability | P-01 | P-02 | P-03 | P-04 | P-05 | P-06 | P-08 | P-09 | P-10 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |

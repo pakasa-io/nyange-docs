@@ -17,7 +17,8 @@ field leg, §7.7 Agent Cash Handling, §7.12 Failed Delivery Fee Waiver
 recognition;
 [catalog.md](catalog.md) for product/refill price rules;
 [payment.md](payment.md) for payment facts;
-[identity-auth.md](identity-auth.md) for the full access matrix.
+[identity-auth.md](identity-auth.md) for personas, authentication, session
+assurance, permission-grant facts, and outlet-scope facts.
 
 ## Invariants
 
@@ -372,8 +373,10 @@ No delivery fee is charged on any failed delivery, regardless of failure reason.
 
 ## Permissions
 
-Trimmed access matrix rows relevant to delivery. Full matrix:
-[identity-auth.md](identity-auth.md).
+Delivery owns authorization decisions for Delivery-owned commands and reads.
+Related rows are shown here for context; rows enforced by another aggregate
+remain with that aggregate. Identity supplies actor, account, grant, and
+outlet-scope facts from [identity-auth.md](identity-auth.md).
 
 | Capability | P-02 | P-04 | P-05 | P-06 | P-10 |
 | --- | --- | --- | --- | --- | --- |

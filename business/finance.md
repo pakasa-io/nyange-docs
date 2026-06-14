@@ -18,7 +18,8 @@ cancellation;
 [delivery.md](delivery.md) for doorstep collection evidence and delivery task
 state;
 [refund.md](refund.md) for refund liabilities;
-[identity-auth.md](identity-auth.md) for the full access matrix.
+[identity-auth.md](identity-auth.md) for personas, authentication, session
+assurance, permission-grant facts, and outlet-scope facts.
 
 ## Invariants
 
@@ -360,8 +361,10 @@ governed by [order.md](order.md), [catalog.md](catalog.md), and
 
 ## Permissions
 
-Trimmed access matrix rows relevant to finance. Full matrix:
-[identity-auth.md](identity-auth.md).
+Finance owns authorization decisions for Finance-owned commands and reads.
+Related rows are shown here for context; rows enforced by another aggregate
+remain with that aggregate. Identity supplies actor, account, grant, and
+outlet-scope facts from [identity-auth.md](identity-auth.md).
 
 | Capability | P-06 | P-08 | P-09 | P-10 |
 | --- | --- | --- | --- | --- |

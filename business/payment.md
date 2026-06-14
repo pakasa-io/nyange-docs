@@ -16,7 +16,8 @@ and which exceptions hand off to delivery, POS Sale, refund, or finance.
 [delivery.md](delivery.md) for doorstep cash collection;
 [refund.md](refund.md) for cash refund liabilities;
 [finance.md](finance.md) for daily closing and cash ledger posting;
-[identity-auth.md](identity-auth.md) for the full access matrix.
+[identity-auth.md](identity-auth.md) for personas, authentication, session
+assurance, permission-grant facts, and outlet-scope facts.
 
 ## Invariants
 
@@ -210,8 +211,10 @@ state and does not create a terminal payment fact.
 
 ## Permissions
 
-Trimmed access matrix rows relevant to payment. Full matrix:
-[identity-auth.md](identity-auth.md).
+Payment owns authorization decisions for Payment-owned commands and reads.
+Related rows are shown here for context; rows enforced by another aggregate
+remain with that aggregate. Identity supplies actor, account, grant, and
+outlet-scope facts from [identity-auth.md](identity-auth.md).
 
 | Capability | P-02 | P-03 | P-06 | P-10 |
 | --- | --- | --- | --- | --- |

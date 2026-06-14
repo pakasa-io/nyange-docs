@@ -15,7 +15,8 @@ checkout readiness;
 [order.md](order.md) for immutable order price snapshots;
 [pos.md](pos.md) for walk-in POS sale line snapshots and saleability checks;
 [delivery.md](delivery.md) for delivery fees and failed-delivery fee waivers;
-[identity-auth.md](identity-auth.md) for the full access matrix.
+[identity-auth.md](identity-auth.md) for personas, authentication, session
+assurance, permission-grant facts, and outlet-scope facts.
 
 ## Invariants
 
@@ -236,8 +237,10 @@ requirements before creating the immutable order snapshot under
 
 ## Permissions
 
-Trimmed access matrix rows relevant to catalog and pricing. Full matrix:
-[identity-auth.md](identity-auth.md).
+Catalog owns authorization decisions for Catalog-owned catalog and pricing
+commands and reads. Related rows are shown here for context; rows enforced by
+another aggregate remain with that aggregate. Identity supplies actor, account,
+grant, and outlet-scope facts from [identity-auth.md](identity-auth.md).
 
 | Capability | P-01 | P-03 | P-06 | P-08 | P-10 |
 | --- | --- | --- | --- | --- | --- |

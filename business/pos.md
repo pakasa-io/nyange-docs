@@ -67,7 +67,7 @@ assurance, permission-grant facts, and outlet-scope facts.
 - Finance owns outlet cash custody, financial and cash ledger posting, daily
   closing, receipt records, and receipt void audit.
 - Refund does not own POS same-day voids at launch.
-- Identity owns staff actor identity, session assurance, and outlet scope facts.
+- Identity owns staff actor identity, account status, and outlet scope facts.
 
 ## Lifecycle
 
@@ -214,7 +214,7 @@ POS Sale completion is the trigger. Participant ownership remains module-scoped:
 
 POS Sale owns authorization decisions for POS-owned commands and reads. Related
 rows are shown here for context; rows enforced by another aggregate remain with
-that aggregate. Identity supplies actor, session, grant, and outlet-scope facts
+that aggregate. Identity supplies actor, account, grant, and outlet-scope facts
 from [identity-auth.md](identity-auth.md).
 
 | Capability | P-03 | P-06 | P-08 | P-09 | P-10 |
