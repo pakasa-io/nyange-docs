@@ -1,10 +1,11 @@
 # Order
 
 **Intent**: Define order behavior for placement, lifecycle state, outlet
-claiming, COD fulfillment, and cancellation.
+claiming, claim-block exceptions, COD fulfillment, and cancellation.
 
 **Reader task**: Use this document to decide whether an online COD order can be
-placed, claimed, prepared, picked up, delivered, failed, or cancelled.
+placed, claimed, claim-blocked, prepared, picked up, delivered, failed,
+closed as unclaimable, or cancelled.
 
 **Sources**: BI-02, BI-07, BI-09, BI-20, BI-21, BI-22, BI-23
 
@@ -73,19 +74,26 @@ Every cancellation record must capture:
 
 Covered cancellations include:
 
-- customer cancellation from `PENDING`, `CLAIMED`, or `READY_FOR_PICKUP`;
+- customer cancellation from `PENDING`, `CLAIM_BLOCKED`, `CLAIMED`, or
+  `READY_FOR_PICKUP`;
 - outlet claim cancellation from `CLAIMED` or `READY_FOR_PICKUP`;
 - delivery task cancellation before pickup.
 
 A cancellation missing any required field is a data integrity violation.
+
+Claim-block closure to `UNCLAIMABLE` is a terminal Order-owned exception
+outcome, not customer cancellation, but it must capture the same actor,
+role, reason code, reason note, timestamp, and audit trail fields.
 
 **BI-22 — Outlet disable is blocked by active orders.**
 
 - An outlet cannot be disabled while it has an active claim, active reservation,
   active delivery task, or active order custody.
 - Terminal order states for this rule are `DELIVERED`,
-  `CUSTOMER_CANCELLED`, and `DELIVERY_FAILED`.
-- Unclaimed `PENDING` orders do not block any outlet from being disabled.
+  `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`, and `UNCLAIMABLE`.
+- Unclaimed `PENDING` and `CLAIM_BLOCKED` orders do not block any outlet from
+  being disabled because they have no claimed fulfilling outlet, active
+  reservation, active delivery task, or active order custody.
 - Disablement is allowed only after every order with an active or retained
   outlet association has reached a terminal state and no related custody,
   reservation, or cash handover blocker remains.
@@ -94,10 +102,11 @@ A cancellation missing any required field is a data integrity violation.
 
 - Critical one-time mutations require idempotency keyed by actor, endpoint, and
   client key.
-- Covered mutations include order creation, order claim, outlet claim
-  cancellation, customer cancellation, ready-for-pickup marking, pickup,
-  delivery completion, failed delivery, returned-empty reconciliation, COD
-  collection reporting, and cash handover.
+- Covered mutations include order creation, order claim, claim-block marking,
+  claim-block reopening, unclaimable closure, outlet claim cancellation,
+  customer cancellation, ready-for-pickup marking, pickup, delivery completion,
+  failed delivery, returned-empty reconciliation, COD collection reporting, and
+  cash handover.
 - Identical replays return the original result.
 - Same-key/different-body replays are rejected.
 - In-progress duplicates return a retryable response.
@@ -114,9 +123,15 @@ A cancellation missing any required field is a data integrity violation.
 ## Boundary
 
 - Order owns order placement, order state, customer-visible status,
-  cancellation, claim association, and immutable price snapshot.
+  cancellation, claim-block exception state, unclaimable closure, claim
+  association, and immutable price snapshot.
 - Order has no fulfilling outlet while it is `PENDING`.
+- Order has no fulfilling outlet while it is `CLAIM_BLOCKED`.
 - Claiming creates exactly one claimed fulfilling outlet association.
+- Claim-block marking removes the order from the claimable pending pool until
+  Order reopens it to `PENDING`.
+- Unclaimable closure terminates an order before pickup without stock,
+  delivery, payment, receipt, refund, or fulfilling outlet effects.
 - Outlet claim cancellation clears the fulfilling outlet association and returns
   the order to `PENDING`.
 - Successful delivery and failed delivery retain the fulfilling outlet
@@ -162,22 +177,29 @@ PENDING
   -> OUT_FOR_DELIVERY
   -> DELIVERED
 
-PENDING|CLAIMED|READY_FOR_PICKUP -> CUSTOMER_CANCELLED
+PENDING -> CLAIM_BLOCKED
+CLAIM_BLOCKED -> PENDING
+CLAIM_BLOCKED -> UNCLAIMABLE
+
+PENDING|CLAIM_BLOCKED|CLAIMED|READY_FOR_PICKUP -> CUSTOMER_CANCELLED
 CLAIMED|READY_FOR_PICKUP -> PENDING   # outlet claim cancel before pickup
 OUT_FOR_DELIVERY -> DELIVERY_FAILED
 ```
 
-Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
+Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
+`UNCLAIMABLE`.
 
 | State | Meaning |
 | --- | --- |
 | `PENDING` | Order placement succeeded; no outlet has claimed the order and no stock is reserved. |
+| `CLAIM_BLOCKED` | Order cannot currently be claimed because the pending-claim timeout expired or every eligible outlet has a current claim-blocking reason. No stock is reserved and no fulfilling outlet is associated. |
 | `CLAIMED` | One active permitted outlet has claimed the whole order and inventory has reserved all requested stock. |
 | `READY_FOR_PICKUP` | Claimed outlet has marked the whole order ready and a delivery task exists. |
 | `OUT_FOR_DELIVERY` | Delivery agent has picked up the whole order and holds outgoing goods custody. |
 | `DELIVERED` | Delivery succeeded; COD fact, stock commitment, claim completion, task state, order state, and returned-cylinder field facts committed together. |
 | `CUSTOMER_CANCELLED` | Customer cancellation completed before pickup; the order is terminal and never returns to the pending pool. |
 | `DELIVERY_FAILED` | Delivery failed after pickup; picked-up goods custody was resolved by physical return or approved custody exception, and zero collection was recorded. |
+| `UNCLAIMABLE` | Order was closed before claim because launch rules could not produce an eligible claiming outlet within the configured claim-block policy. |
 
 ## State Rules
 
@@ -205,6 +227,7 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 - Order placement allocates an immutable `ORD-%08d` public order number.
 - Order placement grants the customer order-scoped read, status, and cancel
   permissions.
+- Order placement starts the Order-owned pending-claim timeout.
 - No stock is reserved during cart activity or order placement.
 - Stock reservation occurs only when an outlet claims the order.
 - While an order is `PENDING`, only active online-fulfillment outlets that serve
@@ -218,10 +241,68 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 - Outlets outside the delivery area scope cannot read the full pending-pool
   detail or attempt the claim.
 
+### Claim Block (`PENDING` -> `CLAIM_BLOCKED`)
+
+- Order owns claim-block detection, state transition, customer-visible status,
+  audit record, and later resolution outcome.
+- Inventory, Catalog, Delivery, Payment, Finance, and Notifications may supply
+  facts or receive events, but they do not own claim-block state.
+- Claim-block evaluation applies only while the order is `PENDING`.
+- The claim-evaluation candidate set is the set of outlets that could claim the
+  order under current service-area, online-fulfillment, outlet-status, and
+  permission-scope facts.
+- `CLAIM_BLOCKED` is entered when any condition is true:
+  - the configured pending-claim timeout expires before any outlet claims the
+    order;
+  - the current claim-evaluation candidate set is empty;
+  - every outlet in the current claim-evaluation candidate set has a current
+    claim-blocking reason for the frozen order.
+- The pending-claim timeout is required Order policy configuration for launch.
+- A missing pending-claim timeout configuration is a launch-blocking policy gap.
+- The timeout starts at order placement and restarts whenever an order is
+  reopened from `CLAIM_BLOCKED` to `PENDING`.
+- Claim-blocking reasons are controlled reason codes. Launch reason codes are:
+  - `NO_RESERVABLE_STOCK`;
+  - `OUTGOING_VENDOR_NOT_FULFILLABLE`;
+  - `INCOMING_VENDOR_NOT_ACCEPTED`;
+  - `PRODUCT_OR_SKU_NOT_FULFILLABLE`;
+  - `NO_CURRENT_SERVICEABLE_OUTLET`;
+  - `OUTLET_ONLINE_FULFILLMENT_DISABLED`;
+  - `DELIVERY_AREA_NO_LONGER_SERVED`;
+  - `COD_TERM_NOT_SUPPORTED`.
+- A claim-blocking reason may come from a rejected claim attempt or from an
+  authoritative system eligibility check.
+- The claim-block record must capture:
+  - order ID and public order number;
+  - frozen order snapshot reference;
+  - evaluated delivery-area facts;
+  - candidate outlet set at evaluation time;
+  - per-outlet claim-blocking reason code and source;
+  - pending-claim timeout value and deadline, when timeout caused the block;
+  - actor or system job that detected the block;
+  - timestamp;
+  - customer-visible status message category;
+  - audit correlation ID.
+- The transition is atomic and allowed only if the order is still `PENDING` and
+  has no active claim.
+- No stock is reserved, committed, released, or ledger-posted by claim-block
+  marking.
+- No delivery task, payment fact, receipt, refund liability, cash custody row,
+  or fulfilling outlet association is created by claim-block marking.
+- A `CLAIM_BLOCKED` order is removed from the pending-pool claim queue.
+- Eligible outlets cannot claim a `CLAIM_BLOCKED` order until Order reopens it
+  to `PENDING`.
+- The customer can see the claim-blocked status and may cancel the order.
+- Notifications attempts the configured claim-blocked customer notification.
+- Failed or delayed claim-blocked notification fanout does not block the
+  committed state transition.
+
 ### Claiming (`PENDING` -> `CLAIMED`)
 
 - Any active online-fulfillment outlet that serves the delivery area and holds
   claim permission may claim an order from the pending pool.
+- An order in `CLAIM_BLOCKED`, `CLAIMED`, `READY_FOR_PICKUP`,
+  `OUT_FOR_DELIVERY`, or any terminal state cannot be claimed.
 - Claim is whole-order only.
 - Partial item claims are prohibited.
 - Claiming reserves all requested stock atomically.
@@ -233,6 +314,45 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 - Claiming cannot change product price, delivery fee, tax, discount, order
   total, or expected COD.
 - No automatic outlet allocation, ranking, or outlet-change chain is defined.
+
+### Claim Block Resolution
+
+- Claim-block resolution is an Order-owned transition from `CLAIM_BLOCKED`.
+- `CLAIM_BLOCKED -> PENDING` reopens the same order to the pending pool.
+- A scoped Outlet Manager may reopen only when their outlet is in the current
+  claim-evaluation candidate set and Order verifies that outlet can currently
+  attempt a claim under the frozen order terms.
+- A Super Admin may reopen any claim-blocked order when Order verifies at least
+  one current eligible claim path.
+- Reopening requires a current Order-owned resolution record proving at least
+  one active online-fulfillment outlet serving the delivery area can now attempt
+  a claim under the frozen order terms.
+- Reopening cannot change product, price, delivery fee, tax, discount, order
+  total, expected COD, customer, delivery address, line contents, public order
+  number, or original order-placement timestamp.
+- Reopening clears the claim-block exception state, records the resolving actor
+  or system basis, appends the audit record, and starts a new pending-claim
+  timeout.
+- Reopening does not reserve stock. Reservation still occurs only when an outlet
+  claims the reopened `PENDING` order.
+- `CLAIM_BLOCKED -> UNCLAIMABLE` closes the order when launch rules cannot
+  produce an eligible claiming outlet and Super Admin confirms that correction
+  is not available inside the launch process.
+- `UNCLAIMABLE` closure requires:
+  - Super Admin actor identity;
+  - actor role;
+  - reason code;
+  - reason note;
+  - timestamp;
+  - unresolved candidate outlet evidence;
+  - customer notification request;
+  - audit correlation ID.
+- `UNCLAIMABLE` closure is terminal.
+- `UNCLAIMABLE` does not create a payment terminal state, refund liability,
+  receipt, delivery task, inventory ledger entry, cash custody row, or fulfilling
+  outlet association.
+- If a customer still wants the goods after `UNCLAIMABLE`, the customer places a
+  new order.
 
 ### Ready for Pickup (`CLAIMED` -> `READY_FOR_PICKUP`)
 
@@ -289,7 +409,14 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 - Customer cancellation releases any active reservation, cancels the active
   claim, cancels any pre-pickup delivery task, records required cancellation
   attribution, and marks the order `CUSTOMER_CANCELLED`.
+- Customer cancellation from `CLAIM_BLOCKED` records cancellation attribution
+  and marks the order `CUSTOMER_CANCELLED`; there is no reservation, active
+  claim, delivery task, payment fact, receipt, refund liability, cash custody
+  row, or fulfilling outlet association to release.
 - A customer-cancelled order never returns to the pending pool.
+- Unclaimable closure from `CLAIM_BLOCKED` records the required exception
+  attribution, marks the order `UNCLAIMABLE`, and retires the COD expectation
+  without creating a payment terminal state.
 - Delivery failure after pickup resolves all picked-up outgoing goods custody by
   physical outlet return or approved custody exception, records a
   zero-collection payment fact, completes the claim, marks the task `FAILED`,
@@ -301,27 +428,32 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 
 1. Customer places an order from a checkout-ready cart and the order enters
    `PENDING`.
-2. An active permitted outlet claims the whole order. The order moves
+2. If no outlet claims within the pending-claim timeout, or every eligible
+   outlet has a current claim-blocking reason, Order moves the order to
+   `CLAIM_BLOCKED`.
+3. A `CLAIM_BLOCKED` order is either reopened to `PENDING` after correction,
+   cancelled by the customer, or closed as `UNCLAIMABLE`.
+4. An active permitted outlet claims the whole order. The order moves
    `PENDING -> CLAIMED`; inventory reserves all requested stock atomically.
    Partial order-item claims are prohibited.
-3. The claimed outlet marks the order ready. The order moves
+5. The claimed outlet marks the order ready. The order moves
    `CLAIMED -> READY_FOR_PICKUP`; fulfillment creates a `READY_FOR_PICKUP`
    delivery task and attempts ready-order notification fanout.
-4. A delivery agent is assigned to the task. Assignment grants the agent
+6. A delivery agent is assigned to the task. Assignment grants the agent
    order-scoped read access to the full delivery address while the assignment
    is active.
-5. The delivery agent picks up the order. Pickup keeps the reserved stock
+7. The delivery agent picks up the order. Pickup keeps the reserved stock
    unavailable, creates outgoing goods custody for the agent, moves the delivery
    task to `PICKED_UP`, and moves the order to `OUT_FOR_DELIVERY`.
-6. The delivery agent completes delivery. Completion requires
+8. The delivery agent completes delivery. Completion requires
    `acknowledged_cash_collected=true`, derives COD from the persisted order
    total, records returned-cylinder field facts when applicable, records the COD
    collection fact, commits outgoing stock, completes the claim, and marks the
    task and order `DELIVERED`.
-7. Returned empties are reconciled separately from delivery completion. Outlet
+9. Returned empties are reconciled separately from delivery completion. Outlet
    intake moves each returned-empty record into outlet empty stock and marks
    those custody rows reconciled.
-8. COD cash is physically held by the Delivery Agent under the Finance-owned
+10. COD cash is physically held by the Delivery Agent under the Finance-owned
    cash custody lifecycle until handover and reconciliation. A permitted
    handover receiver accepts counted cash, transfers custody to outlet cash, and
    records any approved Finance-owned variance.
@@ -347,6 +479,8 @@ Trimmed access matrix rows relevant to orders. Full matrix:
 | Order placement | Full | - | - | - | - | - | - | - | Full |
 | Order status tracking | Own | Own assigned | Scoped | - | Scoped | Scoped | Read assigned outlets | Read | Full |
 | Outlet claiming | - | - | - | - | - | Scoped with explicit permission | - | - | Full |
+| Claim-block resolution | - | - | - | - | - | Scoped reopen with explicit permission | Read assigned outlets | - | Full |
+| Unclaimable closure | - | - | - | - | - | - | - | - | Full |
 | Ready-for-pickup marking | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
 | Delivery assignment | - | - | - | - | Scoped | Scoped | - | - | Full |
 | Delivery completion | - | Own assigned | - | - | - | - | - | - | Full |

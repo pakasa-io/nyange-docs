@@ -93,6 +93,8 @@ may hold multiple permission bundles across one or more outlets.
 
 - Operational owner of a single outlet.
 - Claims pending orders for the outlet when explicitly permissioned.
+- Reopens scoped claim-blocked orders to the pending pool when explicitly
+  permissioned and Order confirms a current eligible claim path.
 - Marks claimed orders ready for pickup.
 - Reconciles daily cash.
 - Initiates scoped refund liabilities and disburses collectible refunds when
@@ -110,9 +112,10 @@ may hold multiple permission bundles across one or more outlets.
 - Regional oversight role assigned to multiple outlets.
 - Has read access to outlet operations, inventory, and financial summaries for
   assigned outlets.
+- Has read access to claim-block exceptions for assigned outlets.
 - Does not perform direct outlet operations.
 - Cannot claim orders, collect cash, adjust inventory, access outlets outside
-  assignment, or override Super Admin controls.
+  assignment, close orders as unclaimable, or override Super Admin controls.
 
 ### P-09 Finance Officer
 
@@ -132,6 +135,8 @@ may hold multiple permission bundles across one or more outlets.
 - Manages global pricing, approves above-threshold inventory adjustments,
   manages authorization policy changes, and other actions no other persona can
   execute.
+- Closes claim-blocked orders as unclaimable when Order-owned policy evidence
+  supports terminal closure.
 - Sensitive mutations and overrides require explicit reason codes and permanent
   audit logging.
 - Cannot issue unaudited mutations.
@@ -164,6 +169,8 @@ may hold multiple permission bundles across one or more outlets.
 | Order placement | Full | - | - | - | - | - | - | - | Full |
 | Order status tracking | Own | Own assigned | Scoped | - | Scoped | Scoped | Read assigned outlets | Read | Full |
 | Outlet claiming | - | - | - | - | - | Scoped with explicit permission | - | - | Full |
+| Claim-block resolution | - | - | - | - | - | Scoped reopen with explicit permission | Read assigned outlets | - | Full |
+| Unclaimable closure | - | - | - | - | - | - | - | - | Full |
 | Ready-for-pickup marking | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
 | Outlet handover confirmation | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
 | Failed-order return receipt | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
@@ -241,6 +248,21 @@ may hold multiple permission bundles across one or more outlets.
   change: service zone, vendor acceptance list, delivery mode support,
   operating-hours policy, workload/capacity limits, and outlet priority score.
 - Outlet Managers do not have write access to outlet configuration.
+
+### Claim-Block Permissions
+
+- Identity owns who may view, reopen, or close claim-blocked orders.
+- [order.md](order.md) owns claim-block eligibility, timeout policy,
+  claim-blocking reason codes, reopen requirements, terminal `UNCLAIMABLE`
+  rules, and audit fields.
+- Claim-block resolution permission allows reopening `CLAIM_BLOCKED -> PENDING`
+  only under Order-owned policy.
+- Scoped claim-block resolution is limited to orders whose current
+  claim-evaluation candidate set includes one of the actor's assigned outlets.
+- Claim-block resolution permission does not authorize changing the frozen order
+  snapshot, manually assigning an outlet, bypassing stock reservation, or
+  closing the order as `UNCLAIMABLE`.
+- `UNCLAIMABLE` closure is Super Admin-only at launch.
 
 ## Authentication Model
 

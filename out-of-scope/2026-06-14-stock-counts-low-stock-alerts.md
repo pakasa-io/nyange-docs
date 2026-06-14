@@ -39,7 +39,7 @@ stock availability and manual inventory review.
 - When a count began, expected quantities were fixed as the count-start basis.
 - Ledger movements during the count window were tracked and used to calculate
   variance at count close.
-- Orders could continue to be placed, accepted, and fulfilled while a count was
+- Orders could continue to be placed, claimed, and fulfilled while a count was
   in progress.
 - Low-stock alerts were based on available stock only.
 - Launch low-stock thresholds were available quantity at or below 2 for saleable
@@ -70,7 +70,7 @@ before stockout frequency proves the need.
 ## Revisit Trigger
 
 Revisit when manual inventory review causes repeated stockouts, stale inventory
-decisions, or avoidable failed order claiming.
+decisions, avoidable claim-blocked orders, or repeated failed claim attempts.
 
 ## Notes
 

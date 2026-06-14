@@ -43,6 +43,11 @@ tests.
 - Each outlet procures stock directly from vendors.
 - There is no central warehouse or central purchasing pool in launch scope.
 - A placed order has no fulfilling outlet while it is `PENDING`.
+- A placed order can move to `CLAIM_BLOCKED` when the pending-claim timeout
+  expires or every eligible outlet has a current claim-blocking reason.
+- A `CLAIM_BLOCKED` order has no fulfilling outlet and no stock reservation.
+- `CLAIM_BLOCKED` can reopen to `PENDING`, be customer-cancelled, or close as
+  terminal `UNCLAIMABLE`.
 - Claiming creates exactly one claimed fulfilling outlet for the order.
 - Outlet claim cancellation clears the fulfilling outlet and returns the order to
   the pending pool.

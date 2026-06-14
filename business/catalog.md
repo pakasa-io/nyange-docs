@@ -84,6 +84,9 @@ Refill price is determined by three dimensions.
   order placement.
 - The claiming outlet must accept the frozen incoming vendor and fulfill the
   frozen outgoing vendor, size, and quantity terms.
+- If every eligible outlet has a current claim-blocking vendor reason for the
+  frozen order terms, Order owns the `CLAIM_BLOCKED` and `UNCLAIMABLE`
+  lifecycle outcomes.
 
 ### Required Pricing Rules
 
@@ -137,6 +140,8 @@ Refill price is determined by three dimensions.
   delivery fee, tax, discount, or order total.
 - Claim eligibility requires the outlet to fulfill the frozen catalog terms,
   vendor terms, quantities, and delivery address scope.
+- Claim-blocked and unclaimable outcomes do not rewrite catalog rules, price
+  rules, or the placed order snapshot.
 
 ## Price Administration
 

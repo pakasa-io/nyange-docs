@@ -201,6 +201,7 @@ if closing_overdue:
             manual_financial_ledger_adjustments
             above_threshold_expense_approval  // >= 100,000 UGX at launch
   allowed:  online_order_placement, order_claiming, inventory_reservation_for_claim
+  allowed:  claim_block_marking, claim_block_reopening, unclaimable_closure
   allowed:  ready_for_pickup, delivery_agent_assignment, pickup, cod_collection
   allowed:  stock_intake
 ```

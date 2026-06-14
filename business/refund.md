@@ -74,9 +74,11 @@ LIABILITY_OPEN|COLLECTIBLE
 - All customer refunds are cash-only at launch.
 - A cash refund does not create customer credit or an internal transfer.
 
-### Cancellation and Failed Delivery
+### Cancellation, Unclaimable Closure, and Failed Delivery
 
 - Cancellation before doorstep COD collection does not create a refund
+  liability.
+- `UNCLAIMABLE` closure before doorstep COD collection does not create a refund
   liability.
 - Failed delivery does not create a refund liability.
 - If an authorized and posted Finance-owned cash over-collection correction

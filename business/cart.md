@@ -81,6 +81,10 @@ Terminal cart states: `CHECKED_OUT`, `SUMMARY_RETAINED`, `CLEARED`.
 - Pre-order orderability does not use per-outlet SKU/vendor stock filtering.
 - Outlet stock and vendor fulfillment constraints are enforced at claim time
   after order placement.
+- If claim-time outlet stock or vendor constraints prevent any eligible outlet
+  from claiming a placed order, Order owns the `CLAIM_BLOCKED` and
+  `UNCLAIMABLE` outcomes.
+- A claim-blocked or unclaimable order does not reopen the checked-out cart.
 
 ### Quote Semantics
 
@@ -147,6 +151,8 @@ business requirements before creating the order snapshot.
   as active cart detail.
 - A safe cart summary remains.
 - Checked-out carts and placed orders are never part of abandoned-cart cleanup.
+- Claim-blocked or unclaimable placed orders are Order lifecycle outcomes, not
+  abandoned-cart cleanup outcomes.
 
 ## Permissions
 

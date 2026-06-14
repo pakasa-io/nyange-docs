@@ -124,7 +124,7 @@ CANCELLED
 | `IN_PROGRESS` | Order is out for delivery; agent is responsible for collecting the expected returned cylinder. |
 | `RETURN_RECORDED` | Agent records returned cylinder vendor, size, and condition at the doorstep. |
 | `INTAKE_PENDING` | Inventory-owned handoff state after successful delivery; cylinder awaits outlet intake confirmation. |
-| `CANCELLED` | Order was cancelled before pickup; no cylinder exchange occurred. |
+| `CANCELLED` | Order was cancelled or closed as unclaimable before pickup; no cylinder exchange occurred. |
 | `FAILED` | Delivery-owned terminal field-leg state for a failed delivery after pickup; no Inventory intake handoff occurs. |
 
 ### Field Leg Rules
@@ -141,6 +141,10 @@ CANCELLED
 - Failed exchange requests retain controlled field facts and failure reason for
   audit, but do not create Inventory intake records.
 - `FAILED` is terminal for the Delivery-owned field leg.
+- Customer cancellation or `UNCLAIMABLE` order closure before pickup moves every
+  affected exchange request to `CANCELLED`.
+- A claim-blocked order has no delivery task and does not move exchange requests
+  by itself.
 - Inventory intake determines when returned cylinders become outlet empty stock.
 
 ## Delivery Assignment

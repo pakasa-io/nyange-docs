@@ -56,8 +56,8 @@ Revisit delivery assignment ranking when manual dispatcher assignment causes
 measured dispatch delays, uneven agent workload, or avoidable missed deliveries.
 
 Revisit advanced stock counts and low-stock alerts when manual inventory review
-causes repeated stockouts, stale inventory decisions, or avoidable failed order
-claiming.
+causes repeated stockouts, stale inventory decisions, avoidable claim-blocked
+orders, or repeated failed claim attempts.
 
 Revisit refund code expiry and regeneration when expired, lost, or inaccessible
 codes create repeated payout support cases that cannot be handled by ordinary

@@ -32,6 +32,8 @@ Launch channels are assigned by event type, not customer preference.
 | Event | Channels |
 | --- | --- |
 | Order confirmation | Push, Email |
+| Claim blocked | Push, Email |
+| Unclaimable closure | Push, Email |
 | Ready for pickup | Push, Email |
 | Out for delivery | Push only |
 | Payment confirmation | Push, Email |

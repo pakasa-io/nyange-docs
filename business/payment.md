@@ -76,7 +76,7 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 - If the completion transaction fails before commit, payment remains
   `PENDING_COLLECTION` and no collected cash fact is recorded.
 
-### Failed Delivery and Cancellation
+### Failed Delivery, Cancellation, and Unclaimable Closure
 
 - Failed delivery records a zero-collection payment fact tied to the failed
   delivery reason.
@@ -88,10 +88,15 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
   authoritative Order cancellation outcome.
 - Order cancellation is the authoritative outcome for cancelled orders before
   collection.
+- `CLAIM_BLOCKED` creates no payment terminal state and records no customer
+  payment fact.
+- `UNCLAIMABLE` before delivery collection creates no payment terminal state and
+  retires the COD expectation through the authoritative Order exception outcome.
 - Payment does not create `CANCELLED`, `NOT_COLLECTED`, or equivalent terminal
-  payment state for pre-collection cancellations.
-- Because launch online orders are COD, cancellation and failed delivery do not
-  create refund liabilities from prior customer collection.
+  payment state for pre-collection cancellations or unclaimable closures.
+- Because launch online orders are COD, cancellation, unclaimable closure, and
+  failed delivery do not create refund liabilities from prior customer
+  collection.
 
 ### Cash Discrepancies
 

@@ -24,7 +24,8 @@ custody;
 - Stock committed to orders cannot exceed physical available stock.
 - When an outlet claims an order, the stock claim is atomic relative to other
   concurrent claims.
-- A claim that cannot reserve every requested stock item is rejected.
+- A claim that cannot reserve every requested stock item is rejected and may
+  supply Order-owned claim-block evidence.
 
 **BI-06 — Reserved stock is unavailable.**
 
@@ -120,6 +121,8 @@ ledger-posting rules for stock corrections.
 - Claiming reserves every requested stock item atomically.
 - Partial item reservation is prohibited.
 - Only available stock can be reserved.
+- Failed claim attempts, `CLAIM_BLOCKED`, and `UNCLAIMABLE` do not reserve,
+  release, commit, or ledger-post stock.
 - Reserved and held stock is not visible as available to any new order.
 - Reservation age alone does not release stock.
 - Stock release occurs only through an explicit lifecycle event.
