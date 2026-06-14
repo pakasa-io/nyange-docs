@@ -121,6 +121,9 @@ LIABILITY_OPEN|COLLECTIBLE
   over-collection correction.
 - Refund owns the resulting liability lifecycle after the source event creates
   `LIABILITY_OPEN`.
+- Refund liability creation is not a launch user command at the Refund boundary.
+- Customer or staff support requests do not create Refund liabilities unless
+  Finance posts a valid cash over-collection correction source event.
 - Additional refund-liability source workflows require explicit launch-scope
   entry with a named source owner before they can create Refund liabilities.
 - Refund has no amount-based approval threshold at launch.
@@ -224,7 +227,6 @@ from [identity-auth.md](identity-auth.md).
 
 | Capability | P-01 | P-03 | P-06 | P-10 |
 | --- | --- | --- | --- | --- |
-| Refund initiation | Own request | - | Scoped | Full |
 | Refund payout cash at outlet | - | Scoped with explicit permission | Scoped with explicit permission | Full |
 
 ## Authorization Edge Cases
@@ -235,9 +237,8 @@ confirms customer cash collected above expected COD creates a refund liability
 eligible for collection-code issuance regardless of amount. Finance owns source
 authorization and any required separation-of-duty rule for the source correction.
 
-**E-07**: An Outlet Manager may initiate scoped refund liabilities. An Outlet
-Manager may disburse collectible refunds within outlet scope only when
-explicitly granted refund-payout permission. Outlet Managers cannot pay refunds
-for another outlet, void or write off refund liabilities, bypass Finance source
-authorization, or approve their own Finance source correction when source
-approval is required.
+**E-07**: An Outlet Manager may disburse collectible refunds within outlet scope
+only when explicitly granted refund-payout permission. Outlet Managers cannot
+create Refund liabilities directly, pay refunds for another outlet, void or
+write off refund liabilities, bypass Finance source authorization, or approve
+their own Finance source correction when source approval is required.

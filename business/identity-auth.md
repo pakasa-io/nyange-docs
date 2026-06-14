@@ -122,9 +122,10 @@ persona references stable; do not reassign it without a documented migration.
   permissioned and Order confirms a current eligible claim path.
 - Marks claimed orders ready for pickup.
 - Reconciles daily cash.
-- Initiates scoped refund liabilities.
 - Disburses collectible refunds only when explicitly granted refund-payout
   permission.
+- Cannot create Refund liabilities directly; launch liabilities are created by
+  Finance-owned cash over-collection correction source events.
 - Submits above-threshold inventory adjustments for approval.
 - Oversees staff, manages delivery operations, and views outlet-specific
   reports.
@@ -228,7 +229,6 @@ using this file as a central override.
 | Vendor refill batch management | - | - | - | Scoped | - | Scoped | - | - | Full |
 | Outlet configuration & policies | - | - | - | - | - | Read | Read assigned outlets | - | Full |
 | Global pricing & catalog | - | - | - | - | - | - | - | - | Full |
-| Refund initiation | Own request | - | - | - | - | Scoped | - | - | Full |
 | Refund payout cash at outlet | - | - | Scoped with explicit permission | - | - | Scoped with explicit permission | - | - | Full |
 | Daily cash closing | - | - | - | - | - | Scoped | - | - | Full |
 | Financial ledger view | - | - | - | - | - | Scoped | Read assigned outlets | Full | Full |
@@ -316,6 +316,9 @@ using this file as a central override.
 - Finance owns source authorization for cash over-collection correction.
   Identity supplies actor, permission-grant, and outlet-scope facts used by
   Finance.
+- Refund liability creation is not a launch user command at the Refund boundary.
+- Customer or staff support requests do not create Refund liabilities unless
+  Finance posts a valid cash over-collection correction source event.
 - Additional refund-liability source workflows require explicit launch-scope
   entry with a named source owner before they can create Refund liabilities.
 - Payout is the separate cash-disbursement event.
@@ -572,12 +575,11 @@ confirms customer cash collected above expected COD creates a refund liability
 eligible for collection-code issuance regardless of amount. Finance owns source
 authorization and any required separation-of-duty rule for the source correction.
 
-**E-07**: An Outlet Manager may initiate scoped refund liabilities. An Outlet
-Manager may disburse collectible refunds within outlet scope only when
-explicitly granted refund-payout permission. Outlet Managers cannot pay refunds
-for another outlet, void or write off refund liabilities, bypass Finance source
-authorization, or approve their own Finance source correction when source
-approval is required.
+**E-07**: An Outlet Manager may disburse collectible refunds within outlet scope
+only when explicitly granted refund-payout permission. Outlet Managers cannot
+create Refund liabilities directly, pay refunds for another outlet, void or
+write off refund liabilities, bypass Finance source authorization, or approve
+their own Finance source correction when source approval is required.
 
 **E-08**: A Dispatcher can change the assigned delivery agent within their
 outlet until pickup with a recorded reason. After pickup, no normal reassignment
