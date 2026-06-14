@@ -54,7 +54,12 @@ cancellation;
 - Receipt numbers are issued at `DELIVERED`.
 - Receipt numbers are distinct from order identifiers.
 - A number issued to a valid receipt cannot be reissued or modified.
-- Ordinary receipt rollback does not create a numbering gap.
+- Receipt rollback means pre-commit technical rollback of the same `DELIVERED`
+  transaction before a receipt number is issued.
+- If the `DELIVERED` transaction fails before commit, the receipt number is not
+  issued and no numbering gap exists.
+- After commit, receipt rollback is not allowed; corrections use separate linked
+  adjustment or void records.
 - Any skipped number range caused by an intentional exception requires a
   permanent approved exception and audit record explaining the gap.
 
