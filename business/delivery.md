@@ -265,6 +265,8 @@ Transition to `PICKED_UP` requires both:
   are recorded as controlled field facts.
 - A required returned cylinder that cannot be accepted for the placed refill
   order causes the whole delivery to fail.
+- Inventory intake correction may correct field-recording errors, but it cannot
+  convert an actual physical size mismatch into a successful refill delivery.
 - Returned cylinders do not become outlet inventory until outlet intake
   confirmation.
 

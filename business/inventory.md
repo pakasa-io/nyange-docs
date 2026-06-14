@@ -272,7 +272,11 @@ INTAKE_PENDING
 ### Intake Correction
 
 - During intake, a returned-cylinder intake actor may correct an agent recording
-  mismatch in returned-cylinder vendor or size.
+  mismatch in returned-cylinder vendor or size only when the physical exchange
+  satisfied the accepted Delivery-owned doorstep facts.
+- Intake correction is for data-entry errors in the field record. It does not
+  permit Inventory to accept a physical cylinder size that would have failed the
+  Delivery-owned refill exchange rules.
 - The actor may be an Inventory Clerk, Outlet Manager, or Super Admin within
   scope.
 - Correction requires reason code, before/after values, and audit trail.
