@@ -85,9 +85,10 @@ A cancellation missing any required field is a data integrity violation.
   active delivery task, or active order custody.
 - Terminal order states for this rule are `DELIVERED`,
   `CUSTOMER_CANCELLED`, and `DELIVERY_FAILED`.
-- Disablement is allowed only after every outlet-owned order has reached a
-  terminal state and no related custody, reservation, or cash handover blocker
-  remains.
+- Unclaimed `PENDING` orders do not block any outlet from being disabled.
+- Disablement is allowed only after every order with an active or retained
+  outlet association has reached a terminal state and no related custody,
+  reservation, or cash handover blocker remains.
 
 **BI-23 — Critical mutations are idempotent.**
 
@@ -114,6 +115,12 @@ A cancellation missing any required field is a data integrity violation.
 
 - Order owns order placement, order state, customer-visible status,
   cancellation, claim association, and immutable price snapshot.
+- Order has no fulfilling outlet while it is `PENDING`.
+- Claiming creates exactly one claimed fulfilling outlet association.
+- Outlet claim cancellation clears the fulfilling outlet association and returns
+  the order to `PENDING`.
+- Successful delivery and failed delivery retain the fulfilling outlet
+  association for reporting and cash/custody traceability.
 - Inventory owns stock availability, reservations, stock commitment, release,
   and returned-empty intake recognition.
 - Delivery owns delivery task state, assignment, pickup, agent custody,

@@ -37,7 +37,12 @@ tests.
 - Outlets may hold filled cylinders from any globally supported vendor.
 - Each outlet procures stock directly from vendors.
 - There is no central warehouse or central purchasing pool in launch scope.
-- An order belongs to exactly one outlet.
+- A placed order has no fulfilling outlet while it is `PENDING`.
+- Claiming creates exactly one claimed fulfilling outlet for the order.
+- Outlet claim cancellation clears the fulfilling outlet and returns the order to
+  the pending pool.
+- Successful delivery and failed delivery retain the fulfilling outlet for
+  reporting and cash/custody traceability.
 - Financial performance is tracked per outlet.
 
 ## Refill Exchange Model
