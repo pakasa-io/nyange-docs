@@ -144,7 +144,8 @@ A cancellation missing any required field is a data integrity violation.
 - Fulfillment acceptance is whole-order only.
 - At most one active fulfillment acceptance may exist for an order.
 - An accepted order requires an active reservation.
-- Inventory and cash ledgers are append-only.
+- Inventory owns append-only inventory ledger entries.
+- Finance owns append-only cash and financial ledger entries.
 - Pickup creates agent custody before the order becomes `OUT_FOR_DELIVERY`.
 - Delivery coordinates delivery completion as the doorstep completion command.
 - Order participates in delivery completion by moving the order from

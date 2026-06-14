@@ -41,6 +41,17 @@ custody;
   workflow.
 - No order can implicitly access another outlet's inventory.
 
+**BI-27 — Inventory ledger entries are append-only.**
+
+- Inventory owns inventory ledger entries for stock reservations, commitments,
+  releases, adjustments, transfers, vendor refill movements, returned-cylinder
+  intake, and other stock movements.
+- Inventory ledger entries are never modified or deleted after creation.
+- Errors are corrected by appending compensating inventory ledger entries with
+  explicit linkage to the erroneous entry.
+- Shared append-only ledger storage or tooling is infrastructure and does not
+  transfer logical inventory ledger ownership to Finance or another module.
+
 ### Cross-Aggregate Invariants
 
 - **BI-08** is defined in [delivery.md](delivery.md). Delivery completion
@@ -52,7 +63,7 @@ custody;
 
 - Inventory owns physical stock availability, reservation state, transfer state,
   vendor refill movement state, returned-cylinder intake recognition, inventory
-  adjustment policy, and inventory adjustment ledger posting.
+  adjustment policy, and inventory ledger posting.
 - Inventory does not own delivery completion, customer payment, refund payout,
   receipt issuance, or outlet cash custody.
 - Incoming customer cylinders from refill delivery do not become outlet empty

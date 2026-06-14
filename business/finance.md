@@ -21,13 +21,17 @@ state;
 
 ## Invariants
 
-**BI-04 — Financial record entries are write-only.**
+**BI-04 — Finance ledger entries are write-only.**
 
-- Entries in any financial or inventory ledger are never modified or deleted
-  after creation.
+- Entries in Finance-owned financial and cash ledgers are never modified or
+  deleted after creation.
 - Errors are corrected by appending compensating entries with explicit linkage
   to the erroneous entry.
 - The audit trail is always complete and continuous.
+- Inventory owns inventory ledger entries and their append-only invariant in
+  [inventory.md](inventory.md).
+- Shared append-only ledger storage or tooling is infrastructure and does not
+  transfer logical ledger ownership between modules.
 
 **BI-05 — Financial closure is `DELIVERED`.**
 
@@ -91,8 +95,8 @@ state;
 
 - Finance owns cash custody after a COD collection fact is committed, cash
   handover, counted-cash acceptance, outlet cash custody, cash variance records,
-  financial ledger posting, daily closing, receipt records, expense controls,
-  and delivery cost reporting.
+  Finance-owned financial and cash ledger posting, daily closing, receipt
+  records, expense controls, and delivery cost reporting.
 - Finance owns the short/over COD collection variance policy and the variance
   records linked from Payment.
 - Delivery owns doorstep collection evidence, delivery task state, field facts,
