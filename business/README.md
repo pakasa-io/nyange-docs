@@ -67,7 +67,7 @@ tests.
 
 | File | Aggregate | Authoritative for |
 | --- | --- | --- |
-| [identity-auth.md](identity-auth.md) | Identity & Authorization | Personas, access matrix, authentication, authorization, edge cases E-01-E-10 |
+| [identity-auth.md](identity-auth.md) | Identity & Authorization | Personas, access matrix, authentication, authorization, edge cases E-02-E-10 |
 | [catalog.md](catalog.md) | Catalog & Pricing | Refill pricing, bundle pricing, global online pricing, launch commercial programs |
 | [cart.md](cart.md) | Cart | Customer cart state, quote readiness, catalog-change handling, checkout readiness, abandoned-cart cleanup |
 | [order.md](order.md) | Order | Order placement, lifecycle state, fulfillment outlet assignment, COD fulfillment, and cancellation |
@@ -75,7 +75,7 @@ tests.
 | [delivery.md](delivery.md) | Delivery | Delivery lifecycle, delivery fee rules, agent cash handling, failed-delivery fee waiver, cylinder exchange field leg |
 | [inventory.md](inventory.md) | Inventory | Reservation lifecycle, outlet transfer, vendor refill batch, cylinder exchange intake leg, stock availability |
 | [refund.md](refund.md) | Refund | Refund lifecycle, collection codes, cash payout constraints |
-| [finance.md](finance.md) | Finance | Daily closing, expense controls, delivery cost reporting, deferred settlement boundary, receipts, and cash custody reporting |
+| [finance.md](finance.md) | Finance | Daily closing, expense controls, delivery cost reporting, receipts, and cash custody reporting |
 | [notifications.md](notifications.md) | Notifications | Notification channel boundaries and event-to-channel assignments |
 
 ## Cross-Aggregate Ownership
@@ -84,8 +84,6 @@ tests.
   [delivery.md](delivery.md) owns the field leg from `PENDING` through
   `RETURN_RECORDED`. [inventory.md](inventory.md) owns the intake leg from
   `INTAKE_PENDING` through `INTAKE_CONFIRMED` or `FAILED`.
-- Deferred customer prepayment workflows are tracked outside the launch
-  business documents.
 - Cart owns customer-selected pre-order state and checkout readiness.
   [order.md](order.md) owns order placement and the immutable order lifecycle
   after checkout succeeds.

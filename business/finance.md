@@ -47,14 +47,10 @@ state;
   such as an approved refund liability or approved adjustment/void record.
 - Later activity must not alter the original delivered sale or receipt.
 
-**BI-13 — Prepayment settlement is not a launch workflow.**
+**BI-13 — COD cash belongs to the fulfilling outlet.**
 
 - Launch online orders are COD cash, collected by the Delivery Agent for the
   fulfilling outlet.
-- No launch workflow records one outlet as the external prepayment receiver and
-  another outlet as the fulfillment outlet.
-- External prepaid payment workflows require explicit settlement rules before
-  they can enter scope.
 
 **BI-14 — Receipt numbers are permanent and sequential.**
 
@@ -231,10 +227,8 @@ if closing_overdue:
 - Refund liabilities carry forward until paid, voided, or written off.
 - Open refund liabilities do not block daily closing.
 
-### Deferred Prepayment Reporting
+### COD Reporting
 
-- External payment receipts and merchant-account attribution are not launch
-  reporting requirements.
 - The fulfilling outlet reports COD collections, delivery work, inventory or
   estimated COGS where configured, refund liabilities it owns, and cash
   reconciliation facts.
@@ -306,13 +300,6 @@ Expense records capture:
 - When configured cost inputs are used for estimated margin reporting, the
   applicable cost for each delivered sale is fixed at `DELIVERED`.
 - Later cost changes do not silently restate sealed-sale estimates.
-
-## Internal Settlements
-
-External prepaid settlement is outside launch scope.
-
-No ordinary launch workflow creates a cross-outlet customer-payment settlement
-because online delivery payment is COD cash collected for the fulfilling outlet.
 
 ## Delivery Cost Reporting
 

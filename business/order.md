@@ -39,11 +39,9 @@ cash custody, variance records, and receipts;
 - COD, receipts, refund liabilities, and reports derive from the frozen
   snapshot, not current rules.
 
-**BI-07 — No pre-payment gate before fulfillment.**
+**BI-07 — COD fulfillment proceeds before cash collection.**
 
 - Online orders are COD.
-- No payment reference, provider verification, wallet, card, mobile-money, or
-  prepaid settlement gate exists before fulfillment.
 - Fulfillment acceptance, ready-for-pickup marking, delivery assignment, and
   pickup may proceed without customer payment action.
 - Cash is collected at the doorstep during delivery.
@@ -333,8 +331,6 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 ## Out of Scope
 
 - Delivery batching, route optimization, and scheduled delivery windows.
-- External prepayment, mobile money, card, wallet, or provider reference
-  workflows.
 - A separate customer-visible order state after delivery.
 - Doorstep code fallback and evidence-retention detail.
 - Order-state mutation workflows for doorstep conversion, delivery-time

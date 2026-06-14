@@ -26,6 +26,7 @@ YYYY-MM-DD-short-item-name.md
 | Item | Status |
 | --- | --- |
 | [Express Delivery Fee](2026-06-14-express-delivery-fee.md) | Deferred |
+| [Customer Prepayment Workflows](2026-06-14-customer-prepayment-workflows.md) | Deferred |
 | [Mobile-Money Payments](2026-06-13-mobile-money-payments.md) | Deferred |
 | [Outlet-Local Pricing and Guardrails](2026-06-14-outlet-local-pricing-guardrails.md) | Deferred |
 | [Competitive Outlet Claiming](2026-06-14-competitive-outlet-claiming.md) | Deferred |
@@ -36,6 +37,10 @@ YYYY-MM-DD-short-item-name.md
 Revisit express delivery fee when the Product Manager approves a customer-facing
 priority delivery offer with service-level promise, eligibility, capacity, fee,
 refund or waiver, reporting, and authorization rules.
+
+Revisit customer prepayment workflows when COD-only launch operations create a
+measured adoption, cash-risk, reconciliation, or customer-convenience problem
+that requires payment before delivery.
 
 Revisit mobile-money payments when COD-only launch operations create a measured
 adoption, cash-risk, reconciliation, or customer-convenience problem that cannot

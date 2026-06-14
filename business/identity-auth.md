@@ -7,8 +7,8 @@ authentication rules, authorization rules, and authorization edge cases.
 which permissions and outlet scopes can authorize an action, and which actor
 combinations require audit or co-approval.
 
-**Sources**: §2 Personas, §3 Access Matrix, §4 Auth Model, E-01-E-02,
-E-04-E-05, E-07-E-10
+**Sources**: §2 Personas, §3 Access Matrix, §4 Auth Model, E-02, E-04-E-05,
+E-07-E-10
 
 ## Invariants
 
@@ -367,11 +367,6 @@ outlet scope or business authority.
   real operational use.
 
 ## Authorization Edge Cases
-
-**E-01**: No launch actor can submit, verify, reuse, or administer an external
-payment reference. External electronic payment rails are outside launch scope
-and require explicit scope re-entry before any related permission can be
-granted.
 
 **E-02**: A Delivery Agent can see the customer's phone number only while an
 order is assigned to them and active. They lose this access when the delivery

@@ -344,8 +344,7 @@ No delivery fee is charged on any failed delivery, regardless of failure reason.
   agent.
 - Failed COD deliveries keep a zero-collection payment fact tied to the failed
   delivery reason.
-- Failed deliveries do not create prepaid refund liabilities because online
-  orders are not prepaid.
+- Failed COD deliveries do not create customer refund liabilities.
 
 ## Permissions
 

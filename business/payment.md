@@ -18,16 +18,11 @@ exceptions hand off to delivery, refund, or finance.
 
 ## Invariants
 
-**BI-03 — Launch payment facts are cash facts only.**
+**BI-03 — Payment facts are cash facts only.**
 
-- Online delivery orders are cash-on-delivery at launch.
-- Electronic payment, wallet, card, bank transfer, provider reference reuse,
-  and merchant-account settlement are not launch payment methods.
-- An external provider reference cannot satisfy an order payment requirement in
-  launch scope.
-- Adding any external payment rail requires an explicit scope decision and
-  coordinated updates to order, payment, refund, finance, delivery, and
-  authorization rules.
+- Online delivery orders are cash-on-delivery.
+- A payment fact records either COD cash collection at delivery or zero
+  collection after failed delivery.
 
 ## Boundary
 
@@ -38,9 +33,6 @@ exceptions hand off to delivery, refund, or finance.
 - Finance owns cash handover, counted-cash acceptance, outlet cash custody, cash
   variance records, daily closing, ledger posting, and receipts.
 - Refund owns customer refund liabilities and payout lifecycle.
-- Payment does not own external payment reference submission, provider
-  verification, merchant-account configuration, provider refunds, customer
-  wallets, or stored external payment credentials at launch.
 
 ## State
 
@@ -62,9 +54,6 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 ### Supported Payment Methods
 
 - Online delivery orders use COD cash.
-- No external payment instruction, merchant-account selection, transaction
-  reference field, provider statement check, or late-reference reuse exists in
-  launch customer, staff, or admin workflows.
 - Active online-fulfillment outlets are expected to support COD cash.
 
 ### COD Collection
@@ -128,10 +117,3 @@ Trimmed access matrix rows relevant to payment. Full matrix:
 | Delivery execution pickup and COD | Own | - | Full |
 | Agent cash handover | Own | Scoped receive | Full |
 | Daily cash closing | - | Scoped | Full |
-
-## Authorization Edge Cases
-
-**E-01**: Any launch attempt to submit, verify, reuse, or administer an
-external payment reference is denied because external payment rails are out of
-scope. Runtime authorization treats those capabilities as absent, not as hidden
-fallback permissions.

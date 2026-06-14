@@ -81,16 +81,13 @@ LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED
 ### Cash-Only Refunds
 
 - All customer refunds are cash-only at launch.
-- Electronic refunds, customer wallet credit, and provider refund workflows are
-  not supported.
 - A cash refund does not create customer credit or an internal transfer.
 
-### No Prepaid Cancellation Refunds at Launch
+### Cancellation and Failed Delivery
 
-- Launch online orders are not prepaid.
 - Cancellation before doorstep COD collection does not create a refund
   liability.
-- Failed delivery does not create a prepaid refund liability.
+- Failed delivery does not create a refund liability.
 - If an authorized and posted Finance-owned cash over-collection correction
   creates a refund liability, the refund lifecycle begins from `LIABILITY_OPEN`.
 - Post-collection refund liabilities do not reopen orders, change order state,
@@ -106,8 +103,7 @@ LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED
   timestamp, and audit trail.
 - A void or write-off discharges the refund liability for daily-closing and
   liability-reporting purposes.
-- A void or write-off does not create a provider refund, customer wallet credit,
-  order mutation, or payment mutation.
+- A void or write-off does not create an order mutation or payment mutation.
 
 ### Source Authorization and Collectibility
 
