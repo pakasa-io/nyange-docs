@@ -18,8 +18,11 @@ use and to confirm that notification delivery does not control business state.
 
 ## Business Rules
 
-- General business notifications use push and email at launch.
+- General business notifications use push at launch.
 - SMS is reserved for human authentication OTP only.
+- Email notification delivery is not launch behavior unless a future
+  Identity/customer-profile rule defines email capture, verification, update,
+  and consent semantics.
 - WhatsApp is not launch behavior.
 - Customer-configurable notification preferences are not launch behavior.
 - Notification types are classified as transactional or non-transactional for
@@ -31,19 +34,20 @@ Launch channels are assigned by event type, not customer preference.
 
 | Event | Classification | Channels |
 | --- | --- | --- |
-| Order confirmation | Transactional | Push, Email |
-| Claim blocked | Transactional | Push, Email |
-| Unclaimable closure | Transactional | Push, Email |
-| Ready for pickup | Transactional | Push, Email |
-| Out for delivery | Transactional | Push only |
-| Payment confirmation | Transactional | Push, Email |
-| Failed delivery | Transactional | Push, Email |
+| Order confirmation | Transactional | Push |
+| Claim blocked | Transactional | Push |
+| Unclaimable closure | Transactional | Push |
+| Ready for pickup | Transactional | Push |
+| Out for delivery | Transactional | Push |
+| Payment confirmation | Transactional | Push |
+| Failed delivery | Transactional | Push |
 
 ## Sensitive Content
 
 ### Refund Collection Codes
 
-- Refund collection codes are not sent in push, email, or SMS message bodies.
+- Refund collection codes are not sent in push, SMS, or any future email message
+  body.
 - A notification may tell the customer that a refund is collectible.
 - A notification may identify the collection outlet.
 - A notification may direct the customer to the authenticated customer
@@ -52,6 +56,7 @@ Launch channels are assigned by event type, not customer preference.
 ## Non-Goals
 
 - WhatsApp integration.
+- Email notification delivery.
 - Customer-configurable channel preferences.
 - SMS for anything other than human authentication OTP.
 
