@@ -47,15 +47,15 @@ exceptions hand off to delivery, refund, or finance.
 PENDING_COLLECTION
   -> COLLECTED
   -> ZERO_COLLECTION
-  -> CANCELLED
 ```
+
+Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 
 | State | Meaning |
 | --- | --- |
 | `PENDING_COLLECTION` | COD is expected but has not yet been collected. |
 | `COLLECTED` | Terminal successful cash collection fact. |
 | `ZERO_COLLECTION` | Terminal fact for failed delivery where no customer cash was collected. |
-| `CANCELLED` | Order did not proceed before cash collection. |
 
 ## Business Rules
 
@@ -83,7 +83,10 @@ PENDING_COLLECTION
 
 - Failed delivery records a zero-collection payment fact tied to the failed
   delivery reason.
-- Cancellation before delivery collection records no customer payment.
+- Cancellation before delivery collection creates no payment terminal state and
+  records no customer payment fact.
+- Order cancellation is the authoritative outcome for cancelled orders before
+  collection.
 - Because launch online orders are COD, cancellation and failed delivery do not
   create refund liabilities from prior customer collection.
 
