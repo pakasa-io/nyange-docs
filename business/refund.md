@@ -34,14 +34,12 @@ can pay it, and why collection-code expiry never discharges the liability.
 - A collection code has a finite validity window.
 - At launch, the code validity window is 24 hours after issuance.
 - The code is invalidated on first successful presentation.
-- Failed verification attempts are rate-limited per refund and outlet actor.
 - Failed attempts are audit-logged with actor, outlet, refund ID, timestamp, and
   safe failure reason.
-- After the configured attempt threshold, the code is locked for the configured
-  cool-down period and requires regeneration or unlock by a permissioned
-  Customer Support Agent or Super Admin with reason and audit trail.
-- The liability remains outstanding while the code is locked.
-- No payout may be recorded until the code is unlocked or regenerated.
+- Failed verification attempts do not lock the collection code or refund record
+  at launch.
+- Collection-code lockout, failed-attempt rate limiting, and cooldown workflows
+  are not launch behavior.
 
 ## Boundary
 
@@ -60,12 +58,10 @@ PENDING_CREATION
 
 COLLECTIBLE
   ├─► PAID
-  ├─► CODE_EXPIRED
-  │     └─► COLLECTIBLE
-  └─► CODE_LOCKED
+  └─► CODE_EXPIRED
         └─► COLLECTIBLE
 
-LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED|CODE_LOCKED
+LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED
   ├─► VOIDED
   └─► WRITTEN_OFF
 ```
@@ -77,7 +73,6 @@ LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED|CODE_LOCKED
 | `COLLECTIBLE` | Code issued; customer can present it at the owning outlet. |
 | `PAID` | Terminal successful cash payout. |
 | `CODE_EXPIRED` | Code expired; liability remains open and a new code can be issued. |
-| `CODE_LOCKED` | Rate-limit threshold exceeded; payout prohibited until unlock or regeneration. |
 | `VOIDED` | Terminal Super Admin-approved void with reason, note, and audit. |
 | `WRITTEN_OFF` | Terminal Super Admin-approved write-off with reason, note, and audit. |
 
@@ -105,8 +100,8 @@ LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED|CODE_LOCKED
 
 - `VOIDED` and `WRITTEN_OFF` are terminal Super Admin-approved exception
   outcomes.
-- Eligible source states are `LIABILITY_OPEN`, `COLLECTIBLE`, `CODE_EXPIRED`,
-  and `CODE_LOCKED`.
+- Eligible source states are `LIABILITY_OPEN`, `COLLECTIBLE`, and
+  `CODE_EXPIRED`.
 - The transition requires actor identity, actor role, reason code, reason note,
   timestamp, and audit trail.
 - A void or write-off discharges the refund liability for daily-closing and
@@ -139,6 +134,8 @@ t = 24h  → if code not used  → CODE_EXPIRED; liability remains open
   code with audit.
 - Regeneration when the customer loses access requires customer verification
   through an audited fallback-action record with reason and audit.
+- Failed verification attempts do not require Support action before a later
+  valid presentation can be paid.
 - The refund liability itself does not expire.
 
 ### Collection Eligibility

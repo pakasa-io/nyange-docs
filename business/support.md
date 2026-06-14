@@ -30,8 +30,8 @@ record.
 Customer Support Agents may perform only explicitly permissioned fallback
 actions. Launch fallback actions may include:
 
-- refund collection-code regeneration, unlock, or audited customer-verified
-  reveal allowed by [refund.md](refund.md);
+- refund collection-code regeneration or audited customer-verified reveal
+  allowed by [refund.md](refund.md);
 - approved transactional customer notification requests allowed by
   [notifications.md](notifications.md);
 - operational escalation to the owning Outlet Manager or Super Admin.

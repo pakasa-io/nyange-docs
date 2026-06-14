@@ -109,8 +109,8 @@ may hold multiple permission bundles across one or more outlets.
 ### P-07 Customer Support Agent
 
 - Handles launch support fallback actions when explicitly permissioned.
-- May perform refund collection-code regeneration, unlock, or audited
-  customer-verified reveal when granted those permissions.
+- May perform refund collection-code regeneration or audited customer-verified
+  reveal when granted those permissions.
 - May request approved transactional customer notifications when explicitly
   permissioned.
 - May relay operational escalation needs to the owning Outlet Manager or Super
@@ -287,7 +287,6 @@ may hold multiple permission bundles across one or more outlets.
 - This permission covers regenerating expired codes.
 - It covers regenerating codes when the customer loses access after verification
   through an audited fallback-action record with reason and audit.
-- It covers unlocking or regenerating rate-limited codes.
 - It covers audited reveal by a permissioned Customer Support Agent or Super
   Admin after customer verification.
 - It does not allow creating, paying, voiding, or writing off a refund
