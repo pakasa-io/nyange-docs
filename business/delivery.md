@@ -102,8 +102,8 @@ Terminal states: `CANCELLED`, `DELIVERED`, `FAILED`.
 ## Refill Exchange Field Leg
 
 Each `REFILL_EXCHANGE` order line creates one exchange request. Delivery owns the
-field leg from creation through `INTAKE_PENDING`. Inventory owns intake after
-that point.
+field leg from creation through `RETURN_RECORDED`. Delivery completion hands off
+the returned-cylinder intake record to Inventory in `INTAKE_PENDING`.
 
 ```
 PENDING
@@ -119,7 +119,7 @@ CANCELLED
 | `PENDING` | Created when the order is placed; expected cylinder vendor/size recorded. |
 | `IN_PROGRESS` | Order is out for delivery; agent is responsible for collecting the expected returned cylinder. |
 | `RETURN_RECORDED` | Agent records returned cylinder vendor, size, and condition at the doorstep. |
-| `INTAKE_PENDING` | Delivery succeeded; cylinder awaits outlet intake confirmation in inventory. |
+| `INTAKE_PENDING` | Inventory-owned handoff state after successful delivery; cylinder awaits outlet intake confirmation. |
 | `CANCELLED` | Order was cancelled before pickup; no cylinder exchange occurred. |
 
 ### Field Leg Rules
@@ -128,7 +128,7 @@ CANCELLED
 - An order with three refill lines has three exchange requests.
 - `RETURN_RECORDED` happens at the doorstep before delivery completion.
 - The agent's recorded condition is the delivery field fact of record.
-- `INTAKE_PENDING` persists after delivery completion.
+- `INTAKE_PENDING` is owned by Inventory and persists after delivery completion.
 - The order can be `DELIVERED` while exchange requests are still
   `INTAKE_PENDING`.
 - Inventory intake determines when returned cylinders become outlet empty stock.
