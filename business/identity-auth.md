@@ -204,30 +204,18 @@ may hold multiple permission bundles across one or more outlets.
   Admin explicitly grants additional access.
 - Area Managers have read access to their assigned outlet set, not all outlets.
 
-### Inventory Adjustment Threshold
+### Inventory Adjustment Permission
 
-- At launch, inventory adjustment authority is policy-driven.
-- Outlet Managers may post without separate Super Admin approval only
-  single-unit damage or quarantine adjustments that do not increase available
-  stock and carry a source reference, such as count, delivery, or order.
-- This single-unit rule is the launch default Outlet Manager posting threshold.
-- No higher Outlet Manager quantity threshold exists at launch.
-- Every loss, missing-source adjustment, manual correction, positive
-  available-stock increase, count variance, or absolute delta greater than one
-  unit is `PENDING_APPROVAL`.
-- `PENDING_APPROVAL` inventory adjustments require Super Admin approval before
-  ledger movement is posted.
-- Every adjustment requires reason, note, active policy code, ledger correlation
-  when posted, and audit trail.
-
-### Inventory Reconciliation
-
-- Inventory reconciliation supports quick day-to-day adjustments with reason
-  codes.
-- Inventory reconciliation supports periodic physical counts with variance
-  reports.
-- Both paths create audited inventory adjustments and follow the active approval
-  threshold before stock is recognized as changed.
+- Identity owns inventory adjustment permissions and outlet scope.
+- [inventory.md](inventory.md) owns inventory adjustment thresholds, approval
+  outcomes, and ledger-posting rules.
+- Inventory Clerks may submit scoped inventory adjustment requests.
+- Outlet Managers may post only policy-limited scoped adjustments allowed by
+  Inventory, and must submit above-policy adjustments for Super Admin approval.
+- Super Admins may approve and post inventory adjustments across all outlets.
+- Permission to submit, post, or approve an adjustment does not bypass
+  Inventory-owned source-reference, reason, note, policy-code, ledger
+  correlation, or audit requirements.
 
 ### Refund Payout Permission
 

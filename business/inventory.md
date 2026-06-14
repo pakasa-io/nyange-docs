@@ -51,11 +51,42 @@ custody;
 ## Boundary
 
 - Inventory owns physical stock availability, reservation state, transfer state,
-  vendor refill movement state, and returned-cylinder intake recognition.
+  vendor refill movement state, returned-cylinder intake recognition, inventory
+  adjustment policy, and inventory adjustment ledger posting.
 - Inventory does not own delivery completion, customer payment, refund payout,
   receipt issuance, or outlet cash custody.
 - Incoming customer cylinders from refill delivery do not become outlet empty
   inventory until intake is confirmed.
+
+## Inventory Adjustment Policy
+
+Inventory owns the launch adjustment threshold policy, approval outcomes, and
+ledger-posting rules for stock corrections.
+
+### Launch Threshold
+
+- At launch, inventory adjustment authority is policy-driven.
+- Outlet Managers may post without separate Super Admin approval only
+  single-unit damage or quarantine adjustments that do not increase available
+  stock and carry a source reference, such as count, delivery, or order.
+- This single-unit rule is the launch default Outlet Manager posting threshold.
+- No higher Outlet Manager quantity threshold exists at launch.
+- Every loss, missing-source adjustment, manual correction, positive
+  available-stock increase, count variance, or absolute delta greater than one
+  unit is `PENDING_APPROVAL`.
+- `PENDING_APPROVAL` inventory adjustments require Super Admin approval before
+  ledger movement is posted.
+- Every adjustment requires reason, note, active policy code, ledger correlation
+  when posted, and audit trail.
+
+### Reconciliation Paths
+
+- Inventory reconciliation supports quick day-to-day adjustments with reason
+  codes.
+- Inventory reconciliation supports periodic physical counts with variance
+  reports.
+- Both paths create audited inventory adjustments and follow the active
+  Inventory-owned approval threshold before stock is recognized as changed.
 
 ## Inventory Reservation Lifecycle
 
