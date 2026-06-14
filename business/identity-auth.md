@@ -241,11 +241,11 @@ may hold multiple permission bundles across one or more outlets.
 ### Refund Source and Payout Boundary
 
 - Refund liabilities have no amount-based approval threshold at launch.
-- A valid authorized and posted source correction, adjustment, or other
-  launch-approved source event may create a refund liability eligible for
-  collection-code issuance regardless of amount.
-- Source authorization remains owned by the source workflow that creates the
-  refund liability.
+- The supported launch refund-liability source is an authorized and posted
+  Finance-owned cash over-collection correction.
+- Finance owns source authorization for cash over-collection correction.
+- Additional refund-liability source workflows require explicit launch-scope
+  entry with a named source owner before they can create Refund liabilities.
 - Payout is the separate cash-disbursement event.
 - Payout permission does not authorize creating, voiding, or writing off a
   refund liability.
@@ -396,15 +396,16 @@ outlets, but cannot perform outlet actions such as claiming orders, collecting
 customer cash, paying refunds, or adjusting inventory.
 
 **E-05**: Refund liabilities have no amount-based approval threshold at launch.
-A valid authorized and posted source event may create a refund liability
-eligible for collection-code issuance regardless of amount. The source workflow
-still owns any required source authorization and separation-of-duty rule.
+A valid authorized and posted Finance-owned cash over-collection correction may
+create a refund liability eligible for collection-code issuance regardless of
+amount. Finance owns source authorization and any required separation-of-duty
+rule for the source correction.
 
 **E-07**: An Outlet Manager may initiate scoped refund liabilities and disburse
 collectible refunds within outlet scope when explicitly permissioned. Outlet
 Managers cannot pay refunds for another outlet, void or write off refund
-liabilities, bypass source-workflow authorization, or approve their own source
-submission when the source workflow requires approval.
+liabilities, bypass Finance source authorization, or approve their own Finance
+source correction when source approval is required.
 
 **E-08**: A Dispatcher can change the assigned delivery agent within their
 outlet until pickup with a recorded reason. After pickup, no normal reassignment

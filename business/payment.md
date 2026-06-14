@@ -112,9 +112,9 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
   terminal state.
 - Payment links to the approved Finance-owned variance record but does not own
   the variance record.
-- Approved post-collection overage correction or post-collection price
-  adjustment may create a refund liability in [refund.md](refund.md), but does
-  not rewrite the frozen order total or payment expectation.
+- An approved Finance-owned cash over-collection correction may create a refund
+  liability in [refund.md](refund.md), but does not rewrite the frozen order
+  total or payment expectation.
 - Payment records preserve expected amount, collected amount, variance link,
   actor, outlet, task, and order identity needed for audit and reconciliation.
 

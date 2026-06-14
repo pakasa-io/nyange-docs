@@ -18,8 +18,8 @@ returned-empty intake recognition;
 custody, field facts, and failure handling;
 [payment.md](payment.md) for expected COD, collected cash facts, and
 zero-collection facts;
-[refund.md](refund.md) for post-collection refund liabilities and payout
-lifecycle;
+[refund.md](refund.md) for Finance-sourced over-collection refund liabilities
+and payout lifecycle;
 [finance.md](finance.md) for cash handover, counted-cash acceptance, outlet
 cash custody, variance records, and receipts;
 [notifications.md](notifications.md) for notification fanout side effects;
@@ -129,7 +129,8 @@ A cancellation missing any required field is a data integrity violation.
   doorstep field facts, failed delivery, and delivery completion.
 - Payment owns expected COD amount, collected cash fact, zero-collection fact,
   and payment outcome.
-- Refund owns approved post-collection refund liabilities and payout lifecycle.
+- Refund owns approved Finance-sourced over-collection refund liabilities and
+  payout lifecycle.
 - Refund liabilities do not reopen orders, change order state, or rewrite the
   frozen order total.
 - Finance owns cash handover, counted-cash acceptance, outlet cash custody,

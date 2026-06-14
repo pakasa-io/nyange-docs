@@ -138,8 +138,13 @@ else                                             -> Super Admin approval
   frozen order total.
 - Payment stores the collected amount and a link to the approved variance; it
   does not own the variance record.
-- Over-collection excess is recorded as a Finance-owned cash discrepancy and
-  reconciled through daily closing or a source-authorized refund liability.
+- Over-collection excess is recorded as a Finance-owned cash discrepancy.
+- Finance may post a cash over-collection correction source event that creates a
+  Refund-owned liability for the excess amount.
+- Post-collection price adjustment is not a launch Finance workflow.
+- Any future post-collection adjustment workflow must name its source owner,
+  authorization rule, posting rule, and Refund handoff contract before it can
+  create a refund liability.
 
 ### Handover Rules
 

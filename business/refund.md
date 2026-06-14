@@ -21,9 +21,9 @@ can pay it, and why collection-code expiry never discharges the liability.
 
 - A refund owed to a customer remains open until a cash payout event is recorded
   or a Super Admin-approved void/write-off path resolves it.
-- Supported launch liability sources include authorized and posted cash
-  over-collection correction and authorized and posted post-collection price
-  adjustment.
+- The supported launch liability source is an authorized and posted
+  Finance-owned cash over-collection correction.
+- Post-collection price adjustment is not a launch refund-liability source.
 - Code expiry, daily closing, and time passing do not discharge the liability.
 - An open liability does not convert to revenue.
 - Open refund liabilities appear in the owning outlet's daily closing and
@@ -91,8 +91,8 @@ LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED
 - Cancellation before doorstep COD collection does not create a refund
   liability.
 - Failed delivery does not create a prepaid refund liability.
-- If a separate authorized and posted post-collection adjustment creates a
-  refund liability, the refund lifecycle begins from `LIABILITY_OPEN`.
+- If an authorized and posted Finance-owned cash over-collection correction
+  creates a refund liability, the refund lifecycle begins from `LIABILITY_OPEN`.
 - Post-collection refund liabilities do not reopen orders, change order state,
   rewrite the frozen order total, or rewrite the collected payment fact.
 
@@ -111,10 +111,14 @@ LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED
 
 ### Source Authorization and Collectibility
 
-- A refund liability must originate from an authorized and posted source
-  correction, adjustment, or other launch-approved source event.
-- Source authorization is owned by the source workflow that creates the refund
-  liability.
+- At launch, a refund liability must originate from an authorized and posted
+  Finance-owned cash over-collection correction source event.
+- Finance owns source authorization, posting, and audit for cash
+  over-collection correction.
+- Refund owns the resulting liability lifecycle after the source event creates
+  `LIABILITY_OPEN`.
+- Additional refund-liability source workflows require explicit launch-scope
+  entry with a named source owner before they can create Refund liabilities.
 - Refund has no amount-based approval threshold at launch.
 - Refund amount does not create a separate amount-based hold state.
 - Once a valid source event creates the liability, the refund may receive a
@@ -210,12 +214,13 @@ Trimmed access matrix rows relevant to refunds. Full matrix:
 ## Authorization Edge Cases
 
 **E-05**: Refund liabilities have no amount-based approval threshold at launch.
-A valid authorized and posted source event may create a refund liability
-eligible for collection-code issuance regardless of amount. The source workflow
-still owns any required source authorization and separation-of-duty rule.
+A valid authorized and posted Finance-owned cash over-collection correction may
+create a refund liability eligible for collection-code issuance regardless of
+amount. Finance owns source authorization and any required separation-of-duty
+rule for the source correction.
 
 **E-07**: An Outlet Manager may initiate scoped refund liabilities and disburse
 collectible refunds within outlet scope when explicitly permissioned. Outlet
 Managers cannot pay refunds for another outlet, void or write off refund
-liabilities, bypass source-workflow authorization, or approve their own source
-submission when the source workflow requires approval.
+liabilities, bypass Finance source authorization, or approve their own Finance
+source correction when source approval is required.
