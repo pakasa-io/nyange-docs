@@ -271,6 +271,9 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
     claim-blocking reason for the frozen order.
 - The pending-claim timeout is required Order policy configuration for launch.
 - A missing pending-claim timeout configuration is a launch-blocking policy gap.
+- The exact launch timeout duration is an open Product Manager decision.
+- Until the duration is set, Order cannot evaluate timeout-based
+  `PENDING -> CLAIM_BLOCKED` transitions deterministically.
 - The timeout starts at order placement and restarts whenever an order is
   reopened from `CLAIM_BLOCKED` to `PENDING`.
 - Claim-blocking reasons are controlled reason codes. Launch reason codes are:
@@ -476,6 +479,14 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
    cash custody lifecycle until handover and reconciliation. A permitted
    handover receiver accepts counted cash, transfers custody to outlet cash, and
    records any approved Finance-owned variance.
+
+## Open Questions
+
+- **OQ-01 — Pending-claim timeout duration.** Product Manager must set the
+  launch pending-claim timeout duration before launch. Order owns the policy and
+  blocks launch until this value is configured because timeout-based
+  `PENDING -> CLAIM_BLOCKED` transitions cannot be evaluated deterministically
+  without it.
 
 ## Out of Scope
 
