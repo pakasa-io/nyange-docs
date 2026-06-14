@@ -20,6 +20,8 @@ tests.
 - Online delivery orders are cash-on-delivery at launch and are collected by
   the Delivery Agent at the doorstep.
 - Online orders create single-order delivery tasks.
+- Walk-in POS sales are cash-only at launch and are completed at the selling
+  outlet counter.
 
 ## Outlet Model
 
@@ -76,6 +78,7 @@ tests.
 | [catalog.md](catalog.md) | Catalog & Pricing | Refill pricing, bundle pricing, global online pricing, launch commercial programs |
 | [cart.md](cart.md) | Cart | Customer cart state, quote readiness, catalog-change handling, checkout readiness, abandoned-cart cleanup |
 | [order.md](order.md) | Order | Order placement, lifecycle state, outlet claiming, COD fulfillment, and cancellation |
+| [pos.md](pos.md) | POS Sale | Walk-in outlet counter sales, immediate cash collection, POS completion, and same-day voids |
 | [payment.md](payment.md) | Payment | COD cash collection, zero-collection facts, payment boundaries |
 | [delivery.md](delivery.md) | Delivery | Delivery lifecycle, delivery fee rules, agent cash handling, failed-delivery fee waiver, cylinder exchange field leg |
 | [inventory.md](inventory.md) | Inventory | Reservation lifecycle, outlet transfer, vendor refill batch, cylinder exchange intake leg, stock availability |
@@ -93,6 +96,9 @@ tests.
 - Cart owns customer-selected pre-order state and checkout readiness.
   [order.md](order.md) owns order placement and the immutable order lifecycle
   after checkout succeeds.
+- [pos.md](pos.md) owns walk-in counter-sale lifecycle state. POS sales do not
+  enter Cart, Order, Delivery, pending-pool claiming, or online COD expectation
+  states.
 - Catalog orderability and priceability rules are referenced by [cart.md](cart.md)
   for quote readiness and by [order.md](order.md) for placement revalidation.
 - The complete access matrix is in [identity-auth.md](identity-auth.md). Each

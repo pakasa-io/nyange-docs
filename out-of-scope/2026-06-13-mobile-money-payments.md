@@ -12,7 +12,9 @@
 
 Mobile-money customer payments are not part of the mid-stage MVP. Launch
 payment behavior is cash-only: COD for online delivery orders and immediate
-cash for walk-in POS sales.
+cash for walk-in POS sales. Walk-in POS cash behavior is defined in
+[../business/pos.md](../business/pos.md); this document defers only the
+mobile-money payment rail.
 
 This deferral covers the complete mobile-money payment rail, not only provider
 integration work.

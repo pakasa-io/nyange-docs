@@ -13,6 +13,8 @@ Lifecycle intake leg
 
 **Related**:
 [order.md](order.md) for reservation triggers;
+[pos.md](pos.md) for walk-in POS stock commitment and counter returned-cylinder
+recognition;
 [delivery.md](delivery.md) for the refill exchange field leg and delivery
 custody;
 [identity-auth.md](identity-auth.md) for the full access matrix.
@@ -21,7 +23,8 @@ custody;
 
 **BI-01 — Available stock never goes below zero.**
 
-- Stock committed to orders cannot exceed physical available stock.
+- Stock committed to online orders or POS sales cannot exceed physical
+  available stock.
 - When an outlet claims an order, the stock claim is atomic relative to other
   concurrent claims.
 - A claim that cannot reserve every requested stock item is rejected and may
@@ -64,10 +67,12 @@ custody;
 - Inventory owns physical stock availability, reservation state, transfer state,
   vendor refill movement state, returned-cylinder intake recognition, inventory
   adjustment policy, and inventory ledger posting.
-- Inventory does not own delivery completion, customer payment, refund payout,
-  receipt issuance, or outlet cash custody.
+- Inventory does not own delivery completion, POS sale completion, customer
+  payment, refund payout, receipt issuance, or outlet cash custody.
 - Incoming customer cylinders from refill delivery do not become outlet empty
   inventory until intake is confirmed.
+- Incoming customer cylinders from POS refill exchange become outlet empty
+  inventory only through the POS completion participant path defined here.
 
 ## Inventory Adjustment Policy
 
@@ -152,6 +157,26 @@ ledger-posting rules for stock corrections.
   reserved outgoing stock for the active claimed order.
 - If the Delivery-coordinated completion fails before commit, outgoing stock
   remains reserved and unavailable; no stock commitment is posted.
+
+## POS Stock Commitment
+
+- POS stock commitment is triggered only by POS Sale completion in
+  [pos.md](pos.md).
+- POS does not create an inventory reservation before completion.
+- Inventory validates that every POS outgoing item is available, saleable, and
+  located at the selling outlet at completion time.
+- POS completion commits outgoing stock immediately when the sale completes.
+- Partial POS stock commitment is prohibited.
+- If any POS line cannot be committed, the entire POS completion fails and no
+  inventory ledger entry is posted.
+- POS refill exchange completion requires physical receipt of the customer's
+  returned empty cylinder at the counter.
+- The POS actor must record returned-cylinder vendor, size, and condition for
+  each refill exchange line before completion.
+- Accepted POS returned cylinders are recognized as confirmed empty outlet stock
+  in the same POS completion commit.
+- POS returned cylinders do not enter Delivery-owned field-leg states or
+  Inventory `INTAKE_PENDING`.
 
 ## Outlet Transfer Lifecycle
 

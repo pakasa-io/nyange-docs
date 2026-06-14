@@ -10,6 +10,7 @@ can pay it, and how customer-presented collection codes authorize payout.
 
 **Related**:
 [order.md](order.md) for cancellation and failed-delivery outcomes;
+[pos.md](pos.md) for POS same-day voids that do not create refund liabilities;
 [payment.md](payment.md) for cash collection and zero-collection facts;
 [delivery.md](delivery.md) for failed-delivery fee waiver;
 [finance.md](finance.md) for daily closing and liability reporting;
@@ -85,6 +86,17 @@ LIABILITY_OPEN|COLLECTIBLE
   creates a refund liability, the refund lifecycle begins from `LIABILITY_OPEN`.
 - Post-collection refund liabilities do not reopen orders, change order state,
   rewrite the frozen order total, or rewrite the collected payment fact.
+
+### POS Void Boundary
+
+- POS same-day voids are not Refund-owned liabilities at launch.
+- A permitted POS same-day void may return cash as a linked void reversal under
+  [pos.md](pos.md), [payment.md](payment.md), and [finance.md](finance.md).
+- POS customer returns, exchanges, post-sale price adjustments, and POS refund
+  liabilities are not launch behavior.
+- After daily closing, POS customer refund workflows require explicit
+  launch-scope entry with a named source owner before they can create Refund
+  liabilities.
 
 ### Terminal Exception Outcomes
 

@@ -12,6 +12,7 @@ closed as unclaimable, or cancelled.
 **Related**:
 [cart.md](cart.md) for customer cart state, quote readiness, catalog-change
 acknowledgements, and checkout readiness;
+[pos.md](pos.md) for separate walk-in outlet counter sales;
 [catalog.md](catalog.md) for orderable products and priceability;
 [inventory.md](inventory.md) for stock reservation, commitment, release, and
 returned-empty intake recognition;
@@ -125,6 +126,8 @@ role, reason code, reason note, timestamp, and audit trail fields.
 - Order owns order placement, order state, customer-visible status,
   cancellation, claim-block exception state, unclaimable closure, claim
   association, and immutable price snapshot.
+- Order does not own walk-in POS sales, POS sale numbers, POS sale completion,
+  POS cash collection, or POS same-day voids.
 - Order has no fulfilling outlet while it is `PENDING`.
 - Order has no fulfilling outlet while it is `CLAIM_BLOCKED`.
 - Claiming creates exactly one claimed fulfilling outlet association.
@@ -475,7 +478,8 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
 - Order-state mutation workflows for doorstep conversion, delivery-time
   price-delta or refund negotiation, and returns after delivery.
 - Partial order fulfillment, split orders, and multi-outlet fulfillment.
-- Counter-sale workflows.
+- Order-owned counter-sale workflows. Walk-in POS sales are a separate lifecycle
+  owned by [pos.md](pos.md).
 
 ## Permissions
 

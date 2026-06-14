@@ -13,6 +13,7 @@ combination is orderable, how it is priced, and who can change prices.
 [cart.md](cart.md) for cart quote readiness, catalog-change handling, and
 checkout readiness;
 [order.md](order.md) for immutable order price snapshots;
+[pos.md](pos.md) for walk-in POS sale line snapshots and saleability checks;
 [delivery.md](delivery.md) for delivery fees and failed-delivery fee waivers;
 [identity-auth.md](identity-auth.md) for the full access matrix.
 
@@ -24,7 +25,7 @@ checkout readiness;
 - There is no deposit, cylinder-return obligation, customer credit account, or
   customer-level cylinder ownership tracking at launch.
 - New filled cylinder purchases may use any globally supported vendor available
-  through the online checkout catalog.
+  through the online checkout catalog or walk-in POS catalog.
 - The claiming outlet must fulfill the frozen outgoing vendor, product, and
   quantity terms without changing the placed order total.
 - A customer who loses or damages their cylinder must buy a new cylinder rather
@@ -143,9 +144,24 @@ Refill price is determined by three dimensions.
 - Claim-blocked and unclaimable outcomes do not rewrite catalog rules, price
   rules, or the placed order snapshot.
 
+## POS Pricing Basis
+
+- Walk-in POS uses the same active launch catalog, product, refill, accessory,
+  bundle, tax, and priceability rules as online checkout.
+- POS does not use delivery-fee rules.
+- POS does not use address serviceability or pre-order outlet claiming.
+- POS may complete only for stock that is available and saleable at the selling
+  outlet at completion time.
+- POS refill exchange line pricing uses the recorded incoming vendor, selected
+  outgoing vendor, and cylinder size under the active global refill pricing
+  matrix.
+- Outlet Cashiers cannot override POS line prices, tax, discounts, or totals.
+- Outlet-local POS product, refill, accessory, or tax price overrides are not
+  launch behavior.
+
 ## Price Administration
 
-- Global online catalog, product, refill, accessory, tax, and delivery-fee rules
+- Global launch catalog, product, refill, accessory, tax, and delivery-fee rules
   are the launch pricing basis.
 - Only Super Admin may create, change, disable, or retire global catalog and
   pricing rules.
@@ -153,8 +169,8 @@ Refill price is determined by three dimensions.
   is not launch behavior.
 - Outlet Managers cannot create, change, approve, or apply outlet-local price
   rules or delivery-fee overrides at launch.
-- Online COD quotes and order placement never consult outlet-local price rules
-  at launch.
+- Online COD quotes, order placement, and POS sale completion never consult
+  outlet-local price rules at launch.
 - Outlet-local pricing guardrails and local delivery-fee overrides are deferred
   in
   [../out-of-scope/2026-06-14-outlet-local-pricing-guardrails.md](../out-of-scope/2026-06-14-outlet-local-pricing-guardrails.md).

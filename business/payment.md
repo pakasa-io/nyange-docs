@@ -1,16 +1,18 @@
 # Payment
 
-**Intent**: Define payment behavior for online COD orders, durable COD
-expectations, collection facts, zero-collection facts, and payment boundaries.
+**Intent**: Define payment behavior for online COD orders, walk-in POS cash
+sales, durable COD expectations, collection facts, zero-collection facts, and
+payment boundaries.
 
-**Reader task**: Use this document to decide whether a cash collection or
-zero-collection fact can satisfy an online order payment requirement, and which
-exceptions hand off to delivery, refund, or finance.
+**Reader task**: Use this document to decide whether a cash collection,
+zero-collection fact, or POS cash fact can satisfy a launch payment requirement,
+and which exceptions hand off to delivery, POS Sale, refund, or finance.
 
 **Sources**: §6.2 Payment Lifecycle, §7.7 Agent Cash Handling
 
 **Related**:
 [order.md](order.md) for order lifecycle;
+[pos.md](pos.md) for walk-in POS sale completion and void triggers;
 [delivery.md](delivery.md) for doorstep cash collection;
 [refund.md](refund.md) for cash refund liabilities;
 [finance.md](finance.md) for daily closing and cash ledger posting;
@@ -21,18 +23,21 @@ exceptions hand off to delivery, refund, or finance.
 **BI-03 — Payment facts are cash facts only.**
 
 - Online delivery orders are cash-on-delivery.
-- A payment fact records either COD cash collection at delivery or zero
-  collection after failed delivery.
+- Walk-in POS sales are immediate cash at the outlet.
+- A payment fact records COD cash collection at delivery, POS cash collection at
+  counter completion, or zero collection after failed delivery.
 
 ## Boundary
 
-- Payment owns the customer payment state needed by Order and Finance:
+- Payment owns the customer payment state needed by Order, POS Sale, and Finance:
   durable COD expectation records, expected COD amount, collected cash fact,
-  zero-collection fact, and payment outcome.
+  POS cash fact, zero-collection fact, and payment outcome.
 - Order owns order placement, cancellation, `UNCLAIMABLE`, `DELIVERED`, and
   `DELIVERY_FAILED` outcomes that create, retire, or complete the Payment-owned
   COD expectation.
 - Delivery owns agent field collection and the delivery completion commit point.
+- POS Sale owns counter-sale completion, abandonment, and same-day void
+  eligibility.
 - Finance owns cash handover, counted-cash acceptance, outlet cash custody, cash
   variance records, daily closing, ledger posting, and receipts.
 - Refund owns customer refund liabilities and payout lifecycle.
@@ -43,15 +48,21 @@ exceptions hand off to delivery, refund, or finance.
 PENDING_COLLECTION -> COLLECTED
 PENDING_COLLECTION -> ZERO_COLLECTION
 PENDING_COLLECTION --retired by Order CUSTOMER_CANCELLED|UNCLAIMABLE--> (no payment terminal state)
+(no expectation) -> POS_CASH_COLLECTED
+POS_CASH_COLLECTED -> POS_CASH_VOIDED
 ```
 
-Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
+Terminal states: `COLLECTED`, `ZERO_COLLECTION`, and `POS_CASH_VOIDED`.
+`POS_CASH_COLLECTED` is terminal after the same-day POS void window closes
+without a void.
 
 | State | Meaning |
 | --- | --- |
 | `PENDING_COLLECTION` | Durable active COD expectation derived from the placed order; no customer cash fact has been recorded and the expectation has not been retired. |
 | `COLLECTED` | Terminal successful cash collection fact; may include an approved short/over variance link. |
 | `ZERO_COLLECTION` | Terminal fact for failed delivery where no customer cash was collected. |
+| `POS_CASH_COLLECTED` | Terminal successful immediate cash collection fact for a completed POS sale. |
+| `POS_CASH_VOIDED` | Terminal linked reversal fact for an allowed same-day POS void. |
 
 Retired COD expectations remain durable records, but retirement is not a Payment
 state and does not create a terminal payment fact.
@@ -62,6 +73,9 @@ state and does not create a terminal payment fact.
 
 - Online delivery orders use COD cash.
 - Active online-fulfillment outlets are expected to support COD cash.
+- Walk-in POS sales use exact immediate `POS_CASH`.
+- Mobile-money, card, customer credit, partial payment, short POS collection,
+  and over POS collection are not supported at launch.
 
 ### COD Expectation Creation
 
@@ -109,6 +123,33 @@ state and does not create a terminal payment fact.
 - If the completion transaction fails before commit, payment remains
   `PENDING_COLLECTION` and no collected cash fact is recorded.
 
+### POS Cash Collection
+
+- POS Sale completion is the business trigger for POS cash collection.
+- POS does not create a COD expectation.
+- Payment records one immediate `POS_CASH_COLLECTED` fact in the same atomic
+  completion commit that completes the POS sale, commits stock, records Finance
+  outlet cash custody, and issues the receipt.
+- The POS cash fact stores:
+  - POS sale ID and public POS sale number;
+  - selling outlet;
+  - cashier actor identity;
+  - optional customer name or phone when captured by POS;
+  - POS sale snapshot reference;
+  - expected amount from the POS sale total;
+  - collected amount;
+  - currency;
+  - payment method `POS_CASH`;
+  - completion idempotency key and correlation ID;
+  - completion timestamp.
+- POS collected amount must equal expected amount.
+- Payment rejects POS cash collection if collected amount, currency, or POS sale
+  snapshot basis differs from the POS completion request.
+- If the POS completion transaction fails before commit, no POS cash fact is
+  recorded.
+- An allowed POS same-day void appends a linked `POS_CASH_VOIDED` reversal fact.
+- A POS void does not create a Refund-owned liability or collection code.
+
 ### Failed Delivery, Cancellation, and Unclaimable Closure
 
 - Failed delivery records a zero-collection payment fact tied to the failed
@@ -155,6 +196,8 @@ state and does not create a terminal payment fact.
 
 - Short and over collection by Delivery Agents follows the Finance-owned cash
   variance policy in [finance.md](finance.md).
+- POS short and over collection are blocked before POS completion and do not use
+  the COD variance policy.
 - Approved short/over collection variance does not create a separate payment
   terminal state.
 - Payment links to the approved Finance-owned variance record but does not own
@@ -170,8 +213,10 @@ state and does not create a terminal payment fact.
 Trimmed access matrix rows relevant to payment. Full matrix:
 [identity-auth.md](identity-auth.md).
 
-| Capability | P-02 | P-06 | P-10 |
-| --- | --- | --- | --- |
-| Delivery execution pickup and COD | Own | - | Full |
-| Agent cash handover | Own | Scoped receive | Full |
-| Daily cash closing | - | Scoped | Full |
+| Capability | P-02 | P-03 | P-06 | P-10 |
+| --- | --- | --- | --- | --- |
+| Delivery execution pickup and COD | Own | - | - | Full |
+| POS cash collection | - | Scoped | - | Full |
+| POS cash void reversal | - | - | Scoped | Full |
+| Agent cash handover | Own | - | Scoped receive | Full |
+| Daily cash closing | - | - | Scoped | Full |

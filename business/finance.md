@@ -13,6 +13,7 @@ Controls, §7.19 Delivery Cost Reporting, BI-14
 **Related**:
 [order.md](order.md) for order placement, terminal states, COD fulfillment, and
 cancellation;
+[pos.md](pos.md) for walk-in POS sale completion and same-day voids;
 [payment.md](payment.md) for cash payment facts;
 [delivery.md](delivery.md) for doorstep collection evidence and delivery task
 state;
@@ -33,37 +34,46 @@ state;
 - Shared append-only ledger storage or tooling is infrastructure and does not
   transfer logical ledger ownership between modules.
 
-**BI-05 — Financial closure is `DELIVERED`.**
+**BI-05 — Financial closure is sale completion.**
 
 - For online COD orders, financial closure means the order reaches
   `DELIVERED`.
+- For walk-in POS sales, financial closure means POS Sale reaches `COMPLETED`.
 - `DELIVERED` seals the original sale financial state.
+- `COMPLETED` seals the original POS sale financial state.
 - The receipt issued at `DELIVERED` is immutable.
+- The receipt issued at POS `COMPLETED` is immutable.
 - Finance participates in Delivery-coordinated completion by issuing the
   immutable receipt number and receipt record in the same atomic commit that
   marks the order `DELIVERED`.
+- Finance participates in POS Sale completion by issuing the immutable receipt
+  number and receipt record in the same atomic commit that completes the POS
+  sale.
 - Later events do not rewrite the original receipt.
 - Later financial activity is allowed only as a separate linked business record,
   such as an approved refund liability or approved adjustment/void record.
-- Later activity must not alter the original delivered sale or receipt.
+- Later activity must not alter the original delivered online sale, completed
+  POS sale, or receipt.
 
-**BI-13 — COD cash belongs to the fulfilling outlet.**
+**BI-13 — Cash belongs to the responsible outlet.**
 
 - Launch online orders are COD cash, collected by the Delivery Agent for the
   fulfilling outlet.
+- Launch POS sales are immediate cash collected by the selling outlet.
 
 **BI-14 — Receipt numbers are permanent and sequential.**
 
 - Receipt numbers are outlet-scoped and sequential within the outlet/date
   receipt series.
 - Receipt numbers carry the outlet and receipt date in the business number.
-- Receipt numbers are issued at `DELIVERED`.
-- Receipt numbers are distinct from order identifiers.
+- Receipt numbers are issued at online order `DELIVERED` or POS sale
+  `COMPLETED`.
+- Receipt numbers are distinct from order identifiers and POS sale identifiers.
 - A number issued to a valid receipt cannot be reissued or modified.
 - Receipt rollback means pre-commit technical rollback of the same `DELIVERED`
-  transaction before a receipt number is issued.
-- If the `DELIVERED` transaction fails before commit, the receipt number is not
-  issued and no numbering gap exists.
+  or POS `COMPLETED` transaction before a receipt number is issued.
+- If the `DELIVERED` or POS `COMPLETED` transaction fails before commit, the
+  receipt number is not issued and no numbering gap exists.
 - After commit, receipt rollback is not allowed; corrections use separate linked
   adjustment or void records.
 - Any skipped number range caused by an intentional exception requires a
@@ -90,17 +100,20 @@ state;
 ## Boundary
 
 - Finance owns cash custody after a COD collection fact is committed, cash
-  handover, counted-cash acceptance, outlet cash custody, cash variance records,
-  Finance-owned financial and cash ledger posting, daily closing, receipt
-  records, expense controls, and delivery cost reporting.
+  handover, counted-cash acceptance, outlet cash custody after POS completion,
+  cash variance records, Finance-owned financial and cash ledger posting, daily
+  closing, receipt records, expense controls, and delivery cost reporting.
 - Finance owns the short/over COD collection variance policy and the variance
   records linked from Payment.
 - Delivery owns doorstep collection evidence, delivery task state, field facts,
   and handover submission evidence.
 - Payment owns expected COD amount, collected cash fact, zero-collection fact,
-  payment outcome, and the link to any Finance-owned cash variance record.
+  POS cash fact, payment outcome, and the link to any Finance-owned cash
+  variance record.
 - Order owns order state and the immutable order total that determines expected
   COD.
+- POS Sale owns POS sale lifecycle state, same-day void eligibility, and the POS
+  sale snapshot that determines expected POS cash.
 - Refund owns customer refund liabilities and payout lifecycle.
 
 ## Cash Custody And Handover
@@ -159,6 +172,21 @@ else                                             -> Super Admin approval
   resolved by an approved Finance-owned variance, correction, or adjustment
   record.
 
+### POS Cash Custody
+
+- POS Sale completion transfers collected cash directly into Finance-owned
+  outlet cash custody for the selling outlet.
+- POS cash does not enter `AGENT_CASH_HELD`, `HANDOVER_SUBMITTED`, or
+  `HANDOVER_VARIANCE_OPEN`.
+- POS cash has no delivery-agent handover.
+- POS completion records exact cash only.
+- POS short or over collection is blocked before completion and does not create
+  a COD variance record.
+- An allowed POS same-day void appends linked Finance cash custody, ledger, and
+  receipt-audit reversal records.
+- POS void cash returned to the customer is a same-day void reversal, not a
+  Refund-owned payout.
+
 ## Daily Closing
 
 Daily closing is the outlet's end-of-day financial reconciliation.
@@ -168,7 +196,9 @@ Daily closing is the outlet's end-of-day financial reconciliation.
 Daily closing summarizes:
 
 - cash count reconciliation;
-- delivered orders and issued receipts;
+- delivered online orders;
+- completed POS sales and POS voids;
+- issued receipts;
 - cash and ledger entries;
 - outstanding refund liabilities carried forward with Outlet Manager
   acknowledgement.
@@ -203,6 +233,7 @@ if closing_overdue:
   allowed:  online_order_placement, order_claiming, inventory_reservation_for_claim
   allowed:  claim_block_marking, claim_block_reopening, unclaimable_closure
   allowed:  ready_for_pickup, delivery_agent_assignment, pickup, cod_collection
+  allowed:  pos_sale_completion, same_day_pos_void_before_current_day_closing
   allowed:  stock_intake
 ```
 
@@ -299,7 +330,9 @@ Expense records capture:
 - Cost changes are audited and may carry effective dates for historical
   estimated-margin reporting.
 - When configured cost inputs are used for estimated margin reporting, the
-  applicable cost for each delivered sale is fixed at `DELIVERED`.
+  applicable cost for each delivered online sale is fixed at `DELIVERED`.
+- When configured cost inputs are used for estimated margin reporting, the
+  applicable cost for each POS sale is fixed at POS `COMPLETED`.
 - Later cost changes do not silently restate sealed-sale estimates.
 
 ## Delivery Cost Reporting

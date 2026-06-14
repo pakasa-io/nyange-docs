@@ -60,13 +60,17 @@ may hold multiple permission bundles across one or more outlets.
 
 ### P-03 Outlet Cashier
 
-- Outlet staff responsible for customer cash refund payouts when explicitly
-  permissioned.
-- Verifies customer-presented refund collection codes for collectible refunds.
-- Disburses collectible cash refunds from the owning outlet.
+- Outlet staff responsible for walk-in POS cash sales within their assigned
+  outlet.
+- Creates and completes scoped POS sales at the outlet counter.
+- May handle customer cash refund payouts only when explicitly permissioned.
+- Verifies customer-presented refund collection codes for collectible refunds
+  only when explicitly granted refund-payout permission.
+- Disburses collectible cash refunds from the owning outlet only when explicitly
+  granted refund-payout permission.
 - Has no delivery responsibilities.
-- Cannot manage online orders, create refund liabilities, adjust inventory, or
-  access another outlet's data.
+- Cannot manage online orders, create refund liabilities, void POS sales,
+  adjust inventory outside POS completion, or access another outlet's data.
 
 ### P-04 Inventory Clerk
 
@@ -183,6 +187,9 @@ may hold multiple permission bundles across one or more outlets.
 | COD recording | - | Own assigned | - | - | - | - | - | - | Full |
 | Delivery execution pickup and COD | - | Own | - | - | - | - | - | - | Full |
 | Agent cash handover | - | Own | - | - | - | Scoped receive | - | - | Full |
+| POS sale creation and completion | - | - | Scoped | - | - | - | - | - | Full |
+| POS sale read/reporting | - | - | Scoped | - | - | Scoped | Read assigned outlets | Read | Full |
+| POS same-day void | - | - | - | - | - | Scoped | - | - | Full |
 | Inventory viewing | - | - | - | Scoped | - | Scoped | Read assigned outlets | - | Full |
 | Reservation from order claim | - | - | - | - | - | Scoped with explicit permission | - | - | Full |
 | Inventory adjustments submit | - | - | - | Scoped request | - | Scoped policy-limited post; above = request | - | - | Full |
@@ -242,6 +249,21 @@ may hold multiple permission bundles across one or more outlets.
 - Launch refund payouts have no per-refund or per-outlet-business-day cash cap.
 - Without explicit per-outlet refund-payout permission, Cashiers and Outlet
   Managers cannot handle refund payouts.
+
+### POS Cashier Authority
+
+- POS Sale owns POS sale authorization at the POS boundary. Identity supplies
+  actor, role, session, and outlet-scope facts.
+- The Outlet Cashier persona carries scoped POS sale creation and completion
+  authority for assigned outlets at launch.
+- No separate POS-sale permission bundle is required for an assigned Outlet
+  Cashier at launch.
+- POS sale authority does not authorize refund payout, POS void, online order
+  management, inventory adjustment, price override, or another outlet's POS
+  sale access.
+- Outlet Managers may void eligible same-outlet, same-business-day POS sales
+  before daily closing under [pos.md](pos.md); Outlet Cashiers cannot void
+  completed POS sales.
 
 ### Refund Source and Payout Boundary
 
