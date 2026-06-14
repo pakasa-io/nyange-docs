@@ -53,7 +53,7 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 | State | Meaning |
 | --- | --- |
 | `PENDING_COLLECTION` | Active COD expectation derived from the placed order; no customer cash fact has been recorded. |
-| `COLLECTED` | Terminal successful cash collection fact. |
+| `COLLECTED` | Terminal successful cash collection fact; may include an approved short/over variance link. |
 | `ZERO_COLLECTION` | Terminal fact for failed delivery where no customer cash was collected. |
 
 ## Business Rules
@@ -77,6 +77,10 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 - Expected COD derives from the persisted order total.
 - Agents record collected cash but cannot alter expected COD.
 - Client requests cannot override expected COD.
+- Payment becomes `COLLECTED` when collected cash matches expected COD or when a
+  delivery-approved short/over collection variance is attached.
+- Approved variance preserves expected amount, collected amount, and variance
+  link; it does not rewrite expected COD or the frozen order total.
 
 ### Failed Delivery and Cancellation
 
@@ -99,6 +103,8 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 
 - Short and over collection by Delivery Agents follows the delivery cash
   variance policy in [delivery.md](delivery.md).
+- Approved short/over collection variance does not create a separate payment
+  terminal state.
 - Approved post-collection overage correction or post-collection price
   adjustment may create a refund liability in [refund.md](refund.md), but does
   not rewrite the frozen order total or payment expectation.

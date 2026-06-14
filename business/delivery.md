@@ -203,6 +203,8 @@ Transition to `PICKED_UP` requires both:
 - COD derives from the persisted order total.
 - The agent cannot modify expected COD.
 - Client requests cannot override COD.
+- Delivery completion may proceed only when collected cash matches expected COD
+  or an approved short/over collection variance is recorded.
 - Returned-cylinder field facts are recorded when applicable.
 - COD collection fact is recorded.
 - Outgoing stock is committed.
@@ -252,7 +254,8 @@ Transition to `PICKED_UP` requires both:
 
 ## Agent Cash Handling
 
-Agents collect exact COD due at the doorstep.
+Agents are expected to collect the exact COD due at the doorstep. Short or over
+collection is allowed only through the controlled variance path below.
 
 ### Short and Over Collection
 
@@ -263,6 +266,8 @@ else                                             -> Super Admin approval
 ```
 
 - Required approval must be recorded before delivery can be marked complete.
+- An approved short/over collection does not change expected COD or the frozen
+  order total.
 - Over-collection excess is recorded as a cash discrepancy and reconciled at
   close.
 
