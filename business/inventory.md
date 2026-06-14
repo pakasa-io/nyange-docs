@@ -178,34 +178,28 @@ EMPTY
 
 ## Refill Exchange Request Intake Leg
 
-The field leg is defined in [delivery.md](delivery.md). Inventory owns
-`INTAKE_PENDING` through `INTAKE_CONFIRMED` or `FAILED`.
+The field leg is defined in [delivery.md](delivery.md). Inventory observes the
+Delivery handoff after `RETURN_RECORDED` and owns intake from `INTAKE_PENDING`
+through `INTAKE_CONFIRMED` or `FAILED`.
 
 ```
-PENDING
-  -> IN_PROGRESS
-      -> RETURN_RECORDED
-          -> INTAKE_PENDING
-              -> INTAKE_CONFIRMED
-              -> FAILED
-
-CANCELLED
+INTAKE_PENDING
+  -> INTAKE_CONFIRMED
+  -> FAILED
 ```
 
 | State | Meaning |
 | --- | --- |
-| `PENDING` | Created at order placement; expected cylinder vendor/size recorded. |
-| `IN_PROGRESS` | Order out for delivery; agent en route to customer. |
-| `RETURN_RECORDED` | Agent records returned cylinder vendor, size, and condition at doorstep. |
-| `INTAKE_PENDING` | Delivery succeeded; cylinder awaiting outlet intake confirmation. |
+| `INTAKE_PENDING` | Inventory-owned handoff state after successful delivery; cylinder awaits outlet intake confirmation. |
 | `INTAKE_CONFIRMED` | Returned-cylinder intake actor confirms intake; cylinder enters outlet inventory. |
-| `FAILED` | Intake rejected or cylinder not returned; exception raised. |
-| `CANCELLED` | Order cancelled before pickup; no cylinder exchange occurred. |
+| `FAILED` | Intake rejected or expected handoff cannot be confirmed; inventory exception raised. |
 
 ### Intake Rules
 
 - Each expected returned cylinder requires its own outlet intake confirmation
   before it becomes outlet empty inventory.
+- Upstream `PENDING`, `IN_PROGRESS`, `RETURN_RECORDED`, and `CANCELLED` are
+  Delivery-owned field-leg states and are not Inventory intake states.
 - `INTAKE_PENDING` persists after delivery completion.
 - The order can be `DELIVERED` while exchange requests are still
   `INTAKE_PENDING`.
