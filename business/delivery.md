@@ -187,7 +187,7 @@ Transition to `PICKED_UP` requires both:
   delivery completion, failed-order return receipt at the outlet, or an approved
   custody exception covers the item.
 - Pickup keeps reserved stock unavailable.
-- Pickup creates full-cylinder custody for the agent.
+- Pickup creates outgoing goods custody for the agent.
 - Pickup moves the order to `OUT_FOR_DELIVERY`.
 
 ## Delivery Completion
@@ -209,7 +209,7 @@ Transition to `PICKED_UP` requires both:
 - Delivery agents may mark a delivery `FAILED` after pickup.
 - A controlled reason code and audit trail are required.
 - An optional note may be added.
-- Failed delivery returns all picked-up full-cylinder custody to outlet stock.
+- Failed delivery returns all picked-up outgoing goods custody to outlet stock.
 - Failed delivery records a zero-collection payment fact.
 - Failed delivery completes the active order claim.
 - Failed delivery marks the order `DELIVERY_FAILED`.
