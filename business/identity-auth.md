@@ -83,7 +83,7 @@ may hold multiple permission bundles across one or more outlets.
 ### P-05 Dispatcher
 
 - Outlet staff responsible for delivery coordination.
-- Assigns delivery agents to single-order delivery tasks.
+- Manually assigns delivery agents to single-order delivery tasks.
 - Tracks delivery progress.
 - May change the assigned delivery agent before pickup within outlet active
   delivery policy.

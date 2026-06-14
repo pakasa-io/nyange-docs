@@ -155,19 +155,14 @@ At launch, an eligible agent must:
 - have no active picked-up task.
 
 Formal shift schedules, live location, and route-distance optimization do not
-add eligibility requirements, expand scope, or change assignment ranking.
+add eligibility requirements or expand scope.
 
-### Default Assignment Ranking
+### Manual Assignment
 
-```
-rank agents by:
-  1. queued_assignment_load  ASC
-  2. least_recent_assignment ASC
-  3. deterministic_tie_breaker
-```
-
-- A Dispatcher or Outlet Manager may assign or change the assigned delivery
-  agent before pickup within outlet scope with a recorded reason.
+- A Dispatcher or Outlet Manager selects an eligible delivery agent manually.
+- The system may list eligible agents for the task outlet.
+- A Dispatcher or Outlet Manager may change the assigned delivery agent before
+  pickup within outlet scope with a recorded reason.
 
 ## Pickup Handover
 
