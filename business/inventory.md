@@ -164,6 +164,8 @@ availability and custody.
 ```
 REQUESTED -> APPROVED
 REQUESTED -> REJECTED
+REQUESTED -> CANCELLED
+APPROVED -> CANCELLED
 ```
 
 | State | Meaning |
@@ -171,11 +173,17 @@ REQUESTED -> REJECTED
 | `REQUESTED` | Receiving outlet requests transfer. |
 | `APPROVED` | Sending Outlet Manager or Super Admin approves the transfer request. |
 | `REJECTED` | Terminal sender decline from `REQUESTED`; no inventory impact. |
+| `CANCELLED` | Terminal cancellation before dispatch; inventory impact depends on whether a sender hold already exists. |
 
 ### Transfer Stock Movement
 
 ```
 TRANSFER_HOLD -> IN_TRANSIT -> RECEIVED
+TRANSFER_HOLD -> TRANSFER_CANCELLED
+TRANSFER_HOLD -> DISPATCH_FAILED -> TRANSFER_EXCEPTION_RESOLVED
+IN_TRANSIT -> PARTIAL_RECEIPT -> TRANSFER_EXCEPTION_RESOLVED
+IN_TRANSIT -> RECEIPT_REJECTED -> TRANSFER_EXCEPTION_RESOLVED
+IN_TRANSIT -> LOST_IN_TRANSIT -> TRANSFER_EXCEPTION_RESOLVED
 ```
 
 | State | Meaning |
@@ -183,6 +191,12 @@ TRANSFER_HOLD -> IN_TRANSIT -> RECEIVED
 | `TRANSFER_HOLD` | Sender stock is held outside sale availability after transfer approval and before dispatch. |
 | `IN_TRANSIT` | Sender stock has left sender availability and is moving to the receiver. |
 | `RECEIVED` | Receiver confirms receipt; sender hold is closed and stock is posted to receiver inventory. |
+| `TRANSFER_CANCELLED` | Approved transfer was cancelled before dispatch; sender hold is closed only after stock is physically verified at sender. |
+| `DISPATCH_FAILED` | Dispatch could not be completed before stock left sender custody; stock remains held until sender verification or exception resolution. |
+| `PARTIAL_RECEIPT` | Receiver confirms fewer units than dispatched; received units may post, while missing units remain non-available. |
+| `RECEIPT_REJECTED` | Receiver rejects all or part of the dispatched stock because item, quantity, condition, or transfer evidence does not match. |
+| `LOST_IN_TRANSIT` | Dispatched stock cannot be physically located by sender or receiver. |
+| `TRANSFER_EXCEPTION_RESOLVED` | Terminal audit state after every exception quantity is received, returned, quarantined, or adjusted. |
 
 ### Transfer Rules
 
@@ -194,8 +208,35 @@ TRANSFER_HOLD -> IN_TRANSIT -> RECEIVED
   `TRANSFER_HOLD` stock movement.
 - Rejection moves the request status to `REJECTED` and creates no stock
   movement.
+- Cancellation from `REQUESTED` creates no stock movement.
+- Cancellation from `APPROVED` before dispatch moves the request to
+  `CANCELLED` and the stock movement to `TRANSFER_CANCELLED`.
+- `TRANSFER_CANCELLED` releases held stock to sender availability only after an
+  authorized sender actor verifies the stock is physically present and
+  saleable at the sender outlet.
 - Sender dispatch moves stock from `TRANSFER_HOLD` to `IN_TRANSIT`.
+- A failed dispatch before stock leaves sender custody moves the stock movement
+  to `DISPATCH_FAILED`.
+- `DISPATCH_FAILED` releases stock to sender availability only after authorized
+  sender verification; otherwise the unresolved quantity remains non-available
+  until `TRANSFER_EXCEPTION_RESOLVED`.
 - Receiver receipt moves stock from `IN_TRANSIT` to `RECEIVED`.
+- Once stock is `IN_TRANSIT`, cancellation is not allowed. Failed completion is
+  handled through `PARTIAL_RECEIPT`, `RECEIPT_REJECTED`, or `LOST_IN_TRANSIT`.
+- `PARTIAL_RECEIPT` posts only the quantity physically received and accepted by
+  the receiver. The missing quantity remains non-available until it is received,
+  returned to the sender, or closed through an approved Inventory adjustment.
+- `RECEIPT_REJECTED` keeps rejected quantity non-available until it is returned
+  to sender stock, accepted by the receiver after correction, quarantined or
+  damaged through policy, or closed through an approved Inventory adjustment.
+- `LOST_IN_TRANSIT` requires a Super Admin-approved loss adjustment before loss
+  is ledger-posted.
+- Transfer exception records must capture transfer id, expected quantity,
+  actual quantity, affected item or cylinder identifiers when present, affected
+  outlets, actor, reason, note, and audit timestamp.
+- All quantities in `PARTIAL_RECEIPT`, `RECEIPT_REJECTED`, and
+  `LOST_IN_TRANSIT` are unavailable for reservation, sale, transfer, or vendor
+  refill until `TRANSFER_EXCEPTION_RESOLVED`.
 - Super Admin can bypass ordinary transfer approval only through an audited
   override that records the approved request status, creates the sender
   `TRANSFER_HOLD`, and captures reason, before/after stock impact, and affected
@@ -215,8 +256,14 @@ TRANSFER_HOLD -> IN_TRANSIT -> RECEIVED
 
 ```
 EMPTY
+  -> REFILL_CANCELLED
   -> IN_REFILL
       -> FILLED
+      -> PARTIAL_REFILL_RETURN -> REFILL_EXCEPTION_RESOLVED
+      -> REFILL_CANCELLED -> REFILL_EXCEPTION_RESOLVED
+      -> DAMAGED_RETURN -> REFILL_EXCEPTION_RESOLVED
+      -> LOST_IN_REFILL -> REFILL_EXCEPTION_RESOLVED
+      -> NEVER_RETURNED -> REFILL_EXCEPTION_RESOLVED
 ```
 
 | State | Meaning |
@@ -224,10 +271,18 @@ EMPTY
 | `EMPTY` | Confirmed empty cylinders at outlet. |
 | `IN_REFILL` | Cylinders dispatched to vendor depot; unavailable. |
 | `FILLED` | Returned filled cylinders confirmed by authorized actor. |
+| `REFILL_CANCELLED` | Refill batch was cancelled before filled-stock intake; stock impact depends on whether cylinders had already left the outlet. |
+| `PARTIAL_REFILL_RETURN` | Vendor returns fewer filled cylinders than dispatched; returned quantity may post while outstanding quantity remains non-available. |
+| `DAMAGED_RETURN` | Vendor returns damaged or unusable cylinders; returned stock is not available filled stock. |
+| `LOST_IN_REFILL` | Vendor, outlet, or authorized reviewer confirms dispatched cylinders were lost during the refill process. |
+| `NEVER_RETURNED` | Authorized reviewer closes a dispatched batch as not recoverable after review of vendor and outlet evidence. |
+| `REFILL_EXCEPTION_RESOLVED` | Terminal audit state after every exception quantity is posted, returned, quarantined, or adjusted. |
 
 ### Vendor Refill Rules
 
-- Launch transition is `EMPTY -> IN_REFILL -> FILLED`.
+- Launch transition is `EMPTY -> IN_REFILL -> FILLED`, with explicit exception
+  paths for cancellation, partial return, damaged return, lost-in-refill, and
+  never-returned batches.
 - Confirmed empty cylinders enter `IN_REFILL` when dispatched to the vendor.
 - Cylinders become filled stock only after an authorized vendor-refill actor
   confirms return intake.
@@ -238,14 +293,36 @@ EMPTY
   transferred.
 - Vendor, size, and quantity sent must be recorded at dispatch.
 - Depot name, external reference, and notes may be recorded when known.
+- Cancelling a refill batch before dispatch moves the batch to
+  `REFILL_CANCELLED` and leaves confirmed empty stock available at the outlet.
+- Cancelling a refill batch after dispatch moves the batch to `REFILL_CANCELLED`
+  but does not restore availability. Dispatched cylinders remain non-available
+  until physically returned, confirmed filled, confirmed damaged, or closed
+  through an approved Inventory adjustment.
 - On return, an authorized vendor-refill actor records received quantity and
   condition before confirming intake.
+- `PARTIAL_REFILL_RETURN` posts only the returned quantity that passes intake.
+  Outstanding quantity remains non-available until later receipt, vendor
+  recovery, or approved Inventory adjustment.
+- `DAMAGED_RETURN` requires condition capture and moves returned cylinders into
+  quarantine or damaged handling before any availability change.
+- `LOST_IN_REFILL` requires a Super Admin-approved loss adjustment before loss
+  is ledger-posted.
+- `NEVER_RETURNED` is not triggered by age alone. An authorized reviewer must
+  record vendor evidence, outlet evidence, reason, note, and affected quantity
+  before the batch can be closed as never returned.
 - Shortage or overage must be reconciled through standard inventory adjustment
   approval and ledger posting, with reason code, audit trail, and
   `INVENTORY_ADJUSTMENT_LAUNCH_V1` threshold evaluation before any ledger
   movement.
 - Overage cylinders remain pending and unavailable for sale or transfer until
   the inventory adjustment is posted.
+- Vendor refill exception records must capture batch id, vendor, depot
+  reference when known, size, sent quantity, received quantity, affected item or
+  cylinder identifiers when present, actor, reason, note, and audit timestamp.
+- All quantities in `PARTIAL_REFILL_RETURN`, `DAMAGED_RETURN`,
+  `LOST_IN_REFILL`, and `NEVER_RETURNED` remain unavailable for reservation,
+  sale, transfer, or another vendor refill until `REFILL_EXCEPTION_RESOLVED`.
 
 ## Refill Exchange Request Intake Leg
 
