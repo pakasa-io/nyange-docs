@@ -53,6 +53,9 @@ uses explicit permissions and scope assignments plus the aggregate-owned
 boundary authorization rules for the action. A single human account may hold
 multiple permission bundles across one or more outlets.
 
+`P-07` is intentionally unused. Preserve the reserved ID to keep existing
+persona references stable; do not reassign it without a documented migration.
+
 ### P-01 Customer
 
 - Orders gas, refills, and accessories from a registered account.
