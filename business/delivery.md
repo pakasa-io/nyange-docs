@@ -328,9 +328,7 @@ order placement.
 
 - These fees apply unless an active global online delivery-fee rule overrides
   them.
-- Delivery-fee guardrail is the smaller of 15% or UGX 2,000 from the current
-  approved basis.
-- Above-guardrail delivery-fee changes require Super Admin approval.
+- Only Super Admin may change the active global online delivery-fee rule.
 
 ## Failed Delivery Fee Waiver
 

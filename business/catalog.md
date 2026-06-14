@@ -1,14 +1,13 @@
 # Catalog & Pricing
 
 **Intent**: Define launch product pricing behavior for online checkout pricing,
-refill pricing, bundle pricing, outlet price guardrails, and launch
+refill pricing, bundle pricing, global online pricing, and launch
 commercial-program limits.
 
 **Reader task**: Use this document to determine whether a catalog item or refill
 combination is orderable, how it is priced, and who can change prices.
 
-**Sources**: §7.2 Refill Pricing Matrix, §7.3 Bundle Pricing, §7.4 Price
-Guardrails
+**Sources**: §7.2 Refill Pricing Matrix, §7.3 Bundle Pricing
 
 **Related**:
 [cart.md](cart.md) for cart quote readiness, catalog-change handling, and
@@ -136,11 +135,24 @@ Refill price is determined by three dimensions.
   tax, and delivery-fee rules.
 - The eventual claiming outlet cannot change the frozen product price,
   delivery fee, tax, discount, or order total.
-- Local outlet price-rule configuration does not affect online COD order totals
-  unless an approved global online pricing policy explicitly uses that rule as
-  an input before order placement.
 - Claim eligibility requires the outlet to fulfill the frozen catalog terms,
   vendor terms, quantities, and delivery address scope.
+
+## Price Administration
+
+- Global online catalog, product, refill, accessory, tax, and delivery-fee rules
+  are the launch pricing basis.
+- Only Super Admin may create, change, disable, or retire global catalog and
+  pricing rules.
+- All price changes require an effective window and audit record.
+- `Immediate` means the effective start is now.
+- Price changes are future-dated or now-dated; they are not backdated.
+- Tax defaults to 0% for all product combinations unless an active tax rule is
+  configured.
+- When a non-zero tax applies, it is part of the customer's order total and is
+  frozen into the order's price snapshot at placement.
+- Multi-country or jurisdiction-specific tax workflows are not launch behavior
+  unless explicitly added to launch scope.
 
 ## Bundle Pricing
 
@@ -185,62 +197,7 @@ and a standalone price.
   but stock reservation, pickup, delivery, and inventory accountability remain
   tied to physical component items.
 
-## Outlet Price Guardrails
-
-Outlet Managers may adjust outlet-specific prices within configured limits.
-
-Outlet-specific price rules are local configuration. They do not affect online
-COD cart quotes or placed order totals unless an approved global online pricing
-policy explicitly uses them before order placement.
-
-### Guardrail Logic
-
-```
-within_guardrail :=
-  abs(percentage_change) <= configured_percentage_limit
-  AND abs(absolute_change) <= configured_absolute_limit
-// both conditions must hold
-// basis: active approved outlet rule at proposed effective time,
-//        or global/default when no outlet rule exists
-```
-
-### Outcomes
-
-- Within-guardrail changes take effect at their scheduled effective time without
-  additional approval.
-- Outside-guardrail changes require Super Admin approval before activation.
-- If daily closing is overdue for the outlet, outside-guardrail activation is
-  blocked unless a Super Admin urgent override with reason and note is recorded.
-
-### Launch Defaults
-
-| Price type | Guardrail |
-| --- | --- |
-| Product, refill, accessory prices | Smaller of 10% or UGX 5,000 from the current approved basis |
-
-Delivery-fee guardrails are defined in [delivery.md](delivery.md).
-
-### Always Requires Super Admin Approval
-
-- Global prices.
-- Taxes.
-- Delivery-cost rules.
-- Guardrail rules.
-- Missing-basis price changes.
-
-### General Rules
-
-- All price changes require an effective window and audit record.
-- `Immediate` means the effective start is now.
-- Price changes are future-dated or now-dated; they are not backdated.
-- Tax defaults to 0% for all product and outlet combinations unless an active
-  tax rule is configured.
-- When a non-zero tax applies, it is part of the customer's order total and is
-  frozen into the order's price snapshot at placement.
-- Multi-country or jurisdiction-specific tax workflows are not launch behavior
-  unless explicitly added to launch scope.
-
-### Cart and Placement Effects
+## Cart and Placement Effects
 
 Cart quote and checkout readiness revalidate catalog orderability and
 priceability under [cart.md](cart.md). Order placement revalidates the same
@@ -255,6 +212,4 @@ Trimmed access matrix rows relevant to catalog and pricing. Full matrix:
 | Capability | P-01 | P-03 | P-06 | P-08 | P-10 |
 | --- | --- | --- | --- | --- | --- |
 | Product catalog browsing | Read | Read | Read | Read | Full |
-| Outlet price rules within guardrail | - | - | Scoped | - | Full |
-| Outlet price rules above guardrail | - | - | Request | - | Approve / Full |
 | Global pricing and catalog | - | - | - | - | Full |

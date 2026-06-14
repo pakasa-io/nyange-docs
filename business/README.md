@@ -26,11 +26,9 @@ tests.
 - Each outlet is a company-owned branch within the same legal entity.
 - Outlet independence is operational and reporting-oriented, not legal or
   financial separation.
-- Each outlet has its own inventory, staff, cash ledger, and local price-rule
-  configuration within guardrails.
+- Each outlet has its own inventory, staff, and cash ledger.
 - Online COD checkout uses the global online pricing and address-based delivery
-  fee basis; local outlet price-rule configuration does not alter placed online
-  order totals.
+  fee basis.
 - Coarse serviceability by address means at least one active online-fulfillment
   outlet serves the delivery area.
 - Pre-order validation avoids per-outlet SKU/vendor filtering before order
@@ -70,7 +68,7 @@ tests.
 | File | Aggregate | Authoritative for |
 | --- | --- | --- |
 | [identity-auth.md](identity-auth.md) | Identity & Authorization | Personas, access matrix, authentication, authorization, edge cases E-01-E-10 |
-| [catalog.md](catalog.md) | Catalog & Pricing | Refill pricing, bundle pricing, price guardrails, launch commercial programs |
+| [catalog.md](catalog.md) | Catalog & Pricing | Refill pricing, bundle pricing, global online pricing, launch commercial programs |
 | [cart.md](cart.md) | Cart | Customer cart state, quote readiness, catalog-change handling, checkout readiness, abandoned-cart cleanup |
 | [order.md](order.md) | Order | Order placement, lifecycle state, outlet claiming, COD fulfillment, and cancellation |
 | [payment.md](payment.md) | Payment | COD cash collection, zero-collection facts, payment boundaries |

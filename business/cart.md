@@ -90,8 +90,6 @@ Terminal cart states: `CHECKED_OUT`, `SUMMARY_RETAINED`, `CLEARED`.
   ignored.
 - Quote generation evaluates current catalog, global online pricing,
   address-based delivery-fee, tax, and pre-order orderability rules.
-- Quote generation does not use local price or delivery-fee rules from a future
-  claiming outlet.
 - Quote generation uses coarse serviceability by address: at least one active
   online-fulfillment outlet serves the delivery area.
 - Quote generation avoids per-outlet SKU/vendor filtering before order

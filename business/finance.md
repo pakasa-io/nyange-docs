@@ -193,12 +193,11 @@ if closing_overdue:
             cash_refund_payouts
   blocked unless owning_policy_action_specific_urgency_override:
             large_inventory_adjustments
-            price_changes_outside_guardrail
             manual_financial_ledger_adjustments
             above_threshold_expense_approval  // >= 100,000 UGX at launch
   allowed:  online_order_placement, order_claiming, inventory_reservation_for_claim
   allowed:  ready_for_pickup, delivery_agent_assignment, pickup, cod_collection
-  allowed:  stock_intake, within_guardrail_price_changes
+  allowed:  stock_intake
 ```
 
 - Only Super Admin urgency override can allow blocked cash refund payouts while

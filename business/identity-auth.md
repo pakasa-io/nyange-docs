@@ -18,7 +18,7 @@ E-04-E-05, E-07-E-10
   individual who submitted or requested it.
 - This applies regardless of role.
 - Covered examples include expense above threshold, inventory adjustment, price
-  change above guardrail, and sensitive authorization-policy change.
+  change, and sensitive authorization-policy change.
 
 ## Terms
 
@@ -130,7 +130,7 @@ may hold multiple permission bundles across one or more outlets.
 - Global platform authority.
 - Has full operational and configuration authority across all outlets, business
   domains, and records.
-- Approves above-guardrail price changes, above-threshold inventory adjustments,
+- Manages global pricing, approves above-threshold inventory adjustments,
   break-glass authorization policy changes, and other actions no other persona
   can execute.
 - Sensitive mutations and overrides require explicit reason codes and permanent
@@ -179,8 +179,6 @@ may hold multiple permission bundles across one or more outlets.
 | Returned cylinder intake | - | - | - | Scoped | - | Scoped | - | - | Full |
 | Vendor refill batch management | - | - | - | Scoped | - | Scoped | - | - | Full |
 | Outlet configuration & policies | - | - | - | - | - | Read | Read assigned outlets | - | Full |
-| Outlet price rules within guardrail | - | - | - | - | - | Scoped | - | - | Full |
-| Outlet price rules above guardrail | - | - | - | - | - | Request | - | - | Approve / Full |
 | Global pricing & catalog | - | - | - | - | - | - | - | - | Full |
 | Refund initiation | Own request | - | - | - | - | Scoped | - | - | Full |
 | Refund payout cash at outlet | - | - | Scoped with explicit permission | - | - | Scoped | - | - | Full |
@@ -261,15 +259,12 @@ may hold multiple permission bundles across one or more outlets.
 - It does not allow creating, paying, voiding, or writing off a refund
   liability.
 
-### Outlet Configuration vs. Price Rules
+### Outlet Configuration
 
 - `Outlet configuration & policies` covers settings that only Super Admin may
   change: service zone, vendor acceptance list, delivery mode support,
   operating-hours policy, workload/capacity limits, and outlet priority score.
-- `Outlet price rules within guardrail` covers outlet-scoped product, refill,
-  accessory prices, and delivery-fee overrides.
-- Outlet Managers have write access to price rules within configured guardrails.
-- Outlet Managers do not have write access to broader outlet configuration.
+- Outlet Managers do not have write access to outlet configuration.
 
 ## Authentication Model
 
