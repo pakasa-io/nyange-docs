@@ -251,9 +251,9 @@ requirements before creating the immutable order snapshot under
 Trimmed access matrix rows relevant to catalog and pricing. Full matrix:
 [identity-auth.md](identity-auth.md).
 
-| Capability | P-01 | P-03 | P-06 | P-08 | P-10 |
-| --- | --- | --- | --- | --- | --- |
-| Product catalog browsing | Read | Read | Read | Read | Full |
-| Outlet price rules within guardrail | - | - | Scoped | - | Full |
-| Outlet price rules above guardrail | - | - | Request | - | Approve / Full |
-| Global pricing and catalog | - | - | - | - | Full |
+| Capability | P-01 | P-03 | P-06 | P-07 | P-08 | P-10 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Product catalog browsing | Read | Read | Read | Read | Read | Full |
+| Outlet price rules within guardrail | - | - | Scoped | - | - | Full |
+| Outlet price rules above guardrail | - | - | Request | - | - | Approve / Full |
+| Global pricing and catalog | - | - | - | - | - | Full |
