@@ -106,7 +106,8 @@ Terminal cart states: `CHECKED_OUT`, `SUMMARY_RETAINED`, `CLEARED`.
 ### Catalog and Price Changes
 
 - Catalog or pricing changes affecting cart lines require customer review and
-  acknowledgement before quote or checkout can proceed.
+  valid line-level acknowledgement before quote readiness or checkout readiness
+  can pass.
 - Catalog or pricing changes include price changes, product disablement, and
   bundle composition changes.
 - If a product's price changes while a cart is active, cart quotes use the
@@ -116,6 +117,21 @@ Terminal cart states: `CHECKED_OUT`, `SUMMARY_RETAINED`, `CLEARED`.
   containing that bundle is flagged invalid.
 - The customer must review and acknowledge the bundle change before quote or
   checkout can proceed.
+- Cart owns catalog-change acknowledgement records for active cart lines.
+- Each acknowledgement record stores affected cart line ID, change reason,
+  Catalog-owned catalog item version, Catalog-owned price rule version, bundle
+  composition version when applicable, acknowledged line quantity,
+  acknowledged server-computed line price, customer Identity account ID, and
+  acknowledgement timestamp.
+- A catalog-change acknowledgement is valid only for the exact affected line,
+  version tuple, quantity, and server-computed line price recorded in the
+  acknowledgement.
+- Any later catalog item version, price rule version, bundle composition
+  version, line quantity, line composition, or server-computed line price change
+  invalidates the acknowledgement and requires customer re-acknowledgement.
+- Acknowledgement does not make a disabled, unorderable, or unpriceable line
+  valid. The customer must remove or change the line before quote readiness or
+  checkout readiness can pass.
 
 ### Delivery Address Readiness
 

@@ -221,6 +221,9 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
 - Order placement rejects cart lines that are not orderable under pre-order
   orderability rules.
 - Order placement rejects unpriceable catalog combinations.
+- Order placement rejects cart lines whose required catalog-change
+  acknowledgement is missing or stale against current catalog item, price rule,
+  or bundle composition version facts.
 - The server computes all line totals and order totals.
 - Client-submitted line totals, fees, taxes, discounts, and order totals are
   ignored.

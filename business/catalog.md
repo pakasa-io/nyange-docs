@@ -235,6 +235,18 @@ priceability under [cart.md](cart.md). Order placement revalidates the same
 requirements before creating the immutable order snapshot under
 [order.md](order.md).
 
+Catalog supplies the authoritative version facts used by Cart catalog-change
+acknowledgements:
+
+- catalog item version;
+- price rule version;
+- bundle composition version when the cart line references a bundle;
+- effective window for the versioned catalog or price fact.
+
+Any Catalog-owned change that can affect cart orderability, priceability, line
+price, or bundle composition creates a new version fact. Cart acknowledgements
+must reference the exact version facts reviewed by the customer.
+
 ## Permissions
 
 Catalog owns authorization decisions for Catalog-owned catalog and pricing
