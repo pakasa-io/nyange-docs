@@ -1,7 +1,7 @@
 # Payment
 
-**Intent**: Define payment behavior for online COD orders, zero-collection
-facts, and payment boundaries.
+**Intent**: Define payment behavior for online COD orders, durable COD
+expectations, collection facts, zero-collection facts, and payment boundaries.
 
 **Reader task**: Use this document to decide whether a cash collection or
 zero-collection fact can satisfy an online order payment requirement, and which
@@ -27,8 +27,11 @@ exceptions hand off to delivery, refund, or finance.
 ## Boundary
 
 - Payment owns the customer payment state needed by Order and Finance:
-  expected COD amount, collected cash fact, zero-collection fact, and payment
-  outcome.
+  durable COD expectation records, expected COD amount, collected cash fact,
+  zero-collection fact, and payment outcome.
+- Order owns order placement, cancellation, `UNCLAIMABLE`, `DELIVERED`, and
+  `DELIVERY_FAILED` outcomes that create, retire, or complete the Payment-owned
+  COD expectation.
 - Delivery owns agent field collection and the delivery completion commit point.
 - Finance owns cash handover, counted-cash acceptance, outlet cash custody, cash
   variance records, daily closing, ledger posting, and receipts.
@@ -39,15 +42,19 @@ exceptions hand off to delivery, refund, or finance.
 ```
 PENDING_COLLECTION -> COLLECTED
 PENDING_COLLECTION -> ZERO_COLLECTION
+PENDING_COLLECTION --retired by Order CUSTOMER_CANCELLED|UNCLAIMABLE--> (no payment terminal state)
 ```
 
 Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 
 | State | Meaning |
 | --- | --- |
-| `PENDING_COLLECTION` | Active COD expectation derived from the placed order; no customer cash fact has been recorded. |
+| `PENDING_COLLECTION` | Durable active COD expectation derived from the placed order; no customer cash fact has been recorded and the expectation has not been retired. |
 | `COLLECTED` | Terminal successful cash collection fact; may include an approved short/over variance link. |
 | `ZERO_COLLECTION` | Terminal fact for failed delivery where no customer cash was collected. |
+
+Retired COD expectations remain durable records, but retirement is not a Payment
+state and does not create a terminal payment fact.
 
 ## Business Rules
 
@@ -55,6 +62,32 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 
 - Online delivery orders use COD cash.
 - Active online-fulfillment outlets are expected to support COD cash.
+
+### COD Expectation Creation
+
+- Order placement is the business trigger for COD expectation creation.
+- When Order commits a new online COD order in `PENDING`, Payment creates one
+  durable `PENDING_COLLECTION` expectation for that order in the same atomic
+  placement commit.
+- If the Payment-owned COD expectation cannot be created, order placement fails
+  and no order is committed.
+- The expectation stores:
+  - order ID and public order number;
+  - customer identity reference;
+  - frozen order snapshot reference;
+  - expected COD amount from the frozen order total;
+  - currency;
+  - payment method `COD_CASH`;
+  - expectation state `PENDING_COLLECTION`;
+  - placement idempotency key and correlation ID;
+  - creation timestamp.
+- Expected COD amount and currency are immutable after expectation creation.
+- A placed order has exactly one Payment-owned COD expectation.
+- COD expectation creation is not an independent customer or staff command.
+- Order creation idempotency covers Payment expectation creation.
+- Identical order-placement replays return the original order and original COD
+  expectation.
+- Same-key/different-body order-placement replays are rejected.
 
 ### COD Collection
 
@@ -89,11 +122,31 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 - Order cancellation is the authoritative outcome for cancelled orders before
   collection.
 - `CLAIM_BLOCKED` creates no payment terminal state and records no customer
-  payment fact.
+  payment fact; the COD expectation remains `PENDING_COLLECTION` while the order
+  can still reopen or be cancelled.
 - `UNCLAIMABLE` before delivery collection creates no payment terminal state and
   retires the COD expectation through the authoritative Order exception outcome.
 - Payment does not create `CANCELLED`, `NOT_COLLECTED`, or equivalent terminal
   payment state for pre-collection cancellations or unclaimable closures.
+- COD expectation retirement is durable and records:
+  - retired order outcome, either `CUSTOMER_CANCELLED` or `UNCLAIMABLE`;
+  - order outcome timestamp;
+  - triggering actor identity or system policy identity;
+  - actor role when a human actor triggered the outcome;
+  - reason code;
+  - reason note when required by Order;
+  - idempotency key and correlation ID;
+  - retirement timestamp.
+- Order cancellation and `UNCLAIMABLE` closure commit Payment expectation
+  retirement in the same atomic commit as the Order-owned outcome.
+- If the Payment retirement participant rejects the mutation or the transaction
+  fails before commit, the Order-owned cancellation or `UNCLAIMABLE` outcome is
+  not committed.
+- Retiring an expectation does not alter expected amount, currency, order total,
+  order snapshot, collected amount, variance link, or any financial ledger.
+- Queries by order ID must return the retired COD expectation with its retired
+  order outcome and must not synthesize a Payment `CANCELLED`, `NOT_COLLECTED`,
+  or `ZERO_COLLECTION` state.
 - Because launch online orders are COD, cancellation, unclaimable closure, and
   failed delivery do not create refund liabilities from prior customer
   collection.

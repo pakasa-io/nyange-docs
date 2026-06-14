@@ -131,7 +131,8 @@ role, reason code, reason note, timestamp, and audit trail fields.
 - Claim-block marking removes the order from the claimable pending pool until
   Order reopens it to `PENDING`.
 - Unclaimable closure terminates an order before pickup without stock,
-  delivery, payment, receipt, refund, or fulfilling outlet effects.
+  delivery, payment terminal state, receipt, refund, or fulfilling outlet
+  effects.
 - Outlet claim cancellation clears the fulfilling outlet association and returns
   the order to `PENDING`.
 - Successful delivery and failed delivery retain the fulfilling outlet
@@ -140,8 +141,8 @@ role, reason code, reason note, timestamp, and audit trail fields.
   and returned-empty intake recognition.
 - Delivery owns delivery task state, assignment, pickup, agent custody,
   doorstep field facts, failed delivery, and delivery completion.
-- Payment owns expected COD amount, collected cash fact, zero-collection fact,
-  and payment outcome.
+- Payment owns durable COD expectation records, expected COD amount, collected
+  cash fact, zero-collection fact, and payment outcome.
 - Refund owns approved Finance-sourced over-collection refund liabilities and
   payout lifecycle.
 - Refund liabilities do not reopen orders, change order state, or rewrite the
@@ -227,6 +228,10 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
 - Order placement allocates an immutable `ORD-%08d` public order number.
 - Order placement grants the customer order-scoped read, status, and cancel
   permissions.
+- Order placement creates one durable Payment-owned `PENDING_COLLECTION` COD
+  expectation from the frozen order total in the same atomic commit.
+- If the Payment-owned COD expectation cannot be created, order placement fails
+  and no order is committed.
 - Order placement starts the Order-owned pending-claim timeout.
 - No stock is reserved during cart activity or order placement.
 - Stock reservation occurs only when an outlet claims the order.
@@ -348,9 +353,9 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
   - customer notification request;
   - audit correlation ID.
 - `UNCLAIMABLE` closure is terminal.
-- `UNCLAIMABLE` does not create a payment terminal state, refund liability,
-  receipt, delivery task, inventory ledger entry, cash custody row, or fulfilling
-  outlet association.
+- `UNCLAIMABLE` retires the Payment-owned COD expectation without creating a
+  payment terminal state, refund liability, receipt, delivery task, inventory
+  ledger entry, cash custody row, or fulfilling outlet association.
 - If a customer still wants the goods after `UNCLAIMABLE`, the customer places a
   new order.
 
@@ -408,11 +413,13 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
 - Customer cancellation before pickup is terminal.
 - Customer cancellation releases any active reservation, cancels the active
   claim, cancels any pre-pickup delivery task, records required cancellation
-  attribution, and marks the order `CUSTOMER_CANCELLED`.
+  attribution, retires the COD expectation without creating a payment terminal
+  state, and marks the order `CUSTOMER_CANCELLED`.
 - Customer cancellation from `CLAIM_BLOCKED` records cancellation attribution
-  and marks the order `CUSTOMER_CANCELLED`; there is no reservation, active
-  claim, delivery task, payment fact, receipt, refund liability, cash custody
-  row, or fulfilling outlet association to release.
+  retires the COD expectation without creating a payment terminal state, and
+  marks the order `CUSTOMER_CANCELLED`; there is no reservation, active claim,
+  delivery task, payment fact, receipt, refund liability, cash custody row, or
+  fulfilling outlet association to release.
 - A customer-cancelled order never returns to the pending pool.
 - Unclaimable closure from `CLAIM_BLOCKED` records the required exception
   attribution, marks the order `UNCLAIMABLE`, and retires the COD expectation
@@ -426,8 +433,9 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
 
 ## Main Flow
 
-1. Customer places an order from a checkout-ready cart and the order enters
-   `PENDING`.
+1. Customer places an order from a checkout-ready cart. Order commits the order
+   in `PENDING` and Payment creates the durable `PENDING_COLLECTION` COD
+   expectation in the same atomic placement commit.
 2. If no outlet claims within the pending-claim timeout, or every eligible
    outlet has a current claim-blocking reason, Order moves the order to
    `CLAIM_BLOCKED`.
