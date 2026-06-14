@@ -25,8 +25,13 @@ YYYY-MM-DD-short-item-name.md
 
 | Item | Status |
 | --- | --- |
+| [Express Delivery Fee](2026-06-14-express-delivery-fee.md) | Deferred |
 | [Mobile-Money Payments](2026-06-13-mobile-money-payments.md) | Deferred |
 | [Support Case Management](2026-06-13-support-case-management.md) | Deferred |
+
+Revisit express delivery fee when the Product Manager approves a customer-facing
+priority delivery offer with service-level promise, eligibility, capacity, fee,
+refund or waiver, reporting, and authorization rules.
 
 Revisit mobile-money payments when COD-only launch operations create a measured
 adoption, cash-risk, reconciliation, or customer-convenience problem that cannot

@@ -9,8 +9,7 @@ which facts are committed at the doorstep, how failed delivery is handled, and
 which delivery facts feed inventory, payment, finance, and order state.
 
 **Sources**: §6.3 Delivery Lifecycle, §6.9 Refill Exchange Request Lifecycle
-field leg, §7.5 Express Delivery Fee, §7.7 Agent Cash Handling, §7.12 Failed
-Delivery Fee Waiver
+field leg, §7.7 Agent Cash Handling, §7.12 Failed Delivery Fee Waiver
 
 **Related**:
 [order.md](order.md) for order lifecycle and COD fulfillment;
@@ -299,6 +298,10 @@ order placement.
 - Delivery fee is part of the order total.
 - Delivery fee is not folded into product, refill, or accessory prices.
 - Later delivery-fee changes do not rewrite the placed order.
+- Express delivery pricing, express-fee multipliers, and customer-facing
+  priority delivery promises are not launch behavior.
+- Express delivery fee scope is deferred in
+  [../out-of-scope/2026-06-14-express-delivery-fee.md](../out-of-scope/2026-06-14-express-delivery-fee.md).
 
 ### Launch Zone Defaults
 

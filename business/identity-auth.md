@@ -304,7 +304,7 @@ may hold multiple permission bundles across one or more outlets.
   change: service zone, vendor acceptance list, delivery mode support,
   operating-hours policy, workload/capacity limits, and outlet priority score.
 - `Outlet price rules within guardrail` covers outlet-scoped product, refill,
-  accessory prices, delivery-fee overrides, and express-fee multipliers.
+  accessory prices, and delivery-fee overrides.
 - Outlet Managers have write access to price rules within configured guardrails.
 - Outlet Managers do not have write access to broader outlet configuration.
 
