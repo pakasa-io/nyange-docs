@@ -326,11 +326,12 @@ order placement.
 
 ### Fee Calculation
 
-- The active global online delivery-fee rule must produce a fee before order
-  placement.
-- Delivery owns the active global online delivery-fee rule and exposes the
-  computed delivery-fee output used by Cart and Order for quote and order
-  totals.
+- A configured active global online delivery-fee rule must produce a fee before
+  order placement when one exists.
+- If no configured active global online delivery-fee rule exists, the launch
+  zone default table is the required default global online delivery-fee rule.
+- Delivery owns the configured active rule, launch default rule, and computed
+  delivery-fee output used by Cart and Order for quote and order totals.
 - If no authoritative fee can be computed for the resolved delivery address and
   order contents, order placement is rejected as unpriceable.
 - The delivery fee is computed from the resolved delivery address and online
@@ -357,8 +358,13 @@ order placement.
 | STANDARD | 5 km <= distance < 10 km | UGX 5,000 |
 | EXTENDED | 10 km <= distance < 15 km | UGX 8,000 |
 
-- These fees apply unless an active global online delivery-fee rule overrides
-  them.
+- The launch zone default table is the required default global online
+  delivery-fee rule.
+- A configured active global online delivery-fee rule overrides the launch
+  default rule.
+- If neither the configured active rule nor the launch default rule can compute a
+  fee for the resolved delivery address and order contents, order placement is
+  rejected as unpriceable.
 - Only Super Admin may change the active global online delivery-fee rule.
 - Outlet-local delivery-fee rules, guardrails, and approval workflows are
   deferred in
