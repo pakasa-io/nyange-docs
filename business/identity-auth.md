@@ -56,8 +56,8 @@ may hold multiple permission bundles across one or more outlets.
 - Performs required field actions during active delivery.
 - Collects COD cash, records returned cylinders, reports failures, and submits
   cash handover.
-- Cannot change outlet claims, view other agents' assignments, modify
-  inventory, issue refunds, or access financial records.
+- Cannot change fulfillment outlet assignments, view other agents' assignments,
+  modify inventory, issue refunds, or access financial records.
 
 ### P-03 Outlet Cashier
 
@@ -75,9 +75,9 @@ may hold multiple permission bundles across one or more outlets.
 - Manages stock counts, submits inventory adjustment requests, confirms
   returned-cylinder intake, initiates outlet transfer requests, and records
   vendor refill movements.
-- May mark claimed orders ready for pickup when explicitly permissioned.
+- May mark accepted orders ready for pickup when explicitly permissioned.
 - Works within assigned outlet only.
-- Cannot claim orders, collect customer cash, issue refunds, access
+- Cannot accept orders, collect customer cash, issue refunds, access
   financial records, or approve their own adjustment requests.
 
 ### P-05 Dispatcher
@@ -93,8 +93,8 @@ may hold multiple permission bundles across one or more outlets.
 ### P-06 Outlet Manager
 
 - Operational owner of a single outlet.
-- Claims pending orders for the outlet when explicitly permissioned.
-- Marks claimed orders ready for pickup.
+- Accepts assigned pending orders for the outlet when explicitly permissioned.
+- Marks accepted orders ready for pickup.
 - Reconciles daily cash.
 - Initiates scoped refund liabilities and disburses collectible refunds when
   explicitly permissioned.
@@ -112,7 +112,7 @@ may hold multiple permission bundles across one or more outlets.
 - Has read access to outlet operations, inventory, and financial summaries for
   assigned outlets.
 - Does not perform direct outlet operations.
-- Cannot claim orders, collect cash, adjust inventory, access outlets outside
+- Cannot accept orders, collect cash, adjust inventory, access outlets outside
   assignment, or override Super Admin controls.
 
 ### P-09 Finance Officer
@@ -164,7 +164,7 @@ may hold multiple permission bundles across one or more outlets.
 | Cart checkout | Full | - | - | - | - | - | - | - | Full |
 | Order placement | Full | - | - | - | - | - | - | - | Full |
 | Order status tracking | Own | Own assigned | Scoped | - | Scoped | Scoped | Read assigned outlets | Read | Full |
-| Outlet claiming | - | - | - | - | - | Scoped with explicit permission | - | - | Full |
+| Fulfillment acceptance | - | - | - | - | - | Scoped with explicit permission | - | - | Full |
 | Ready-for-pickup marking | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
 | Outlet handover confirmation | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
 | Failed-order return receipt | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
@@ -251,7 +251,7 @@ may hold multiple permission bundles across one or more outlets.
 
 - `Outlet configuration & policies` covers settings that only Super Admin may
   change: service zone, vendor acceptance list, delivery mode support,
-  operating-hours policy, workload/capacity limits, and outlet priority score.
+  operating-hours policy, and workload/capacity limits.
 - Outlet Managers do not have write access to outlet configuration.
 
 ## Authentication Model
@@ -380,7 +380,7 @@ reaches a terminal state. Phone-number access is scoped to the active assignment
 and is audit-sensitive under the active audit policy.
 
 **E-04**: An Area Manager can view reports and operational data for assigned
-outlets, but cannot perform outlet actions such as claiming orders, collecting
+outlets, but cannot perform outlet actions such as accepting orders, collecting
 customer cash, paying refunds, or adjusting inventory.
 
 **E-05**: Refund liabilities have no amount-based approval threshold at launch.

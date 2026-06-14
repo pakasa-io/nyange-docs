@@ -139,10 +139,10 @@ CANCELLED
 
 ### Task Creation
 
-- A delivery task is created when the claimed outlet marks the order
+- A delivery task is created when the accepted fulfillment outlet marks the order
   `READY_FOR_PICKUP`.
 - Each order has at most one active delivery task.
-- A task-only cancellation before pickup allows the claimed outlet to create or
+- A task-only cancellation before pickup allows the accepted outlet to create or
   assign a replacement delivery task for the same `READY_FOR_PICKUP` order.
 - The task is not a route plan and does not group multiple orders.
 
@@ -205,7 +205,7 @@ Transition to `PICKED_UP` requires both:
 | Participant | Owned mutation in the completion commit |
 | --- | --- |
 | Delivery | Validate the picked-up task, record doorstep field facts, mark the delivery task `DELIVERED`, and resolve delivery-agent outgoing-goods custody for successful delivery. |
-| Order | Move the order `OUT_FOR_DELIVERY -> DELIVERED` and complete the active claim. |
+| Order | Move the order `OUT_FOR_DELIVERY -> DELIVERED` and complete the active fulfillment acceptance. |
 | Inventory | Commit reserved outgoing stock and create returned-cylinder intake handoff records when refill exchange lines apply. |
 | Payment | Record the COD collection fact and move payment to `COLLECTED`. |
 | Finance | Issue the immutable receipt number and receipt record for the delivered sale. |
@@ -219,7 +219,7 @@ Transition to `PICKED_UP` requires both:
 - Returned-cylinder field facts are recorded when applicable.
 - COD collection fact is recorded.
 - Outgoing stock is committed.
-- The active order claim is completed.
+- The active fulfillment acceptance is completed.
 - The delivery task is marked `DELIVERED`.
 - The order is marked `DELIVERED`.
 - Finance issues the immutable receipt.
@@ -242,7 +242,7 @@ Transition to `PICKED_UP` requires both:
 - Goods covered by custody exception do not become available stock through the
   failed-delivery action.
 - Failed delivery records a zero-collection payment fact.
-- Failed delivery completes the active order claim.
+- Failed delivery completes the active fulfillment acceptance.
 - Failed delivery marks the order `DELIVERY_FAILED`.
 - The agent cannot reschedule the failed order.
 - If the customer still wants the goods, the customer places a new order.
@@ -309,7 +309,7 @@ order placement.
 - If no authoritative fee can be computed for the resolved delivery address and
   order contents, order placement is rejected as unpriceable.
 - The delivery fee is computed from the resolved delivery address and online
-  fee policy, not from the eventual claiming outlet.
+  fee policy, not from the assigned fulfilling outlet.
 - Delivery fee is part of the order total.
 - Delivery fee is not folded into product, refill, or accessory prices.
 - Later delivery-fee changes do not rewrite the placed order.

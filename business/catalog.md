@@ -25,7 +25,7 @@ checkout readiness;
   customer-level cylinder ownership tracking at launch.
 - New filled cylinder purchases may use any globally supported vendor available
   through the online checkout catalog.
-- The claiming outlet must fulfill the frozen outgoing vendor, product, and
+- The fulfilling outlet must fulfill the frozen outgoing vendor, product, and
   quantity terms without changing the placed order total.
 - A customer who loses or damages their cylinder must buy a new cylinder rather
   than treat the loss as a refill.
@@ -60,7 +60,7 @@ Refill price is determined by three dimensions.
   outgoing-vendor default.
 - At launch, the global online outgoing-vendor default is Vengas.
 - Outlet configured default vendors do not apply before order placement.
-- The claiming outlet must fulfill the frozen outgoing vendor.
+- The fulfilling outlet must fulfill the frozen outgoing vendor.
 
 ### Supported Vendors
 
@@ -74,7 +74,8 @@ Refill price is determined by three dimensions.
 ### Pair Eligibility
 
 - Incoming-to-outgoing refill pair eligibility is global at launch.
-- Outlets may restrict which incoming vendors they accept at claim time.
+- Outlets may restrict which incoming vendors they accept at fulfillment
+  acceptance time.
 - Outlets do not define outlet-specific incoming-to-outgoing pair overrides.
 - A refill pair is orderable online only when the global pair is eligible and
   priceable.
@@ -82,8 +83,8 @@ Refill price is determined by three dimensions.
   active online-fulfillment outlet serves the delivery area.
 - Online pre-order validation avoids per-outlet SKU/vendor filtering before
   order placement.
-- The claiming outlet must accept the frozen incoming vendor and fulfill the
-  frozen outgoing vendor, size, and quantity terms.
+- The assigned fulfilling outlet must accept the frozen incoming vendor and
+  fulfill the frozen outgoing vendor, size, and quantity terms.
 
 ### Required Pricing Rules
 
@@ -99,13 +100,13 @@ Refill price is determined by three dimensions.
 
 ### Same-Vendor Availability
 
-- Same-vendor refill availability is a claim-time fulfillment constraint.
-- Claim-time same-vendor fulfillment depends on the claiming outlet's actual
+- Same-vendor refill availability is a fulfillment-acceptance constraint.
+- Same-vendor fulfillment depends on the assigned fulfilling outlet's actual
   filled stock for that vendor and size.
 - Expected vendor-depot returns do not make a same-vendor option fulfillable at
-  claim time.
-- Cylinders in `IN_REFILL` do not make a same-vendor option fulfillable at claim
-  time.
+  fulfillment acceptance time.
+- Cylinders in `IN_REFILL` do not make a same-vendor option fulfillable at
+  fulfillment acceptance time.
 
 ### Multi-Line Orders
 
@@ -123,7 +124,7 @@ Refill price is determined by three dimensions.
 - Coarse serviceability by address must pass before checkout: at least one active
   online-fulfillment outlet serves the delivery area.
 - Per-outlet SKU/vendor filtering before order placement is not launch behavior.
-- Pre-order orderability does not require claim-time outlet stock or
+- Pre-order orderability does not require fulfillment-time outlet stock or
   outlet-vendor availability.
 - Cart quote and checkout readiness revalidate orderability and priceability.
 - Pre-order filtering is a usability measure, not a substitute for order placement
@@ -133,10 +134,10 @@ Refill price is determined by three dimensions.
 
 - Online COD cart quotes and order placement use global online catalog, price,
   tax, and delivery-fee rules.
-- The eventual claiming outlet cannot change the frozen product price,
+- The assigned fulfilling outlet cannot change the frozen product price,
   delivery fee, tax, discount, or order total.
-- Claim eligibility requires the outlet to fulfill the frozen catalog terms,
-  vendor terms, quantities, and delivery address scope.
+- Fulfillment acceptance requires the outlet to fulfill the frozen catalog
+  terms, vendor terms, quantities, and delivery address scope.
 
 ## Price Administration
 
