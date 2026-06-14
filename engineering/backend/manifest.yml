@@ -7,6 +7,8 @@ system: Nyange API modular monolith
 runtime:
   language: Go
   architecture: single-deployable modular monolith
+  package_layout: feature-first modules with internal platform adapters
+  dependency_injection: github.com/pakasa-io/di
   http_framework: Fiber v3
   api_contracts: OpenAPI-first REST under /v1
   health_endpoints: [/livez, /readyz]
@@ -16,26 +18,64 @@ persistence:
   schema: app
   driver: pgx
   data_access: GORM repositories with explicit data mappers
-  transactions: github.com/pakasa-io/uow edge-managed unit of work
+  unit_of_work: github.com/pakasa-io/uow
+  transactions: edge-managed unit of work
+  migration_tool: goose
   migrations: forward-only; no production AutoMigrate
 
 identity:
   authentication: AWS Cognito access tokens
   login: passwordless SMS OTP
   authorization: Cedar action/resource policies
+  authorization_engine: github.com/cedar-policy/cedar-go
   roles: forbidden as runtime authorization model
 
 platform:
+  aws_sdk: github.com/aws/aws-sdk-go-v2
   config: koanf v2
+  config_precedence: defaults < files < environment < SSM parameters
   secrets: AWS Systems Manager Parameter Store
+  local_secrets: .env files for local defaults only; production secrets from SSM
   local_aws: LocalStack
+  local_orchestration: docker compose
+  correlation: request/correlation ID propagated through logs, traces, events, and module contracts
+  http_client: github.com/go-resty/resty/v2
+  logging: github.com/rs/zerolog
   observability: structured logs plus OpenTelemetry traces/metrics
   deployment: container-first
 
 testing:
   unit: go test
+  assertions: github.com/stretchr/testify
   integration: Testcontainers for Postgres and LocalStack
   contracts: OpenAPI validation required for module HTTP surfaces
+
+module_contracts:
+  cross_module_access: commands, queries, events, projections, coordinators
+  event_dispatch: in-process post-commit dispatch
+  consistency: atomic UoW for same-transaction workflows; documented async contracts otherwise
+
+data_conventions:
+  ids: ULID for application-owned public identifiers
+  id_generator: github.com/oklog/ulid/v2
+  money: integer minor units; no float storage or arithmetic
+  phone_numbers: normalized E.164 for identity and customer contact fields
+  phone_number_parser: github.com/nyaruka/phonenumbers
+  time: UTC timestamps at rest and across API contracts
+
+validation:
+  transport: Fiber request binding plus explicit DTO validation
+  transport_validator: github.com/go-playground/validator/v10
+  domain: constructor and command validation inside owning modules
+
+idempotency:
+  store: Postgres-backed command records
+  scope: actor, operation, idempotency key
+  duplicates: completed commands replay stored outcome; in-progress commands return retryable response
+
+quality_gates:
+  static_analysis: golangci-lint
+  required: go test, OpenAPI validation, migration validation, container build
 
 hard_boundaries:
   - Domain packages must not contain GORM models or persistence tags.
