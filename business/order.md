@@ -311,13 +311,13 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 Trimmed access matrix rows relevant to orders. Full matrix:
 [identity-auth.md](identity-auth.md).
 
-| Capability | P-01 | P-02 | P-05 | P-06 | P-07 | P-08 | P-10 |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Order placement | Full | - | - | - | - | - | Full |
-| Order status tracking | Own | Own assigned | Scoped | Scoped | Scoped | Read assigned outlets | Full |
-| Outlet claiming | - | - | - | Scoped with explicit permission | - | - | Full |
-| Ready-for-pickup marking | - | - | - | Scoped with explicit permission | - | - | Full |
-| Delivery assignment | - | - | Scoped | Scoped | - | - | Full |
-| Delivery completion | - | Own assigned | - | - | - | - | Full |
-| COD recording | - | Own assigned | - | - | - | - | Full |
-| Cancellation | Own before pickup | - | - | Scoped outlet claim cancellation | Scoped with explicit permission | - | Full |
+| Capability | P-01 | P-02 | P-04 | P-05 | P-06 | P-07 | P-08 | P-10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Order placement | Full | - | - | - | - | - | - | Full |
+| Order status tracking | Own | Own assigned | - | Scoped | Scoped | Scoped | Read assigned outlets | Full |
+| Outlet claiming | - | - | - | - | Scoped with explicit permission | - | - | Full |
+| Ready-for-pickup marking | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
+| Delivery assignment | - | - | - | Scoped | Scoped | - | - | Full |
+| Delivery completion | - | Own assigned | - | - | - | - | - | Full |
+| COD recording | - | Own assigned | - | - | - | - | - | Full |
+| Cancellation | Own before pickup | - | - | - | Scoped outlet claim cancellation | Scoped with explicit permission | - | Full |

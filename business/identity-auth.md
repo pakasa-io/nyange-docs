@@ -77,6 +77,7 @@ may hold multiple permission bundles across one or more outlets.
 - Manages stock counts, submits inventory adjustment requests, confirms
   returned-cylinder intake, initiates outlet transfer requests, and records
   vendor refill movements.
+- May mark claimed orders ready for pickup when explicitly permissioned.
 - Works within assigned outlet only.
 - Cannot claim orders, collect customer cash, issue refunds, access
   financial records, or approve their own adjustment requests.
