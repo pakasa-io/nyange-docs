@@ -70,7 +70,7 @@ before stockout frequency proves the need.
 ## Revisit Trigger
 
 Revisit when manual inventory review causes repeated stockouts, stale inventory
-decisions, or avoidable failed fulfillment acceptance.
+decisions, or avoidable failed order claiming.
 
 ## Notes
 

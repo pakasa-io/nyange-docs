@@ -29,7 +29,6 @@ YYYY-MM-DD-short-item-name.md
 | [Customer Prepayment Workflows](2026-06-14-customer-prepayment-workflows.md) | Deferred |
 | [Mobile-Money Payments](2026-06-13-mobile-money-payments.md) | Deferred |
 | [Outlet-Local Pricing and Guardrails](2026-06-14-outlet-local-pricing-guardrails.md) | Deferred |
-| [Competitive Outlet Claiming](2026-06-14-competitive-outlet-claiming.md) | Deferred |
 | [Delivery Assignment Ranking](2026-06-14-delivery-assignment-ranking.md) | Deferred |
 | [Advanced Stock Counts and Low-Stock Alerts](2026-06-14-stock-counts-low-stock-alerts.md) | Deferred |
 | [Refund Code Expiry and Regeneration](2026-06-14-refund-code-expiry-regeneration.md) | Deferred |
@@ -53,16 +52,12 @@ Revisit outlet-local pricing and guardrails when outlets need independently
 managed local price schedules that cannot be handled through global online
 pricing and Super Admin catalog administration.
 
-Revisit competitive outlet claiming when order volume, service-area overlap, or
-outlet capacity pressure makes static service-area assignment too manual or too
-slow for daily operations.
-
 Revisit delivery assignment ranking when manual dispatcher assignment causes
 measured dispatch delays, uneven agent workload, or avoidable missed deliveries.
 
 Revisit advanced stock counts and low-stock alerts when manual inventory review
-causes repeated stockouts, stale inventory decisions, or avoidable failed
-fulfillment acceptance.
+causes repeated stockouts, stale inventory decisions, or avoidable failed order
+claiming.
 
 Revisit refund code expiry and regeneration when expired, lost, or inaccessible
 codes create repeated payout support cases that cannot be handled by ordinary

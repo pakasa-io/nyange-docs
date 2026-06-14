@@ -12,8 +12,7 @@ created, changed, quoted, checked out, abandoned, or cleaned up.
 [catalog.md](catalog.md) for orderable products, refill combinations, bundle
 pricing, and price rules;
 [order.md](order.md) for order placement and immutable order snapshots;
-[inventory.md](inventory.md) for reservation behavior after fulfillment
-acceptance;
+[inventory.md](inventory.md) for reservation behavior after outlet claim;
 [identity-auth.md](identity-auth.md) for the full access matrix.
 
 ## Boundary
@@ -22,7 +21,7 @@ acceptance;
 - Cart owns cart line contents, quantities, selected delivery address reference,
   customer acknowledgements for catalog or price changes, quote readiness, and
   abandoned-cart cleanup state.
-- Cart does not own order lifecycle state, fulfillment outlet assignment, stock
+- Cart does not own order lifecycle state, outlet claim state, stock
   reservation, payment facts, delivery tasks, receipts, refunds, inventory
   ledgers, or audit ledgers.
 - Checkout is a command from a checkout-ready cart to Order.
@@ -80,8 +79,8 @@ Terminal cart states: `CHECKED_OUT`, `SUMMARY_RETAINED`, `CLEARED`.
 - Pre-order orderability uses enabled catalog items, valid bundles, global
   refill-pair eligibility, priceability, and coarse serviceability by address.
 - Pre-order orderability does not use per-outlet SKU/vendor stock filtering.
-- Outlet stock and vendor fulfillment constraints are enforced during
-  fulfillment acceptance after order placement.
+- Outlet stock and vendor fulfillment constraints are enforced at claim time
+  after order placement.
 
 ### Quote Semantics
 

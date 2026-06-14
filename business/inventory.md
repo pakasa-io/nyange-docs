@@ -22,20 +22,20 @@ custody;
 **BI-01 — Available stock never goes below zero.**
 
 - Stock committed to orders cannot exceed physical available stock.
-- When an outlet accepts an assigned order, the reservation is atomic relative
-  to other concurrent reservations.
-- An acceptance that cannot reserve every requested stock item is rejected.
+- When an outlet claims an order, the stock claim is atomic relative to other
+  concurrent claims.
+- A claim that cannot reserve every requested stock item is rejected.
 
 **BI-06 — Reserved stock is unavailable.**
 
-- Stock reserved for an active order cannot be sold, transferred, or otherwise
-  consumed by another workflow.
+- Stock reserved for an active order cannot be claimed, sold, transferred, or
+  otherwise consumed by another workflow.
 - Reserved stock remains unavailable until it is explicitly committed or
   released.
 
 **BI-11 — Outlet stock is isolated.**
 
-- Stock at Outlet A cannot be drawn down by an order assigned to Outlet B.
+- Stock at Outlet A cannot be drawn down by an order claimed by Outlet B.
 - Stock transfers between outlets follow an explicit, audited transfer
   workflow.
 - No order can implicitly access another outlet's inventory.
@@ -108,7 +108,7 @@ ledger-posting rules for stock corrections.
 
 | State | Meaning |
 | --- | --- |
-| `RESERVED` | Stock held for an active accepted order. |
+| `RESERVED` | Stock held for an active claimed order. |
 | `COMMITTED` | Delivery succeeded; stock deducted from saleable inventory. |
 | `RELEASED` | Claim cancellation, customer cancellation, or failed delivery returned stock to availability when valid. |
 
@@ -116,15 +116,14 @@ ledger-posting rules for stock corrections.
 
 - No stock is reserved by cart creation, cart update, quote generation,
   checkout readiness, or order placement.
-- Reservation occurs only when an active permitted assigned outlet accepts an
-  order.
-- Fulfillment acceptance reserves every requested stock item atomically.
+- Reservation occurs only when an active permitted outlet claims an order.
+- Claiming reserves every requested stock item atomically.
 - Partial item reservation is prohibited.
 - Only available stock can be reserved.
 - Reserved and held stock is not visible as available to any new order.
 - Reservation age alone does not release stock.
 - Stock release occurs only through an explicit lifecycle event.
-- Fulfillment acceptance cancellation before pickup releases the reservation.
+- Outlet claim cancellation before pickup releases the reservation.
 - Customer cancellation before pickup releases the reservation.
 - Delivery failure after pickup releases physically returned goods to
   availability only after outlet return receipt.
@@ -136,7 +135,7 @@ ledger-posting rules for stock corrections.
 - `INTAKE_PENDING` cylinders do not enter available empty stock until outlet
   intake is confirmed.
 - During Delivery-coordinated completion, Inventory participates by committing
-  reserved outgoing stock for the active accepted order.
+  reserved outgoing stock for the active claimed order.
 - If the Delivery-coordinated completion fails before commit, outgoing stock
   remains reserved and unavailable; no stock commitment is posted.
 
@@ -305,7 +304,7 @@ Trimmed access matrix rows relevant to inventory. Full matrix:
 | Capability | P-04 | P-06 | P-08 | P-10 |
 | --- | --- | --- | --- | --- |
 | Inventory viewing | Scoped | Scoped | Read assigned outlets | Full |
-| Reservation from fulfillment acceptance | - | Scoped with explicit permission | - | Full |
+| Reservation from order claim | - | Scoped with explicit permission | - | Full |
 | Inventory adjustments submit | Scoped request | Scoped policy-limited post; above = request | - | Full |
 | Inventory adjustments approve | - | - | - | Full |
 | Outlet-to-outlet transfers | Scoped request | Scoped request/approve/receive | - | Full |

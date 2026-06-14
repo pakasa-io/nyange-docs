@@ -29,23 +29,23 @@ tests.
 - Each outlet has its own inventory, staff, and cash ledger.
 - Online COD checkout uses the global online pricing and address-based delivery
   fee basis.
-- Coarse serviceability by address resolves one active online-fulfillment outlet
-  assigned to the delivery area.
+- Coarse serviceability by address means at least one active online-fulfillment
+  outlet serves the delivery area.
 - Pre-order validation avoids per-outlet SKU/vendor filtering before order
   placement.
-- Pending order visibility is limited to the assigned fulfilling outlet and
-  Super Admin.
+- Pending-pool visibility and claim attempts are limited to active
+  online-fulfillment outlets that serve the delivery area and hold claim
+  permission.
 - Outlet cash is company cash.
 - Outlets are not franchisees or marketplace merchants.
 - Outlet stocking is vendor-specific and outlet-owned.
 - Outlets may hold filled cylinders from any globally supported vendor.
 - Each outlet procures stock directly from vendors.
 - There is no central warehouse or central purchasing pool in launch scope.
-- A placed order has exactly one assigned fulfilling outlet while it is
-  `PENDING`.
-- Fulfillment acceptance by the assigned outlet reserves stock for the order.
-- Fulfillment acceptance cancellation releases the reservation and returns the
-  order to `PENDING` with the same assigned fulfilling outlet.
+- A placed order has no fulfilling outlet while it is `PENDING`.
+- Claiming creates exactly one claimed fulfilling outlet for the order.
+- Outlet claim cancellation clears the fulfilling outlet and returns the order to
+  the pending pool.
 - Successful delivery and failed delivery retain the fulfilling outlet for
   reporting and cash/custody traceability.
 - Financial performance is tracked per outlet.
@@ -70,7 +70,7 @@ tests.
 | [identity-auth.md](identity-auth.md) | Identity & Authorization | Personas, access matrix, authentication, authorization, edge cases E-02-E-09 |
 | [catalog.md](catalog.md) | Catalog & Pricing | Refill pricing, bundle pricing, global online pricing, launch commercial programs |
 | [cart.md](cart.md) | Cart | Customer cart state, quote readiness, catalog-change handling, checkout readiness, abandoned-cart cleanup |
-| [order.md](order.md) | Order | Order placement, lifecycle state, fulfillment outlet assignment, COD fulfillment, and cancellation |
+| [order.md](order.md) | Order | Order placement, lifecycle state, outlet claiming, COD fulfillment, and cancellation |
 | [payment.md](payment.md) | Payment | COD cash collection, zero-collection facts, payment boundaries |
 | [delivery.md](delivery.md) | Delivery | Delivery lifecycle, delivery fee rules, agent cash handling, failed-delivery fee waiver, cylinder exchange field leg |
 | [inventory.md](inventory.md) | Inventory | Reservation lifecycle, outlet transfer, vendor refill batch, cylinder exchange intake leg, stock availability |
