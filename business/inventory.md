@@ -66,7 +66,8 @@ custody;
       -> RELEASED
 
 TRANSFER_HOLD
-  -> released when transfer received
+  -> IN_TRANSIT
+      -> RECEIVED
 ```
 
 | State | Meaning |
@@ -74,7 +75,9 @@ TRANSFER_HOLD
 | `RESERVED` | Stock held for an active claimed order. |
 | `COMMITTED` | Delivery succeeded; stock deducted from saleable inventory. |
 | `RELEASED` | Claim cancellation, customer cancellation, or failed delivery returned stock to availability when valid. |
-| `TRANSFER_HOLD` | Stock locked for an in-transit outlet transfer. |
+| `TRANSFER_HOLD` | Sender stock held outside sale availability after transfer approval and before dispatch. |
+| `IN_TRANSIT` | Sender stock has left sender availability and is moving to the receiver. |
+| `RECEIVED` | Receiver confirms receipt; sender hold is closed and stock is posted to receiver inventory. |
 
 ### Reservation Rules
 
@@ -125,7 +128,10 @@ REJECTED
 - Super Admin can bypass the transfer approval step only through an audited
   override with reason, before/after stock impact, and affected outlets.
 - Both sides must participate: receiving outlet requests, sending outlet
-  approves and releases stock, and receiving outlet confirms receipt.
+  approves and moves stock into `TRANSFER_HOLD`, sender dispatch moves stock to
+  `IN_TRANSIT`, and receiving outlet confirms receipt.
+- Transfer receipt closes the sender hold and posts received stock to receiver
+  inventory; it does not release stock back to sender availability.
 - Every transfer transition is audit-logged with actor, outlet scope, timestamp,
   and reason where applicable.
 - Inter-outlet stock transfers do not involve financial settlement.
