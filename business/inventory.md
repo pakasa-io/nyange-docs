@@ -93,8 +93,8 @@ TRANSFER_HOLD
   to outlet stock or are covered by an approved custody exception.
 - Delivery success commits reserved outgoing stock.
 - Incoming customer cylinders from refill delivery are tracked separately as
-  `PENDING_INTAKE`.
-- `PENDING_INTAKE` cylinders do not enter available empty stock until outlet
+  `INTAKE_PENDING`.
+- `INTAKE_PENDING` cylinders do not enter available empty stock until outlet
   intake is confirmed.
 
 ## Outlet Transfer Lifecycle
