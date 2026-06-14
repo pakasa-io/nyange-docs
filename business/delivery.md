@@ -95,7 +95,7 @@ PICKED_UP -> FAILED
 | `PICKED_UP` | Outlet handover and agent receipt are confirmed; agent has custody and the order is `OUT_FOR_DELIVERY`. |
 | `DELIVERED` | Terminal successful task state committed with order `DELIVERED`, stock commitment, returned-cylinder field facts, and COD fact. |
 | `FAILED` | Terminal failed task state after pickup; order becomes `DELIVERY_FAILED` and zero collection is recorded. |
-| `CANCELLED` | Terminal delivery task cancellation before pickup. |
+| `CANCELLED` | Terminal task-only operational cancellation before pickup; the order remains `READY_FOR_PICKUP`. |
 
 Terminal states: `CANCELLED`, `DELIVERED`, `FAILED`.
 
@@ -139,7 +139,9 @@ CANCELLED
 
 - A delivery task is created when the claimed outlet marks the order
   `READY_FOR_PICKUP`.
-- Each order creates one delivery task.
+- Each order has at most one active delivery task.
+- A task-only cancellation before pickup allows the claimed outlet to create or
+  assign a replacement delivery task for the same `READY_FOR_PICKUP` order.
 - The task is not a route plan and does not group multiple orders.
 
 ### Agent Eligibility

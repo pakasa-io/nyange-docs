@@ -263,6 +263,13 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 - Outlet claim cancellation before pickup releases the reservation, cancels any
   pre-pickup delivery task, cancels the active claim, clears the claimed outlet,
   and returns the order to `PENDING`.
+- Standalone delivery task cancellation before pickup is task-only operational
+  cancellation.
+- Task-only cancellation keeps the order in `READY_FOR_PICKUP`, keeps the active
+  claim and reservation, and allows the claimed outlet to create or assign a
+  replacement delivery task.
+- If the intended outcome is to release the reservation or return the order to
+  the pending pool, the outlet claim cancellation path must be used instead.
 - Customer cancellation before pickup is terminal.
 - Customer cancellation releases any active reservation, cancels the active
   claim, cancels any pre-pickup delivery task, records required cancellation
