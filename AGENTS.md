@@ -54,6 +54,9 @@ For the full design and documentation guide, see
 
 - Canonical style: `start-here/doc-style.md`. Apply it
   to every documentation chunk regardless of size, type, or location.
+- Placement rule: backend-specific docs must live under a path containing
+  `/backend/`; frontend/backend shared docs must live under a path containing
+  `/common/`.
 - Assume at least 80% of documentation will be read by AI agents; keep human
   readability, brevity, and reviewability as secondary constraints.
 - Optimize for explicit structure, stable headings, precise terminology,
