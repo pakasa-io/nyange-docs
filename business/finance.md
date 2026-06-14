@@ -293,8 +293,7 @@ Expense records capture:
 - Margin or profitability values that depend on configured costs or expense
   controls must be labeled estimated unless accounting-grade costing and expense
   controls are approved.
-- At launch, daily and weekly sales reports plus low-stock reports satisfy
-  reporting needs.
+- At launch, daily and weekly sales reports satisfy reporting needs.
 - Demand forecasting is not supported at launch.
 
 ### Cost Inputs

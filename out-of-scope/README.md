@@ -30,6 +30,7 @@ YYYY-MM-DD-short-item-name.md
 | [Outlet-Local Pricing and Guardrails](2026-06-14-outlet-local-pricing-guardrails.md) | Deferred |
 | [Competitive Outlet Claiming](2026-06-14-competitive-outlet-claiming.md) | Deferred |
 | [Delivery Assignment Ranking](2026-06-14-delivery-assignment-ranking.md) | Deferred |
+| [Advanced Stock Counts and Low-Stock Alerts](2026-06-14-stock-counts-low-stock-alerts.md) | Deferred |
 | [Post-Collection Price Adjustments](2026-06-14-post-collection-price-adjustments.md) | Deferred |
 
 Revisit express delivery fee when the Product Manager approves a customer-facing
@@ -50,6 +51,10 @@ slow for daily operations.
 
 Revisit delivery assignment ranking when manual dispatcher assignment causes
 measured dispatch delays, uneven agent workload, or avoidable missed deliveries.
+
+Revisit advanced stock counts and low-stock alerts when manual inventory review
+causes repeated stockouts, stale inventory decisions, or avoidable failed
+fulfillment acceptance.
 
 Revisit post-collection price adjustments when the Product Manager approves a
 post-delivery adjustment policy with source owner, authorization, posting,

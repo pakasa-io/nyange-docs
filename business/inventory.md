@@ -1,16 +1,15 @@
 # Inventory
 
 **Intent**: Define inventory behavior for reservations, outlet transfers,
-vendor refill batches, returned-cylinder intake, stock counts, and low-stock
-alerts.
+vendor refill batches, returned-cylinder intake, and stock availability.
 
 **Reader task**: Use this document to decide whether stock can be reserved,
-released, committed, transferred, counted, replenished, or recognized as
-returned-cylinder inventory.
+released, committed, transferred, replenished, or recognized as returned-cylinder
+inventory.
 
 **Sources**: §6.4 Inventory Reservation Lifecycle, §6.5 Outlet Transfer
 Lifecycle, §6.8 Vendor Refill Batch Lifecycle, §6.9 Refill Exchange Request
-Lifecycle intake leg, §7.17 Stock Count Behaviour, §7.18 Low-Stock Alerts
+Lifecycle intake leg
 
 **Related**:
 [order.md](order.md) for reservation triggers;
@@ -79,12 +78,13 @@ ledger-posting rules for stock corrections.
 - At launch, inventory adjustment authority is policy-driven.
 - Outlet Managers may post without separate Super Admin approval only
   single-unit damage or quarantine adjustments that do not increase available
-  stock and carry a source reference, such as count, delivery, or order.
+  stock and carry a source reference, such as delivery, order, intake, vendor
+  refill, or transfer record.
 - This single-unit rule is the launch default Outlet Manager posting threshold.
 - No higher Outlet Manager quantity threshold exists at launch.
 - Every loss, missing-source adjustment, manual correction, positive
-  available-stock increase, count variance, or absolute delta greater than one
-  unit is `PENDING_APPROVAL`.
+  available-stock increase, or absolute delta greater than one unit is
+  `PENDING_APPROVAL`.
 - `PENDING_APPROVAL` inventory adjustments require Super Admin approval before
   ledger movement is posted.
 - Every adjustment requires reason, note, active policy code, ledger correlation
@@ -92,12 +92,10 @@ ledger-posting rules for stock corrections.
 
 ### Reconciliation Paths
 
-- Inventory reconciliation supports quick day-to-day adjustments with reason
+- Inventory reconciliation supports source-referenced adjustments with reason
   codes.
-- Inventory reconciliation supports periodic physical counts with variance
-  reports.
-- Both paths create audited inventory adjustments and follow the active
-  Inventory-owned approval threshold before stock is recognized as changed.
+- Adjustment records are audited and follow the active Inventory-owned approval
+  threshold before stock is recognized as changed.
 
 ## Inventory Reservation Lifecycle
 
@@ -278,15 +276,15 @@ INTAKE_PENDING
 - If the physical cylinder size does not match accepted delivery facts, intake
   follows the `FAILED` intake and approved-exception path.
 
-## Stock Count Behaviour
+## Stock Availability Model
 
 ### Facts
 
 - Launch inventory accountability is aggregate by outlet, vendor, cylinder size,
   filled status, condition, and item/SKU as applicable.
 - Individual cylinder serial-number tracking is not required at launch.
-- Serial-number tracking is not a prerequisite for stock counts, reservations,
-  transfers, custody reconciliation, or vendor refill movements.
+- Serial-number tracking is not a prerequisite for reservations, transfers,
+  custody reconciliation, or vendor refill movements.
 
 ### Fill Lifecycle and Availability
 
@@ -296,39 +294,6 @@ INTAKE_PENDING
   quarantined, in transit, lost, sold, and returned.
 - Stock is sellable, reservable, or transferable only when both fill lifecycle
   and availability/condition permit that action.
-
-### Count Rules
-
-- Stock counts do not freeze outlet operations.
-- When a count begins, expected quantities are fixed as the count-start basis.
-- Ledger movements during the count window are tracked and used to calculate
-  variance at count close.
-- Orders may continue to be placed, accepted, and fulfilled while a count is in
-  progress.
-
-## Low-Stock Alerts
-
-Low-stock alerts are based on available stock only.
-
-### Launch Defaults
-
-| Stock type | Alert threshold |
-| --- | --- |
-| Saleable filled cylinders | Available quantity at or below 2 |
-| Saleable accessories | Available quantity at or below 1 |
-| Empty cylinders, non-saleable stock | Disabled by default, threshold 0 unless explicitly configured |
-
-### Alert Rules
-
-- Defaults may be overridden per outlet, product, or stock item.
-- Alerts are scoped to the outlet and stock item.
-- Repeated alerts for the same outlet/stock item are deduplicated while the item
-  remains below threshold during the four-hour launch threshold window.
-- Alerts are visible to permissioned Outlet Managers, Area Managers, and Super
-  Admins within authorized scope.
-- Alerts may show relevant `IN_REFILL` and incoming-transfer context.
-- Alerts do not reserve stock, block checkout, alter fulfillment acceptance, or
-  forecast demand.
 
 ## Permissions
 
@@ -344,4 +309,3 @@ Trimmed access matrix rows relevant to inventory. Full matrix:
 | Outlet-to-outlet transfers | Scoped request | Scoped request/approve/receive | - | Full |
 | Returned cylinder intake | Scoped | Scoped | - | Full |
 | Vendor refill batch management | Scoped | Scoped | - | Full |
-| Low-stock alerts | - | Scoped | Read assigned outlets | Full |

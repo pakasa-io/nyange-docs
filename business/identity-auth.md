@@ -72,7 +72,7 @@ may hold multiple permission bundles across one or more outlets.
 ### P-04 Inventory Clerk
 
 - Outlet staff responsible for stock management.
-- Manages stock counts, submits inventory adjustment requests, confirms
+- Reviews stock records, submits inventory adjustment requests, confirms
   returned-cylinder intake, initiates outlet transfer requests, and records
   vendor refill movements.
 - May mark accepted orders ready for pickup when explicitly permissioned.
@@ -190,7 +190,6 @@ may hold multiple permission bundles across one or more outlets.
 | Notification template administration | - | - | - | - | - | - | - | - | Full |
 | Customer notification requests | - | - | - | - | - | Scoped approved transactional only | - | - | Full |
 | Audit log viewing | - | - | - | - | - | Scoped | Read assigned outlets | Read | Full |
-| Low-stock alerts | - | - | - | - | - | Scoped | Read assigned outlets | - | Full |
 | Cross-outlet reporting | - | - | - | - | - | - | Read assigned outlets | Read | Full |
 | User & role management | - | - | - | - | - | - | - | - | Full |
 | Authorization policy management | - | - | - | - | - | - | - | - | Full with dual approval for sensitive changes |
