@@ -165,9 +165,6 @@ rank agents by:
 
 - A Dispatcher or Outlet Manager may assign or change the assigned delivery
   agent before pickup within outlet scope with a recorded reason.
-- Operational risk alerts may be shown to permissioned Outlet Managers or Super
-  Admins during manual assignment.
-- Risk alerts do not block assignment or change assignment priority.
 
 ## Pickup Handover
 

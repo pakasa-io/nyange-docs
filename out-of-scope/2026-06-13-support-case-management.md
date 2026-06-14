@@ -11,7 +11,7 @@
 
 Support case management is deferred from the mid-stage MVP. Launch support uses
 direct owning-domain workflows, audited fallback actions, approved
-transactional notifications, and operational risk alerts instead of a dedicated
+transactional notifications, and operational escalation instead of a dedicated
 case management system.
 
 ## Proposed Scope
@@ -67,14 +67,16 @@ OPEN
   history.
 - Supported case uses could include customer-facing issues, complaints, refund
   exceptions, reassignment disputes, payment exceptions, delivery exceptions,
-  operational escalations, risk-alert follow-up, and cross-domain follow-up.
+  operational escalations, risk-alert follow-up if operational risk alerts also
+  enter scope, and cross-domain follow-up.
 - Cases would not be required for every exception.
 
 ### Domain Record Linkage
 
 - A case could link to one or more domain records.
 - Linked records could include orders, payments, deliveries, refunds, inventory
-  exceptions, operational risk alerts, and other scoped entities.
+  exceptions, operational risk alerts if those also enter scope, and other
+  scoped entities.
 - A support case would not mutate linked domain records by itself.
 
 ### Notes and Communication Summaries
@@ -126,8 +128,9 @@ Support action request states could be:
 ### Case Creation
 
 - Cases could be created manually.
-- Operational alerts, risk alerts, closure blockers, payment exceptions,
-  delivery exceptions, and refund exceptions could supply default case context.
+- Operational alerts, risk alerts if in scope, closure blockers, payment
+  exceptions, delivery exceptions, and refund exceptions could supply default
+  case context.
 - Default context could include case type, linked entities, priority suggestion,
   summary, and supporting context.
 - No case would exist until a permissioned Customer Support Agent, in-scope
@@ -219,11 +222,12 @@ Support action request states could be:
 - Support retention would apply only to support-derived records.
 - Support retention must not delete or weaken linked orders, payments, refunds,
   deliveries, financial ledger records, ledger entries, notification logs,
-  closure blockers, operational risk alerts, or audit logs.
+  closure blockers, in-scope operational risk alerts, or audit logs.
 
 ### Operational Risk Alert Integration
 
-Risk-alert integration could add `CASE_OPENED` to the risk alert lifecycle.
+If operational risk alerts also move back into scope, risk-alert integration
+could add `CASE_OPENED` to the risk alert lifecycle.
 
 - When an Outlet Manager for that outlet or a Super Admin chooses to open a case
   from a risk alert, the alert could supply default case context.

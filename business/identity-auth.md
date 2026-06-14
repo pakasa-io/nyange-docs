@@ -128,9 +128,8 @@ may hold multiple permission bundles across one or more outlets.
 - Has read access to outlet operations, inventory, and financial summaries for
   assigned outlets.
 - Does not perform direct outlet operations.
-- Cannot claim orders, collect cash, adjust inventory, view or manage
-  operational risk alerts, access outlets outside assignment, or override Super
-  Admin controls.
+- Cannot claim orders, collect cash, adjust inventory, access outlets outside
+  assignment, or override Super Admin controls.
 
 ### P-09 Finance Officer
 
@@ -209,7 +208,6 @@ may hold multiple permission bundles across one or more outlets.
 | Notification template administration | - | - | - | - | - | - | - | - | - | Full |
 | Customer notification requests | - | - | - | - | - | Scoped approved transactional only | Scoped approved transactional only | - | - | Full |
 | Audit log viewing | - | - | - | - | - | Scoped | - | Read assigned outlets | Read | Full |
-| Operational risk alerts | - | - | - | - | - | Scoped with explicit permission | - | - | - | Full |
 | Low-stock alerts | - | - | - | - | - | Scoped | - | Read assigned outlets | - | Full |
 | Cross-outlet reporting | - | - | - | - | - | - | - | Read assigned outlets | Read | Full |
 | User & role management | - | - | - | - | - | - | - | - | - | Full |
@@ -433,9 +431,8 @@ cross-outlet support access. There is no implicit cross-outlet access based on
 issue type, priority, or customer complaint.
 
 **E-04**: An Area Manager can view reports and operational data for assigned
-outlets, but cannot view operational risk alerts or perform outlet actions such
-as claiming orders, collecting customer cash, paying refunds, or adjusting
-inventory.
+outlets, but cannot perform outlet actions such as claiming orders, collecting
+customer cash, paying refunds, or adjusting inventory.
 
 **E-05**: Refund liabilities have no amount-based approval threshold at launch.
 A valid authorized and posted source event may create a refund liability

@@ -40,7 +40,6 @@ Launch channels are assigned by event type, not customer preference.
 | Payment confirmation | Push, Email |
 | Failed delivery | Push, Email |
 | Outlet low-stock alert | Push only |
-| Configured operational risk alert | Push only |
 
 ## Sensitive Content
 

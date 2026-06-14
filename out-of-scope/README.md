@@ -27,6 +27,7 @@ YYYY-MM-DD-short-item-name.md
 | --- | --- |
 | [Express Delivery Fee](2026-06-14-express-delivery-fee.md) | Deferred |
 | [Mobile-Money Payments](2026-06-13-mobile-money-payments.md) | Deferred |
+| [Operational Risk Alerts](2026-06-14-operational-risk-alerts.md) | Deferred |
 | [Support Case Management](2026-06-13-support-case-management.md) | Deferred |
 
 Revisit express delivery fee when the Product Manager approves a customer-facing
@@ -36,6 +37,10 @@ refund or waiver, reporting, and authorization rules.
 Revisit mobile-money payments when COD-only launch operations create a measured
 adoption, cash-risk, reconciliation, or customer-convenience problem that cannot
 be solved by cash-process controls within the MVP.
+
+Revisit operational risk alerts when launch operations need systematic
+rolling-window detection for repeated custody, cash, delivery, or adjustment
+exceptions beyond direct owning-domain review and ordinary audit logs.
 
 Revisit support case management when direct owning-domain workflows cannot
 provide enough traceability for customer complaints, cross-domain exceptions,
