@@ -53,7 +53,7 @@ assurance, permission-grant facts, and outlet-scope facts.
 - Every line in an order delivers together or the whole order fails.
 - Partial item claims, partial delivery completion, split orders, and
   multi-outlet fulfillment are prohibited.
-- Failed delivery records a whole-order failed outcome.
+- Terminal failed delivery records a whole-order failed outcome.
 
 **BI-20 — Order totals are immutable after placement.**
 
@@ -200,7 +200,7 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
 | `CLAIM_BLOCKED` | Order cannot currently be claimed because the pending-claim timeout expired or every eligible outlet has a current claim-blocking reason. No stock is reserved and no fulfilling outlet is associated. |
 | `CLAIMED` | One active permitted outlet has claimed the whole order and inventory has reserved all requested stock. |
 | `READY_FOR_PICKUP` | Claimed outlet has marked the whole order ready and a delivery task exists. |
-| `OUT_FOR_DELIVERY` | Delivery agent has picked up the whole order and holds outgoing goods custody. |
+| `OUT_FOR_DELIVERY` | Delivery agent has picked up the whole order and holds outgoing goods custody; the order stays in this state while a failed delivery attempt is pending return or custody resolution. |
 | `DELIVERED` | Delivery succeeded; COD fact, stock commitment, claim completion, task state, order state, and returned-cylinder field facts committed together. |
 | `CUSTOMER_CANCELLED` | Customer cancellation completed before pickup; the order is terminal and never returns to the pending pool. |
 | `DELIVERY_FAILED` | Delivery failed after pickup; picked-up goods custody was resolved by physical return or approved custody exception, and zero collection was recorded. |
@@ -431,10 +431,14 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
 - Unclaimable closure from `CLAIM_BLOCKED` records the required exception
   attribution, marks the order `UNCLAIMABLE`, and retires the COD expectation
   without creating a payment terminal state.
-- Delivery failure after pickup resolves all picked-up outgoing goods custody by
-  physical outlet return or approved custody exception, records a
-  zero-collection payment fact, completes the claim, marks the task `FAILED`,
-  and marks the order `DELIVERY_FAILED`.
+- A failed delivery attempt after pickup moves the delivery task to
+  `RETURN_PENDING`; the order remains `OUT_FOR_DELIVERY`, the Payment-owned COD
+  expectation remains `PENDING_COLLECTION`, and the active claim remains open.
+- Terminal delivery failure occurs only after all picked-up outgoing goods
+  custody is resolved by physical outlet return or approved custody exception.
+- Terminal delivery failure records a zero-collection payment fact, completes the
+  claim, marks the delivery task `FAILED`, and marks the order
+  `DELIVERY_FAILED`.
 - Failed delivery does not by itself make custody-exception goods available for
   new sale.
 

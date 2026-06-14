@@ -147,6 +147,8 @@ ledger-posting rules for stock corrections.
 - Customer cancellation before pickup releases the reservation.
 - Delivery failure after pickup releases physically returned goods to
   availability only after outlet return receipt.
+- While a Delivery-owned failed attempt is `RETURN_PENDING`, picked-up outgoing
+  goods remain unavailable and in agent custody.
 - Goods covered by an approved custody exception remain non-available until
   Inventory posts the appropriate adjustment or resolution record.
 - Delivery success commits reserved outgoing stock.

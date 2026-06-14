@@ -61,7 +61,7 @@ without a void.
 | --- | --- |
 | `PENDING_COLLECTION` | Durable active COD expectation derived from the placed order; no customer cash fact has been recorded and the expectation has not been retired. |
 | `COLLECTED` | Terminal successful cash collection fact; may include an approved short/over variance link. |
-| `ZERO_COLLECTION` | Terminal fact for failed delivery where no customer cash was collected. |
+| `ZERO_COLLECTION` | Terminal fact for a failed delivery finalized with no customer cash collected. |
 | `POS_CASH_COLLECTED` | Terminal successful immediate cash collection fact for a completed POS sale. |
 | `POS_CASH_VOIDED` | Terminal linked reversal fact for an allowed same-day POS void. |
 
@@ -153,8 +153,11 @@ state and does not create a terminal payment fact.
 
 ### Failed Delivery, Cancellation, and Unclaimable Closure
 
-- Failed delivery records a zero-collection payment fact tied to the failed
-  delivery reason.
+- Terminal failed delivery records a zero-collection payment fact tied to the
+  failed delivery reason.
+- A Delivery-owned `RETURN_PENDING` failed-attempt state records no terminal
+  payment fact; the COD expectation remains `PENDING_COLLECTION` until terminal
+  failed delivery commits.
 - `PENDING_COLLECTION` is an active expectation, not a durable terminal payment
   fact.
 - Cancellation before delivery collection creates no payment terminal state and
@@ -190,7 +193,7 @@ state and does not create a terminal payment fact.
   order outcome and must not synthesize a Payment `CANCELLED`, `NOT_COLLECTED`,
   or `ZERO_COLLECTION` state.
 - Because launch online orders are COD, cancellation, unclaimable closure, and
-  failed delivery do not create refund liabilities from prior customer
+  terminal failed delivery do not create refund liabilities from prior customer
   collection.
 
 ### Cash Discrepancies

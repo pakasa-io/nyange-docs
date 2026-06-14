@@ -88,7 +88,7 @@ READY_FOR_PICKUP
   -> DELIVERED
 
 READY_FOR_PICKUP|ASSIGNED -> CANCELLED
-PICKED_UP -> FAILED
+PICKED_UP -> RETURN_PENDING -> FAILED
 ```
 
 | State | Meaning |
@@ -96,6 +96,7 @@ PICKED_UP -> FAILED
 | `READY_FOR_PICKUP` | Claimed outlet marked the order ready and a delivery task exists. |
 | `ASSIGNED` | Delivery agent is assigned and can read the full delivery address while assignment is active. |
 | `PICKED_UP` | Outlet handover and agent receipt are confirmed; agent has custody and the order is `OUT_FOR_DELIVERY`. |
+| `RETURN_PENDING` | Failed doorstep outcome was recorded after pickup; outgoing goods remain in agent custody until outlet return receipt or approved custody exception resolves every picked-up item. |
 | `DELIVERED` | Terminal successful task state committed with order `DELIVERED`, stock commitment, returned-cylinder field facts, and COD fact. |
 | `FAILED` | Terminal failed task state after pickup; order becomes `DELIVERY_FAILED` and zero collection is recorded. |
 | `CANCELLED` | Terminal task-only operational cancellation before pickup; the order remains `READY_FOR_PICKUP`. |
@@ -137,8 +138,8 @@ CANCELLED
 - `INTAKE_PENDING` is owned by Inventory and persists after delivery completion.
 - The order can be `DELIVERED` while exchange requests are still
   `INTAKE_PENDING`.
-- A failed delivery after pickup moves every affected exchange request to
-  `FAILED`.
+- A failed delivery attempt after pickup moves every affected exchange request to
+  Delivery-owned field-leg `FAILED`.
 - Failed exchange requests retain controlled field facts and failure reason for
   audit, but do not create Inventory intake records.
 - `FAILED` is terminal for the Delivery-owned field leg.
@@ -240,21 +241,29 @@ Transition to `PICKED_UP` requires both:
 
 ## Failed Deliveries
 
-- Delivery agents may mark a delivery `FAILED` after pickup.
+- Delivery agents may record a failed delivery attempt after pickup.
+- A failed delivery attempt moves the delivery task `PICKED_UP ->
+  RETURN_PENDING`.
+- `RETURN_PENDING` records the failed doorstep outcome and keeps outgoing goods
+  in agent custody.
+- While a delivery task is `RETURN_PENDING`, the order remains
+  `OUT_FOR_DELIVERY`, Payment remains `PENDING_COLLECTION`, and the active claim
+  remains open.
 - A controlled reason code and audit trail are required.
 - An optional note may be added.
-- Failed delivery requires every picked-up outgoing goods custody row to be
-  resolved by physical return to the outlet or by approved custody exception.
+- Failed delivery attempts for refill deliveries move affected exchange requests
+  to Delivery-owned field-leg `FAILED`; no returned-cylinder intake handoff is
+  created for those failed exchange requests.
+- Terminal failed delivery requires every picked-up outgoing goods custody row to
+  be resolved by physical return to the outlet or by approved custody exception.
 - Physically returned goods may be receipted back to outlet stock through
   Inventory.
 - Goods covered by custody exception do not become available stock through the
   failed-delivery action.
-- Failed delivery records a zero-collection payment fact.
-- Failed delivery completes the active order claim.
-- Failed delivery marks the order `DELIVERY_FAILED`.
-- Failed refill deliveries move affected exchange requests to Delivery-owned
-  field-leg `FAILED`; no returned-cylinder intake handoff is created for those
-  failed exchange requests.
+- Delivery coordinates terminal failed delivery as `RETURN_PENDING -> FAILED`.
+- Terminal failed delivery records a zero-collection payment fact.
+- Terminal failed delivery completes the active order claim.
+- Terminal failed delivery marks the order `DELIVERY_FAILED`.
 - The agent cannot reschedule the failed order.
 - If the customer still wants the goods, the customer places a new order.
 
@@ -368,7 +377,7 @@ No delivery fee is charged on any failed delivery, regardless of failure reason.
 - For COD orders, the waived fee is not collected from the customer by the
   agent.
 - Failed COD deliveries keep a zero-collection payment fact tied to the failed
-  delivery reason.
+  delivery reason after terminal failed delivery commits.
 - Failed COD deliveries do not create customer refund liabilities.
 
 ## Permissions
