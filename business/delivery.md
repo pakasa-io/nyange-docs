@@ -30,7 +30,8 @@ Delivery completion is the single commit point for:
 - outgoing stock commitment;
 - returned-cylinder field recording;
 - cash collection recording;
-- payment status.
+- payment status;
+- receipt issuance.
 
 ```
 delivery completion commits atomically:
@@ -40,6 +41,7 @@ delivery completion commits atomically:
   returned_cylinder_field_recording
   cash_collection_recording
   payment_status
+  receipt_issuance
 // all succeed or none do
 ```
 
@@ -195,6 +197,18 @@ Transition to `PICKED_UP` requires both:
 
 ## Delivery Completion
 
+- Delivery coordinates delivery completion because the doorstep completion action
+  is the business trigger.
+- Participant ownership remains module-scoped:
+
+| Participant | Owned mutation in the completion commit |
+| --- | --- |
+| Delivery | Validate the picked-up task, record doorstep field facts, mark the delivery task `DELIVERED`, and resolve delivery-agent outgoing-goods custody for successful delivery. |
+| Order | Move the order `OUT_FOR_DELIVERY -> DELIVERED` and complete the active claim. |
+| Inventory | Commit reserved outgoing stock and create returned-cylinder intake handoff records when refill exchange lines apply. |
+| Payment | Record the COD collection fact and move payment to `COLLECTED`. |
+| Finance | Issue the immutable receipt number and receipt record for the delivered sale. |
+
 - Delivery completion requires `acknowledged_cash_collected=true`.
 - COD derives from the persisted order total.
 - The agent cannot modify expected COD.
@@ -207,7 +221,13 @@ Transition to `PICKED_UP` requires both:
 - The active order claim is completed.
 - The delivery task is marked `DELIVERED`.
 - The order is marked `DELIVERED`.
+- Finance issues the immutable receipt.
 - All completion effects commit in one transaction.
+- The same idempotency key and correlation ID apply to every participant
+  mutation in the completion commit.
+- If any participant rejects the mutation or the transaction fails before commit,
+  all participant mutations fail together, no receipt number is issued, and the
+  delivery task remains `PICKED_UP`.
 
 ## Failed Deliveries
 

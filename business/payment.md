@@ -71,9 +71,11 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 - COD is collected at the doorstep while the order is `OUT_FOR_DELIVERY`.
 - COD is recorded when the order reaches `DELIVERED`.
 - The Delivery Agent collects cash before marking delivery complete.
+- Delivery coordinates completion. Payment participates by recording the COD
+  collection fact and moving payment to `COLLECTED`.
 - Delivery completion atomically commits payment status with delivery task
-  state, order state, outgoing stock, returned-cylinder field facts, and cash
-  collection facts.
+  state, order state, outgoing stock, returned-cylinder field facts, receipt
+  issuance, and cash collection facts.
 - Expected COD derives from the persisted order total.
 - Agents record collected cash but cannot alter expected COD.
 - Client requests cannot override expected COD.
@@ -81,6 +83,8 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
   delivery-approved short/over collection variance is attached.
 - Approved variance preserves expected amount, collected amount, and variance
   link; it does not rewrite expected COD or the frozen order total.
+- If the completion transaction fails before commit, payment remains
+  `PENDING_COLLECTION` and no collected cash fact is recorded.
 
 ### Failed Delivery and Cancellation
 

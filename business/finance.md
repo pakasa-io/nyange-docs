@@ -32,6 +32,9 @@ cancellation;
   `DELIVERED`.
 - `DELIVERED` seals the original sale financial state.
 - The receipt issued at `DELIVERED` is immutable.
+- Finance participates in Delivery-coordinated completion by issuing the
+  immutable receipt number and receipt record in the same atomic commit that
+  marks the order `DELIVERED`.
 - Later events do not rewrite the original receipt.
 - Later financial activity is allowed only as a separate linked business record,
   such as an approved refund liability or approved adjustment/void record.

@@ -94,6 +94,10 @@ custody;
   `INTAKE_PENDING`.
 - `INTAKE_PENDING` cylinders do not enter available empty stock until outlet
   intake is confirmed.
+- During Delivery-coordinated completion, Inventory participates by committing
+  reserved outgoing stock for the active claimed order.
+- If the Delivery-coordinated completion fails before commit, outgoing stock
+  remains reserved and unavailable; no stock commitment is posted.
 
 ## Outlet Transfer Lifecycle
 

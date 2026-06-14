@@ -140,9 +140,13 @@ A cancellation missing any required field is a data integrity violation.
 - A claimed order requires an active reservation.
 - Inventory and cash ledgers are append-only.
 - Pickup creates agent custody before the order becomes `OUT_FOR_DELIVERY`.
-- Delivery completion commits outgoing stock.
+- Delivery coordinates delivery completion as the doorstep completion command.
+- Order participates in delivery completion by moving the order from
+  `OUT_FOR_DELIVERY` to `DELIVERED` and completing the active claim in the same
+  atomic commit.
 - Delivery completion records COD, returned-cylinder facts, task and order
-  terminal state, and custody changes in one transaction.
+  terminal state, outgoing stock commitment, payment status, receipt issuance,
+  and custody changes in one transaction.
 - Client requests cannot override COD amount, currency, catalog-derived prices,
   authoritative delivery timestamps, partial payments, refunds, fees, taxes, or
   discounts.
@@ -250,6 +254,9 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 
 ### Delivery Completion (`OUT_FOR_DELIVERY` -> `DELIVERED`)
 
+- Delivery is the coordinator for this transition.
+- Order accepts the participant mutation only for the active claimed order tied
+  to the picked-up delivery task.
 - Completion requires `acknowledged_cash_collected=true`.
 - COD derives from the persisted order total.
 - Client requests cannot override COD.
@@ -259,7 +266,10 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 - The active claim is completed.
 - The delivery task is marked `DELIVERED`.
 - The order is marked `DELIVERED`.
+- Finance issues the immutable receipt in the same transaction.
 - All completion effects commit in one transaction.
+- If any participant mutation fails, the order remains `OUT_FOR_DELIVERY` and no
+  participant mutation is committed.
 - `DELIVERED` is the terminal successful order state.
 - No later order state follows `DELIVERED`.
 
