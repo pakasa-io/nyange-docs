@@ -203,17 +203,21 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
   permissions.
 - No stock is reserved during cart activity or order placement.
 - Stock reservation occurs only when an outlet claims the order.
-- While an order is `PENDING`, permitted outlets may read full pending-pool order
+- While an order is `PENDING`, only active online-fulfillment outlets that serve
+  the delivery area and hold claim permission may read full pending-pool order
   detail needed to decide whether to claim and fulfill the order.
 - Pending-pool reads expose the full structured delivery address, resolved
   coordinates, recipient name, recipient phone, delivery instructions, frozen
   order contents, frozen customer-visible totals, and serviceability facts.
-- Pending-pool reads are outlet-scoped permissioned reads; no delivery-area
-  redaction is applied to permitted claiming outlets.
+- Pending-pool reads are address-serviceable outlet-scoped permissioned reads;
+  no delivery-area redaction is applied to eligible claiming outlets.
+- Outlets outside the delivery area scope cannot read the full pending-pool
+  detail or attempt the claim.
 
 ### Claiming (`PENDING` -> `CLAIMED`)
 
-- Any active permitted outlet may claim an order from the pending pool.
+- Any active online-fulfillment outlet that serves the delivery area and holds
+  claim permission may claim an order from the pending pool.
 - Claim is whole-order only.
 - Partial item claims are prohibited.
 - Claiming reserves all requested stock atomically.

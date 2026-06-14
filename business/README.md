@@ -35,6 +35,9 @@ tests.
   outlet serves the delivery area.
 - Pre-order validation avoids per-outlet SKU/vendor filtering before order
   placement.
+- Pending-pool visibility and claim attempts are limited to active
+  online-fulfillment outlets that serve the delivery area and hold claim
+  permission.
 - Outlet cash is company cash.
 - Outlets are not franchisees or marketplace merchants.
 - Outlet stocking is vendor-specific and outlet-owned.
