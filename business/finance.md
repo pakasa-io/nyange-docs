@@ -121,8 +121,8 @@ if closing_overdue AND NOT super_admin_urgency_override:
   allowed:  stock_intake, within_guardrail_price_changes
 ```
 
-- Outlet Manager urgent override is allowed for cash refund payouts when policy
-  permits it.
+- Only Super Admin urgency override can allow blocked cash refund payouts while
+  daily closing is overdue.
 
 ### Liability Recognition
 
