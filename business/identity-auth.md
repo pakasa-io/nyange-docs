@@ -251,6 +251,23 @@ using this file as a central override.
   Admin explicitly grants additional access.
 - Area Managers have read access to their assigned outlet set, not all outlets.
 
+### Address And Coordinate Ownership
+
+- Identity owns customer saved address records, address coordinate correction
+  lifecycle, and account-to-address authorization.
+- Customer `Own account & address` permission allows a customer to create,
+  update, select, and correct their own saved addresses and map pin coordinates.
+- Super Admin may correct customer address coordinates only through an audited
+  support action with actor, reason, before/after address values, and
+  before/after coordinate values.
+- Identity supplies the current structured address and resolved-coordinate facts
+  to Cart and Order when those boundaries evaluate address readiness.
+- Cart owns checkout readiness and consumes Identity-owned address facts.
+- Order owns the placed-order address snapshot. Identity address or coordinate
+  corrections after order placement do not mutate placed orders.
+- Identity does not own delivery serviceability, delivery-fee calculation, outlet
+  eligibility, or order claim visibility.
+
 ### Inventory Adjustment Permission
 
 - Identity records inventory adjustment permission grants and outlet scope.

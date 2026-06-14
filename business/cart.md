@@ -137,12 +137,15 @@ Terminal cart states: `CHECKED_OUT`, `SUMMARY_RETAINED`, `CLEARED`.
 ### Delivery Address Readiness
 
 - A cart may reference a customer delivery address.
+- Cart consumes Identity-owned saved-address and resolved-coordinate facts for
+  the selected delivery address.
 - Checkout readiness requires the selected delivery address to have resolved
   coordinates.
 - An unresolved delivery address blocks checkout until coordinates are resolved
   or the customer selects a different address.
 - Cart may store unresolved address selection as customer preference state, but
   it cannot make the cart checkout-ready.
+- Cart does not own saved-address correction or coordinate-correction lifecycle.
 
 ## Checkout Readiness
 

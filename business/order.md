@@ -231,7 +231,10 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`,
   order placement.
 - Order placement snapshots product, price, delivery-fee, tax, and total fields.
 - The snapshot is write-once.
-- Order placement stores the structured delivery address.
+- Order placement stores the structured delivery address and resolved coordinates
+  supplied from Identity-owned saved-address facts.
+- Later Identity address or coordinate corrections do not mutate the placed-order
+  address snapshot.
 - Order placement allocates an immutable `ORD-%08d` public order number.
 - Order placement grants the customer order-scoped read, status, and cancel
   permissions.
