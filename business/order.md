@@ -187,7 +187,8 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
   online-fulfillment outlet serves the delivery area.
 - Order placement avoids per-outlet SKU/vendor filtering before claim.
 - Order placement rejects disabled products.
-- Order placement rejects unavailable cart lines.
+- Order placement rejects cart lines that are not orderable under pre-order
+  orderability rules.
 - Order placement rejects unpriceable catalog combinations.
 - The server computes all line totals and order totals.
 - Client-submitted line totals, fees, taxes, discounts, and order totals are

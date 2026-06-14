@@ -68,17 +68,19 @@ Terminal cart states: `CHECKED_OUT`, `SUMMARY_RETAINED`, `CLEARED`.
 - Cart contents are not durable order, payment, ledger, custody, receipt, refund,
   or audit facts.
 
-### Availability
+### Pre-Order Orderability
 
-- Out-of-stock cart items are marked unavailable and remain in the cart until
-  the customer removes them or stock returns.
 - Disabled products are not orderable or sellable, even if stock exists.
-- Any cart item referencing a disabled product is marked unavailable.
-- The customer must resolve unavailable items before checkout can proceed.
+- Any cart item referencing a disabled product or invalid bundle is marked not
+  orderable.
+- The customer must resolve not-orderable items before checkout can proceed.
 - Already-placed orders referencing a disabled product are not affected by later
   disablement.
-- Pre-order availability uses global catalog availability and coarse
-  serviceability by address, not per-outlet SKU/vendor stock filtering.
+- Pre-order orderability uses enabled catalog items, valid bundles, global
+  refill-pair eligibility, priceability, and coarse serviceability by address.
+- Pre-order orderability does not use per-outlet SKU/vendor stock filtering.
+- Outlet stock and vendor fulfillment constraints are enforced at claim time
+  after order placement.
 
 ### Quote Semantics
 
@@ -87,7 +89,7 @@ Terminal cart states: `CHECKED_OUT`, `SUMMARY_RETAINED`, `CLEARED`.
 - Client-submitted line totals, fees, taxes, discounts, and order totals are
   ignored.
 - Quote generation evaluates current catalog, global online pricing,
-  address-based delivery-fee, tax, and availability rules.
+  address-based delivery-fee, tax, and pre-order orderability rules.
 - Quote generation does not use local price or delivery-fee rules from a future
   claiming outlet.
 - Quote generation uses coarse serviceability by address: at least one active
@@ -129,7 +131,7 @@ A cart is checkout-ready only when:
 - the customer is authenticated;
 - at least one cart line exists;
 - every cart line references an enabled product or valid bundle;
-- every cart line is currently available;
+- every cart line is orderable under pre-order orderability rules;
 - every catalog combination is priceable;
 - the selected delivery address has resolved coordinates;
 - coarse serviceability by address is satisfied;

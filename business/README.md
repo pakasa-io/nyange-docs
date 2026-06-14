@@ -89,7 +89,7 @@ tests.
 - Cart owns customer-selected pre-order state and checkout readiness.
   [order.md](order.md) owns order placement and the immutable order lifecycle
   after checkout succeeds.
-- Catalog availability and priceability rules are referenced by [cart.md](cart.md)
+- Catalog orderability and priceability rules are referenced by [cart.md](cart.md)
   for quote readiness and by [order.md](order.md) for placement revalidation.
 - The complete access matrix is in [identity-auth.md](identity-auth.md). Each
   aggregate file includes only the permission rows directly relevant to that

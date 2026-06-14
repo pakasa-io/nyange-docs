@@ -125,7 +125,9 @@ Refill price is determined by three dimensions.
 - Coarse serviceability by address must pass before checkout: at least one active
   online-fulfillment outlet serves the delivery area.
 - Per-outlet SKU/vendor filtering before order placement is not launch behavior.
-- Cart quote and checkout readiness revalidate availability and price.
+- Pre-order orderability does not require claim-time outlet stock or
+  outlet-vendor availability.
+- Cart quote and checkout readiness revalidate orderability and priceability.
 - Pre-order filtering is a usability measure, not a substitute for order placement
   revalidation.
 
@@ -241,7 +243,7 @@ Delivery-fee guardrails are defined in [delivery.md](delivery.md).
 
 ### Cart and Placement Effects
 
-Cart quote and checkout readiness revalidate catalog availability and
+Cart quote and checkout readiness revalidate catalog orderability and
 priceability under [cart.md](cart.md). Order placement revalidates the same
 requirements before creating the immutable order snapshot under
 [order.md](order.md).
