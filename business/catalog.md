@@ -55,12 +55,13 @@ Refill price is determined by three dimensions.
 | Outgoing vendor | The filled cylinder the customer receives |
 | Cylinder size | 6kg or 12kg |
 
-### Vendor Defaults
+### Online Vendor Defaults
 
-- If the customer does not choose a same-vendor refill, the outgoing vendor uses
-  the outlet's configured default when present.
-- If no outlet default is configured, the outgoing vendor defaults to global
-  Vengas.
+- Online COD checkout defaults the outgoing refill vendor to the global online
+  outgoing-vendor default.
+- At launch, the global online outgoing-vendor default is Vengas.
+- Outlet configured default vendors do not apply before order placement.
+- The claiming outlet must fulfill the frozen outgoing vendor.
 
 ### Supported Vendors
 
@@ -75,11 +76,14 @@ Refill price is determined by three dimensions.
 ### Pair Eligibility
 
 - Incoming-to-outgoing refill pair eligibility is global at launch.
-- Outlets may restrict which incoming vendors they accept.
+- Outlets may restrict which incoming vendors they accept at claim time.
 - Outlets do not define outlet-specific incoming-to-outgoing pair overrides.
-- A refill pair is orderable online only when the global pair is eligible,
-  priceable, and fulfillable by at least one permitted outlet for the delivery
-  address.
+- A refill pair is orderable online only when the global pair is eligible and
+  priceable.
+- Online pre-order validation uses coarse serviceability by address: at least one
+  active online-fulfillment outlet serves the delivery area.
+- Online pre-order validation avoids per-outlet SKU/vendor filtering before
+  order placement.
 - The claiming outlet must accept the frozen incoming vendor and fulfill the
   frozen outgoing vendor, size, and quantity terms.
 
@@ -97,10 +101,13 @@ Refill price is determined by three dimensions.
 
 ### Same-Vendor Availability
 
-- Same-vendor refill availability depends on the outlet's actual filled stock
-  for that vendor and size.
-- Expected vendor-depot returns do not make a same-vendor option orderable.
-- Cylinders in `IN_REFILL` do not make a same-vendor option orderable.
+- Same-vendor refill availability is a claim-time fulfillment constraint.
+- Claim-time same-vendor fulfillment depends on the claiming outlet's actual
+  filled stock for that vendor and size.
+- Expected vendor-depot returns do not make a same-vendor option fulfillable at
+  claim time.
+- Cylinders in `IN_REFILL` do not make a same-vendor option fulfillable at claim
+  time.
 
 ### Multi-Line Orders
 
@@ -111,14 +118,15 @@ Refill price is determined by three dimensions.
 - All-or-nothing fulfillment applies across all lines: every refill in the
   order succeeds together or the whole order fails.
 
-### Cart Filtering
+### Pre-Order Filtering
 
-- Vendor options shown to a customer are filtered to combinations that are
-  currently fulfillable by at least one permitted outlet for their delivery
-  address and incoming cylinder.
-- Options that no permitted outlet can currently fulfill are not shown.
+- Vendor options shown to a customer are filtered by global vendor support,
+  global pair eligibility, and priceability.
+- Coarse serviceability by address must pass before checkout: at least one active
+  online-fulfillment outlet serves the delivery area.
+- Per-outlet SKU/vendor filtering before order placement is not launch behavior.
 - Cart quote and checkout readiness revalidate availability and price.
-- Cart filtering is a usability measure, not a substitute for order placement
+- Pre-order filtering is a usability measure, not a substitute for order placement
   revalidation.
 
 ## Online Checkout Pricing Basis

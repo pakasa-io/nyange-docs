@@ -183,6 +183,9 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 - Order placement requires an authenticated customer account.
 - The delivery address must have resolved coordinates.
 - An unresolved delivery address blocks order placement.
+- Coarse serviceability by address must pass: at least one active
+  online-fulfillment outlet serves the delivery area.
+- Order placement avoids per-outlet SKU/vendor filtering before claim.
 - Order placement rejects disabled products.
 - Order placement rejects unavailable cart lines.
 - Order placement rejects unpriceable catalog combinations.

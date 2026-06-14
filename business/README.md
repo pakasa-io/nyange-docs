@@ -31,6 +31,10 @@ tests.
 - Online COD checkout uses the global online pricing and address-based delivery
   fee basis; local outlet price-rule configuration does not alter placed online
   order totals.
+- Coarse serviceability by address means at least one active online-fulfillment
+  outlet serves the delivery area.
+- Pre-order validation avoids per-outlet SKU/vendor filtering before order
+  placement.
 - Outlet cash is company cash.
 - Outlets are not franchisees or marketplace merchants.
 - Outlet stocking is vendor-specific and outlet-owned.
@@ -49,10 +53,13 @@ tests.
 
 - A refill exchange means the customer surrenders an empty cylinder and receives
   a filled cylinder.
-- The outgoing cylinder defaults to the outlet's configured default vendor when
-  present; otherwise it defaults to the global Vengas default.
-- The customer may choose another currently fulfillable outgoing vendor,
-  including same-vendor refill when outlet policy allows it and stock exists.
+- Online COD checkout defaults the outgoing cylinder to the global online
+  outgoing-vendor default, Vengas at launch.
+- Outlet configured default vendors do not apply before order placement.
+- If launch checkout exposes outgoing-vendor choice, the customer may choose
+  another globally supported and priceable outgoing vendor.
+- Pre-order outgoing-vendor choices do not depend on per-outlet vendor policy or
+  stock filtering.
 - Refill pricing varies by incoming vendor, outgoing vendor, and cylinder size.
 
 ## Aggregate Index

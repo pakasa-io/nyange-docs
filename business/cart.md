@@ -79,6 +79,8 @@ Terminal cart states: `CHECKED_OUT`, `SUMMARY_RETAINED`, `CLEARED`.
 - The customer must resolve unavailable items before checkout can proceed.
 - Already-placed orders referencing a disabled product are not affected by later
   disablement.
+- Pre-order availability uses global catalog availability and coarse
+  serviceability by address, not per-outlet SKU/vendor stock filtering.
 
 ### Quote Semantics
 
@@ -90,6 +92,10 @@ Terminal cart states: `CHECKED_OUT`, `SUMMARY_RETAINED`, `CLEARED`.
   address-based delivery-fee, tax, and availability rules.
 - Quote generation does not use local price or delivery-fee rules from a future
   claiming outlet.
+- Quote generation uses coarse serviceability by address: at least one active
+  online-fulfillment outlet serves the delivery area.
+- Quote generation avoids per-outlet SKU/vendor filtering before order
+  placement.
 - Pricing is locked only when Order creates the immutable order snapshot.
 - No stock is reserved by cart creation, cart update, quote generation, or
   checkout readiness.
@@ -128,6 +134,7 @@ A cart is checkout-ready only when:
 - every cart line is currently available;
 - every catalog combination is priceable;
 - the selected delivery address has resolved coordinates;
+- coarse serviceability by address is satisfied;
 - required catalog-change and price-change acknowledgements are complete;
 - the server can compute all line totals and order totals.
 
