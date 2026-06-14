@@ -183,8 +183,8 @@ Transition to `PICKED_UP` requires both:
 - Both confirmations must be recorded before the agent departs.
 - A discrepancy between handover record and agent receipt confirmation is a
   custody exception requiring Outlet Manager resolution before departure.
-- Missing agent receipt confirmation can be overridden only by an Outlet Manager
-  or Super Admin with reason and audit.
+- Missing agent receipt confirmation blocks the transition to `PICKED_UP`.
+- Pickup has no missing-agent-receipt override at launch.
 - After `PICKED_UP`, outgoing stock remains in the agent's custody until
   delivery completion, failed-order return receipt at the outlet, or an approved
   custody exception covers the item.
