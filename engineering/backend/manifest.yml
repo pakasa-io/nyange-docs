@@ -1,0 +1,46 @@
+id: nyange-backend-tech-stack
+schema_version: 1
+status: approved
+scope: backend
+system: Nyange API modular monolith
+
+runtime:
+  language: Go
+  architecture: single-deployable modular monolith
+  http_framework: Fiber v3
+  api_contracts: OpenAPI-first REST under /v1
+  health_endpoints: [/livez, /readyz]
+
+persistence:
+  database: Postgres
+  schema: app
+  driver: pgx
+  data_access: GORM repositories with explicit data mappers
+  transactions: github.com/pakasa-io/uow edge-managed unit of work
+  migrations: forward-only; no production AutoMigrate
+
+identity:
+  authentication: AWS Cognito access tokens
+  login: passwordless SMS OTP
+  authorization: Cedar action/resource policies
+  roles: forbidden as runtime authorization model
+
+platform:
+  config: koanf v2
+  secrets: AWS Systems Manager Parameter Store
+  local_aws: LocalStack
+  observability: structured logs plus OpenTelemetry traces/metrics
+  deployment: container-first
+
+testing:
+  unit: go test
+  integration: Testcontainers for Postgres and LocalStack
+  contracts: OpenAPI validation required for module HTTP surfaces
+
+hard_boundaries:
+  - Domain packages must not contain GORM models or persistence tags.
+  - Cross-module writes must go through documented contracts inside the UoW.
+  - Mutating HTTP commands require Idempotency-Key unless explicitly exempted.
+  - Ledger, history, event, and audit records are append-only.
+  - External side effects must not run inside an uncommitted transaction.
+  - Host-only development, test, migration, or deploy paths are not sufficient.
