@@ -175,8 +175,7 @@ if expense_amount >= 100,000 UGX  → requires approval AND receipt attachment
 - The active expense approval policy starts from global defaults and may define
   outlet/category overrides.
 - Expense categories are globally configured.
-- Outlets may request category additions through Customer Support Agent or Super
-  Admin escalation.
+- Outlets may request category additions through Super Admin escalation.
 - Outlets do not manage category definitions directly.
 - Category configuration cannot bypass the active approval policy.
 - An Outlet Manager cannot approve their own expense submissions.

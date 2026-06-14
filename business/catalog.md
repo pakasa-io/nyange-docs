@@ -67,8 +67,7 @@ Refill price is determined by three dimensions.
 
 - Refill vendor choices are limited to globally configured supported vendors at
   launch.
-- Outlets may request vendor additions through Customer Support Agent or Super
-  Admin escalation.
+- Outlets may request vendor additions through Super Admin escalation.
 - The supported-vendor list remains globally managed.
 - `Other` and `Unknown` incoming cylinder vendors are not accepted for checkout,
   refill pricing, or doorstep exchange handling.
@@ -253,9 +252,9 @@ requirements before creating the immutable order snapshot under
 Trimmed access matrix rows relevant to catalog and pricing. Full matrix:
 [identity-auth.md](identity-auth.md).
 
-| Capability | P-01 | P-03 | P-06 | P-07 | P-08 | P-10 |
-| --- | --- | --- | --- | --- | --- | --- |
-| Product catalog browsing | Read | Read | Read | Read | Read | Full |
-| Outlet price rules within guardrail | - | - | Scoped | - | - | Full |
-| Outlet price rules above guardrail | - | - | Request | - | - | Approve / Full |
-| Global pricing and catalog | - | - | - | - | - | Full |
+| Capability | P-01 | P-03 | P-06 | P-08 | P-10 |
+| --- | --- | --- | --- | --- | --- |
+| Product catalog browsing | Read | Read | Read | Read | Full |
+| Outlet price rules within guardrail | - | - | Scoped | - | Full |
+| Outlet price rules above guardrail | - | - | Request | - | Approve / Full |
+| Global pricing and catalog | - | - | - | - | Full |

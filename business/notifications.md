@@ -11,8 +11,8 @@ use and to confirm that notification delivery does not control business state.
 ## Boundary
 
 - Notifications are communication side effects of domain events.
-- Notifications do not own order, payment, inventory, delivery, refund, support,
-  or finance state.
+- Notifications do not own order, payment, inventory, delivery, refund, or
+  finance state.
 - Failed or unsent notifications may be surfaced for operational review where
   relevant, but they must not block or reverse committed business activity.
 
@@ -24,9 +24,6 @@ use and to confirm that notification delivery does not control business state.
 - Customer-configurable notification preferences are not launch behavior.
 - Notification types are classified as transactional or non-transactional for
   future policy use.
-- Customer Support Agent notification requests must use approved transactional
-  notification templates or events with safe structured parameters.
-- Support-authored freeform message bodies are not supported.
 
 ## Channel Assignments
 
@@ -50,8 +47,8 @@ Launch channels are assigned by event type, not customer preference.
 - A notification may identify the collection outlet.
 - A notification may direct the customer to the authenticated customer
   experience.
-- A permissioned Customer Support Agent or Super Admin may perform audited code
-  reveal only after customer verification.
+- A Super Admin may perform audited code reveal only after customer
+  verification.
 
 ## Non-Goals
 

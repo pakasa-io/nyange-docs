@@ -130,12 +130,10 @@ t = 24h  → if code not used  → CODE_EXPIRED; liability remains open
            // new code can be issued from CODE_EXPIRED
 ```
 
-- A permissioned Customer Support Agent or Super Admin can regenerate an expired
-  code with audit.
+- A Super Admin can regenerate an expired code with audit.
 - Regeneration when the customer loses access requires customer verification
-  through an audited fallback-action record with reason and audit.
-- Failed verification attempts do not require Support action before a later
-  valid presentation can be paid.
+  through an audited exception record with reason and audit.
+- Failed verification attempts do not block a later valid presentation.
 - The refund liability itself does not expire.
 
 ### Collection Eligibility
@@ -143,9 +141,8 @@ t = 24h  → if code not used  → CODE_EXPIRED; liability remains open
 - Only the original account holder may collect a refund at launch.
 - Delegated or proxy collection is not a standard supported workflow.
 - Any exceptional override requires an audited exception record, Super Admin
-  handling or explicitly permissioned Customer Support Agent fallback under the
-  active exception policy, explicit reason and evidence notes, and full audit
-  trail.
+  handling under the active exception policy, explicit reason and evidence
+  notes, and full audit trail.
 - Outlet Managers cannot independently approve proxy collection.
 
 ### Payout Process
@@ -180,8 +177,7 @@ At payout, the Outlet Manager or explicitly permissioned Outlet Cashier must:
 ### Collection Code Reveal
 
 - The collection code is revealed only through the authenticated customer
-  experience or audited reveal by a permissioned Customer Support Agent or Super
-  Admin after customer verification.
+  experience or audited reveal by a Super Admin after customer verification.
 - The code must not appear in push notifications, email bodies, or SMS.
 - An Outlet Manager or explicitly permissioned Outlet Cashier may verify a
   customer-presented code.
@@ -205,11 +201,11 @@ At payout, the Outlet Manager or explicitly permissioned Outlet Cashier must:
 Trimmed access matrix rows relevant to refunds. Full matrix:
 [identity-auth.md](identity-auth.md).
 
-| Capability | P-01 | P-03 | P-06 | P-07 | P-10 |
-| --- | --- | --- | --- | --- | --- |
-| Refund initiation | Own request | - | Scoped | Request | Full |
-| Refund payout cash at outlet | - | Scoped with explicit permission | Scoped | - | Full |
-| Refund collection code management | - | - | - | Scoped with explicit permission | Full |
+| Capability | P-01 | P-03 | P-06 | P-10 |
+| --- | --- | --- | --- | --- |
+| Refund initiation | Own request | - | Scoped | Full |
+| Refund payout cash at outlet | - | Scoped with explicit permission | Scoped | Full |
+| Refund collection code management | - | - | - | Full |
 
 ## Authorization Edge Cases
 

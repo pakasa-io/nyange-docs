@@ -288,13 +288,13 @@ Low-stock alerts are based on available stock only.
 Trimmed access matrix rows relevant to inventory. Full matrix:
 [identity-auth.md](identity-auth.md).
 
-| Capability | P-04 | P-06 | P-07 | P-08 | P-10 |
-| --- | --- | --- | --- | --- | --- |
-| Inventory viewing | Scoped | Scoped | Scoped | Read assigned outlets | Full |
-| Reservation from order claim | - | Scoped with explicit permission | - | - | Full |
-| Inventory adjustments submit | Scoped request | Scoped policy-limited post; above = request | - | - | Full |
-| Inventory adjustments approve | - | - | - | - | Full |
-| Outlet-to-outlet transfers | Scoped request | Scoped request/approve/receive | - | - | Full |
-| Returned cylinder intake | Scoped | Scoped | - | - | Full |
-| Vendor refill batch management | Scoped | Scoped | - | - | Full |
-| Low-stock alerts | - | Scoped | - | Read assigned outlets | Full |
+| Capability | P-04 | P-06 | P-08 | P-10 |
+| --- | --- | --- | --- | --- |
+| Inventory viewing | Scoped | Scoped | Read assigned outlets | Full |
+| Reservation from order claim | - | Scoped with explicit permission | - | Full |
+| Inventory adjustments submit | Scoped request | Scoped policy-limited post; above = request | - | Full |
+| Inventory adjustments approve | - | - | - | Full |
+| Outlet-to-outlet transfers | Scoped request | Scoped request/approve/receive | - | Full |
+| Returned cylinder intake | Scoped | Scoped | - | Full |
+| Vendor refill batch management | Scoped | Scoped | - | Full |
+| Low-stock alerts | - | Scoped | Read assigned outlets | Full |

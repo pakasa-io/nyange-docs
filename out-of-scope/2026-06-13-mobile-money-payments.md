@@ -31,7 +31,7 @@ rules for:
 - unpaid-order expiry and late-reference handling;
 - mobile-money-paid cancellation and failed-delivery refund liabilities;
 - post-payment outlet reassignment and any internal settlement rules;
-- audit, authorization, support, reporting, and receipt behavior.
+- audit, authorization, reporting, and receipt behavior.
 
 ## Captured Prior Business Rules
 
@@ -226,9 +226,8 @@ measured adoption, cash-risk, reconciliation, or customer-convenience problem
 that cannot be solved by cash-process controls within the MVP.
 
 Before re-entry, produce updated order, payment, refund, delivery, finance,
-authorization, reporting, and support rules together. Do not reintroduce
-mobile-money payment references in one module without the full cross-module
-lifecycle.
+authorization, and reporting rules together. Do not reintroduce mobile-money
+payment references in one module without the full cross-module lifecycle.
 
 ## Notes
 
