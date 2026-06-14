@@ -125,7 +125,8 @@ LIABILITY_OPEN|COLLECTIBLE
 
 ### Payout Process
 
-At payout, the Outlet Manager or explicitly permissioned Outlet Cashier must:
+At payout, the actor must be an Outlet Manager or Outlet Cashier with explicit
+refund-payout permission. The actor must:
 
 1. Verify the one-time collection code.
 2. Confirm the collector is the original account holder tied to the order.
@@ -135,6 +136,8 @@ At payout, the Outlet Manager or explicitly permissioned Outlet Cashier must:
 
 - A permitted payout actor may disburse any collectible refund within the owning
   outlet's scope.
+- Outlet Manager payout authority requires explicit refund-payout permission;
+  the Outlet Manager role alone is insufficient.
 - Launch refund payouts have no per-refund or per-outlet-business-day cash cap.
 - Refund payout permission does not authorize creating, voiding, or writing off
   a refund liability.
@@ -157,8 +160,8 @@ At payout, the Outlet Manager or explicitly permissioned Outlet Cashier must:
 - The collection code is available only through the authenticated customer
   experience.
 - The code must not appear in push notifications, email bodies, or SMS.
-- An Outlet Manager or explicitly permissioned Outlet Cashier may verify a
-  customer-presented code.
+- An Outlet Manager or Outlet Cashier with explicit refund-payout permission may
+  verify a customer-presented code.
 
 ### Daily Closing
 
@@ -180,7 +183,7 @@ Trimmed access matrix rows relevant to refunds. Full matrix:
 | Capability | P-01 | P-03 | P-06 | P-10 |
 | --- | --- | --- | --- | --- |
 | Refund initiation | Own request | - | Scoped | Full |
-| Refund payout cash at outlet | - | Scoped with explicit permission | Scoped | Full |
+| Refund payout cash at outlet | - | Scoped with explicit permission | Scoped with explicit permission | Full |
 
 ## Authorization Edge Cases
 
@@ -190,8 +193,9 @@ create a refund liability eligible for collection-code issuance regardless of
 amount. Finance owns source authorization and any required separation-of-duty
 rule for the source correction.
 
-**E-07**: An Outlet Manager may initiate scoped refund liabilities and disburse
-collectible refunds within outlet scope when explicitly permissioned. Outlet
-Managers cannot pay refunds for another outlet, void or write off refund
-liabilities, bypass Finance source authorization, or approve their own Finance
-source correction when source approval is required.
+**E-07**: An Outlet Manager may initiate scoped refund liabilities. An Outlet
+Manager may disburse collectible refunds within outlet scope only when
+explicitly granted refund-payout permission. Outlet Managers cannot pay refunds
+for another outlet, void or write off refund liabilities, bypass Finance source
+authorization, or approve their own Finance source correction when source
+approval is required.

@@ -97,8 +97,9 @@ may hold multiple permission bundles across one or more outlets.
   permissioned and Order confirms a current eligible claim path.
 - Marks claimed orders ready for pickup.
 - Reconciles daily cash.
-- Initiates scoped refund liabilities and disburses collectible refunds when
-  explicitly permissioned.
+- Initiates scoped refund liabilities.
+- Disburses collectible refunds only when explicitly granted refund-payout
+  permission.
 - Submits above-threshold inventory adjustments for approval.
 - Oversees staff, manages delivery operations, and views outlet-specific
   reports.
@@ -192,7 +193,7 @@ may hold multiple permission bundles across one or more outlets.
 | Outlet configuration & policies | - | - | - | - | - | Read | Read assigned outlets | - | Full |
 | Global pricing & catalog | - | - | - | - | - | - | - | - | Full |
 | Refund initiation | Own request | - | - | - | - | Scoped | - | - | Full |
-| Refund payout cash at outlet | - | - | Scoped with explicit permission | - | - | Scoped | - | - | Full |
+| Refund payout cash at outlet | - | - | Scoped with explicit permission | - | - | Scoped with explicit permission | - | - | Full |
 | Daily cash closing | - | - | - | - | - | Scoped | - | - | Full |
 | Financial ledger view | - | - | - | - | - | Scoped | Read assigned outlets | Full | Full |
 | Expense submission | - | - | - | - | - | Scoped | - | - | Full |
@@ -231,9 +232,12 @@ may hold multiple permission bundles across one or more outlets.
 - An Outlet Cashier with explicit refund-payout permission may verify the
   customer's collection code and disburse collectible refunds within their
   outlet scope.
-- Outlet Managers may disburse collectible refunds within outlet scope.
+- An Outlet Manager with explicit refund-payout permission may verify the
+  customer's collection code and disburse collectible refunds within their
+  outlet scope.
 - Launch refund payouts have no per-refund or per-outlet-business-day cash cap.
-- Without explicit per-outlet permission, cashiers cannot handle refund payouts.
+- Without explicit per-outlet refund-payout permission, Cashiers and Outlet
+  Managers cannot handle refund payouts.
 
 ### Refund Source and Payout Boundary
 
@@ -417,11 +421,12 @@ create a refund liability eligible for collection-code issuance regardless of
 amount. Finance owns source authorization and any required separation-of-duty
 rule for the source correction.
 
-**E-07**: An Outlet Manager may initiate scoped refund liabilities and disburse
-collectible refunds within outlet scope when explicitly permissioned. Outlet
-Managers cannot pay refunds for another outlet, void or write off refund
-liabilities, bypass Finance source authorization, or approve their own Finance
-source correction when source approval is required.
+**E-07**: An Outlet Manager may initiate scoped refund liabilities. An Outlet
+Manager may disburse collectible refunds within outlet scope only when
+explicitly granted refund-payout permission. Outlet Managers cannot pay refunds
+for another outlet, void or write off refund liabilities, bypass Finance source
+authorization, or approve their own Finance source correction when source
+approval is required.
 
 **E-08**: A Dispatcher can change the assigned delivery agent within their
 outlet until pickup with a recorded reason. After pickup, no normal reassignment
