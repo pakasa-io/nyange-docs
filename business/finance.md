@@ -144,6 +144,17 @@ Agents are expected to collect the exact COD due at the doorstep. Short or over
 collection is allowed only through a Finance-owned COD collection variance
 record.
 
+- `abs_variance_per_order` is the absolute difference between expected COD and
+  collected cash for the current order.
+- `shift_cumulative_variance` is the sum of absolute COD collection variances
+  for the same Delivery Agent's active shift, including the current requested
+  variance and any previously approved short/over variance records in that
+  shift.
+- The active shift for this policy is the Delivery Agent cash-handling shift
+  used by Finance for handover and full shift close.
+- Over-collections and short-collections do not offset each other for threshold
+  evaluation.
+
 ```
 if abs_variance_per_order <= 10,000 UGX
    AND shift_cumulative_variance <= 50,000 UGX  -> Outlet Manager approval
