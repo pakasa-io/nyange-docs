@@ -64,10 +64,6 @@ custody;
   -> RESERVED
       -> COMMITTED
       -> RELEASED
-
-TRANSFER_HOLD
-  -> IN_TRANSIT
-      -> RECEIVED
 ```
 
 | State | Meaning |
@@ -75,9 +71,6 @@ TRANSFER_HOLD
 | `RESERVED` | Stock held for an active claimed order. |
 | `COMMITTED` | Delivery succeeded; stock deducted from saleable inventory. |
 | `RELEASED` | Claim cancellation, customer cancellation, or failed delivery returned stock to availability when valid. |
-| `TRANSFER_HOLD` | Sender stock held outside sale availability after transfer approval and before dispatch. |
-| `IN_TRANSIT` | Sender stock has left sender availability and is moving to the receiver. |
-| `RECEIVED` | Receiver confirms receipt; sender hold is closed and stock is posted to receiver inventory. |
 
 ### Reservation Rules
 
@@ -104,38 +97,58 @@ TRANSFER_HOLD
 
 ## Outlet Transfer Lifecycle
 
-```
-REQUESTED
-  -> APPROVED
-      -> IN_TRANSIT
-          -> RECEIVED
+Outlet transfers have separate request status and stock movement state. Request
+status records business approval. Stock movement state records physical
+availability and custody.
 
-REJECTED
+### Transfer Request Status
+
+```
+REQUESTED -> APPROVED
+REQUESTED -> REJECTED
 ```
 
 | State | Meaning |
 | --- | --- |
 | `REQUESTED` | Receiving outlet requests transfer. |
-| `APPROVED` | Sending Outlet Manager approves; sender holds stock outside sale availability. |
-| `IN_TRANSIT` | Stock has left sender availability and is not yet received. |
-| `RECEIVED` | Receiving outlet confirms receipt; stock added to receiver. |
+| `APPROVED` | Sending Outlet Manager or Super Admin approves the transfer request. |
 | `REJECTED` | Terminal sender decline from `REQUESTED`; no inventory impact. |
+
+### Transfer Stock Movement
+
+```
+TRANSFER_HOLD -> IN_TRANSIT -> RECEIVED
+```
+
+| State | Meaning |
+| --- | --- |
+| `TRANSFER_HOLD` | Sender stock is held outside sale availability after transfer approval and before dispatch. |
+| `IN_TRANSIT` | Sender stock has left sender availability and is moving to the receiver. |
+| `RECEIVED` | Receiver confirms receipt; sender hold is closed and stock is posted to receiver inventory. |
 
 ### Transfer Rules
 
 - Only available filled cylinders, available accessories, and confirmed empty
   cylinders may be transferred.
-- Reserved, damaged, quarantined, `IN_TRANSIT`, and `IN_REFILL` stock is not
-  transferable.
-- Super Admin can bypass the transfer approval step only through an audited
-  override with reason, before/after stock impact, and affected outlets.
+- Reserved, damaged, quarantined, `TRANSFER_HOLD`, `IN_TRANSIT`, and
+  `IN_REFILL` stock is not transferable.
+- Approval moves the request status to `APPROVED` and creates sender
+  `TRANSFER_HOLD` stock movement.
+- Rejection moves the request status to `REJECTED` and creates no stock
+  movement.
+- Sender dispatch moves stock from `TRANSFER_HOLD` to `IN_TRANSIT`.
+- Receiver receipt moves stock from `IN_TRANSIT` to `RECEIVED`.
+- Super Admin can bypass ordinary transfer approval only through an audited
+  override that records the approved request status, creates the sender
+  `TRANSFER_HOLD`, and captures reason, before/after stock impact, and affected
+  outlets.
 - Both sides must participate: receiving outlet requests, sending outlet
   approves and moves stock into `TRANSFER_HOLD`, sender dispatch moves stock to
   `IN_TRANSIT`, and receiving outlet confirms receipt.
 - Transfer receipt closes the sender hold and posts received stock to receiver
   inventory; it does not release stock back to sender availability.
-- Every transfer transition is audit-logged with actor, outlet scope, timestamp,
-  and reason where applicable.
+- Every request status transition and stock movement transition is audit-logged
+  with actor, outlet scope, timestamp, and reason where applicable.
 - Inter-outlet stock transfers do not involve financial settlement.
 - No financial settlement entry is created between outlets for a stock transfer.
 - Launch outlet transfers do not create internal settlement records.
