@@ -69,11 +69,12 @@ delivery completion commits atomically:
 
 ## Boundary
 
-- Delivery owns delivery task state, delivery assignment, pickup, agent custody,
-  doorstep field facts, failed-delivery outcome, and delivery cash collection
-  facts.
+- Delivery owns delivery task state, delivery assignment, pickup, outgoing-goods
+  agent custody, doorstep field facts, failed-delivery outcome, delivery cash
+  collection evidence, and cash handover submission evidence.
 - Delivery does not own inventory intake recognition, refund payout, payment
-  policy, receipt issuance, or outlet cash custody.
+  policy, receipt issuance, Finance-owned cash variance records, cash handover
+  acceptance, or outlet cash custody.
 - Returned cylinders collected during delivery become inventory only after the
   intake leg in [inventory.md](inventory.md).
 
@@ -271,30 +272,27 @@ Transition to `PICKED_UP` requires both:
 ## Agent Cash Handling
 
 Agents are expected to collect the exact COD due at the doorstep. Short or over
-collection is allowed only through the controlled variance path below.
+collection is allowed only through the Finance-owned variance path in
+[finance.md](finance.md).
 
 ### Short and Over Collection
 
-```
-if abs_variance_per_order <= 10,000 UGX
-   AND shift_cumulative_variance <= 50,000 UGX  -> Outlet Manager approval
-else                                             -> Super Admin approval
-```
-
-- Required approval must be recorded before delivery can be marked complete.
+- A Finance-owned approved COD collection variance record must exist before
+  delivery can be marked complete when collected cash differs from expected COD.
 - An approved short/over collection does not change expected COD or the frozen
   order total.
-- Over-collection excess is recorded as a cash discrepancy and reconciled at
-  close.
+- Over-collection excess is recorded as a Finance-owned cash discrepancy and
+  reconciled at close.
 
 ### Agent Rules
 
 - Agents record cash collected.
 - Agents cannot modify the expected amount.
 - Expected amount is determined by the persisted order total.
-- COD cash remains delivery-agent-owned until handover and reconciliation.
-- A supervisor accepts counted cash, transfers custody to outlet cash, and
-  records any approved variance.
+- COD cash is physically held by the Delivery Agent under the Finance-owned cash
+  custody lifecycle until handover and reconciliation.
+- A permitted handover receiver accepts counted cash, transfers custody to
+  outlet cash, and records any approved Finance-owned variance.
 - Cash reconciliation requires all cash collected to match expected cash or have
   an approved variance record for each order.
 - Open cash discrepancy or unaccounted item blocks full shift close.

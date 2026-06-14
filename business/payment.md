@@ -35,7 +35,8 @@ exceptions hand off to delivery, refund, or finance.
   expected COD amount, collected cash fact, zero-collection fact, and payment
   outcome.
 - Delivery owns agent field collection and the delivery completion commit point.
-- Finance owns cash handover, daily closing, ledger posting, and receipts.
+- Finance owns cash handover, counted-cash acceptance, outlet cash custody, cash
+  variance records, daily closing, ledger posting, and receipts.
 - Refund owns customer refund liabilities and payout lifecycle.
 - Payment does not own external payment reference submission, provider
   verification, merchant-account configuration, provider refunds, customer
@@ -105,10 +106,12 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 
 ### Cash Discrepancies
 
-- Short and over collection by Delivery Agents follows the delivery cash
-  variance policy in [delivery.md](delivery.md).
+- Short and over collection by Delivery Agents follows the Finance-owned cash
+  variance policy in [finance.md](finance.md).
 - Approved short/over collection variance does not create a separate payment
   terminal state.
+- Payment links to the approved Finance-owned variance record but does not own
+  the variance record.
 - Approved post-collection overage correction or post-collection price
   adjustment may create a refund liability in [refund.md](refund.md), but does
   not rewrite the frozen order total or payment expectation.

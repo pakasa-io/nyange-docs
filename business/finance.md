@@ -1,18 +1,21 @@
 # Finance
 
-**Intent**: Define financial operations for daily closing, expense controls,
-delivery cost reporting, receipt issuance, and cash custody reporting.
+**Intent**: Define financial operations for cash custody, cash handover,
+variance records, daily closing, expense controls, delivery cost reporting, and
+receipt issuance.
 
 **Reader task**: Use this document to determine how financial records are
 posted, sealed, reviewed, carried forward, or reported.
 
-**Sources**: §7.8 Daily Closing, §7.9 Expense Controls, §7.19 Delivery Cost
-Reporting, BI-14
+**Sources**: §7.7 Agent Cash Handling, §7.8 Daily Closing, §7.9 Expense
+Controls, §7.19 Delivery Cost Reporting, BI-14
 
 **Related**:
 [order.md](order.md) for order placement, terminal states, COD fulfillment, and
 cancellation;
 [payment.md](payment.md) for cash payment facts;
+[delivery.md](delivery.md) for doorstep collection evidence and delivery task
+state;
 [refund.md](refund.md) for refund liabilities;
 [identity-auth.md](identity-auth.md) for the full access matrix.
 
@@ -83,6 +86,73 @@ cancellation;
 - Multi-currency sale, refund, or expense workflows are not supported at
   launch.
 - Future currency expansion requires an explicit business policy decision.
+
+## Boundary
+
+- Finance owns cash custody after a COD collection fact is committed, cash
+  handover, counted-cash acceptance, outlet cash custody, cash variance records,
+  financial ledger posting, daily closing, receipt records, expense controls,
+  and delivery cost reporting.
+- Finance owns the short/over COD collection variance policy and the variance
+  records linked from Payment.
+- Delivery owns doorstep collection evidence, delivery task state, field facts,
+  and handover submission evidence.
+- Payment owns expected COD amount, collected cash fact, zero-collection fact,
+  payment outcome, and the link to any Finance-owned cash variance record.
+- Order owns order state and the immutable order total that determines expected
+  COD.
+- Refund owns customer refund liabilities and payout lifecycle.
+
+## Cash Custody And Handover
+
+Finance owns the physical COD cash custody lifecycle after the
+Delivery-coordinated completion commit records a COD collection fact.
+
+```
+AGENT_CASH_HELD -> HANDOVER_SUBMITTED -> OUTLET_CASH_ACCEPTED
+HANDOVER_SUBMITTED -> HANDOVER_VARIANCE_OPEN -> OUTLET_CASH_ACCEPTED
+```
+
+| State | Meaning |
+| --- | --- |
+| `AGENT_CASH_HELD` | Delivery completion committed a COD collection fact; the assigned Delivery Agent physically holds the cash for the fulfilling outlet. |
+| `HANDOVER_SUBMITTED` | The Delivery Agent submitted handover evidence and counted cash for Finance-owned acceptance. |
+| `HANDOVER_VARIANCE_OPEN` | Counted handover cash does not match the Finance handover basis; Finance owns the discrepancy record and reconciliation path. |
+| `OUTLET_CASH_ACCEPTED` | A permitted receiver accepted counted cash into outlet cash custody for daily closing and ledger posting. |
+
+### COD Collection Variance Policy
+
+Agents are expected to collect the exact COD due at the doorstep. Short or over
+collection is allowed only through a Finance-owned COD collection variance
+record.
+
+```
+if abs_variance_per_order <= 10,000 UGX
+   AND shift_cumulative_variance <= 50,000 UGX  -> Outlet Manager approval
+else                                             -> Super Admin approval
+```
+
+- Required approval must be recorded before Delivery can mark the order
+  complete.
+- An approved short/over collection variance does not change expected COD or the
+  frozen order total.
+- Payment stores the collected amount and a link to the approved variance; it
+  does not own the variance record.
+- Over-collection excess is recorded as a Finance-owned cash discrepancy and
+  reconciled through daily closing or a source-authorized refund liability.
+
+### Handover Rules
+
+- The Delivery Agent must submit cash handover evidence live.
+- A permitted Outlet Manager or Super Admin may receive handover within scope.
+- The receiver records counted cash before accepting custody into outlet cash.
+- Handover acceptance transfers cash custody from the Delivery Agent to outlet
+  cash.
+- If counted handover cash differs from the Finance handover basis, Finance
+  records a `HANDOVER_VARIANCE_OPEN` discrepancy.
+- Open cash discrepancy or unaccounted item blocks full shift close until
+  resolved by an approved Finance-owned variance, correction, or adjustment
+  record.
 
 ## Daily Closing
 

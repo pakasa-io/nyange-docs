@@ -321,9 +321,10 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 7. Returned empties are reconciled separately from delivery completion. Outlet
    intake moves each returned-empty record into outlet empty stock and marks
    those custody rows reconciled.
-8. COD cash remains delivery-agent-owned until handover and reconciliation. A
-   supervisor accepts counted cash, transfers custody to outlet cash, and
-   records any approved variance.
+8. COD cash is physically held by the Delivery Agent under the Finance-owned
+   cash custody lifecycle until handover and reconciliation. A permitted
+   handover receiver accepts counted cash, transfers custody to outlet cash, and
+   records any approved Finance-owned variance.
 
 ## Out of Scope
 
