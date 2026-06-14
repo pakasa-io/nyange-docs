@@ -35,12 +35,10 @@ Launch channels are assigned by event type, not customer preference.
 | Event | Channels |
 | --- | --- |
 | Order confirmation | Push, Email |
-| Delivery PIN | Push, Email |
+| Ready for pickup | Push, Email |
+| Out for delivery | Push only |
 | Payment confirmation | Push, Email |
 | Failed delivery | Push, Email |
-| Reservation-expiry warning | Push, Email |
-| Dispatch notification | Push only |
-| Exhausted-candidate Super Admin intervention alert | Push only |
 | Outlet low-stock alert | Push only |
 | Configured operational risk alert | Push only |
 
@@ -55,11 +53,6 @@ Launch channels are assigned by event type, not customer preference.
   experience.
 - A permissioned Customer Support Agent or Super Admin may perform audited code
   reveal only after customer verification.
-
-### Delivery PIN
-
-- Delivery PIN notifications use push and email at launch.
-- PIN exposure and fallback rules are governed by [delivery.md](delivery.md).
 
 ## Non-Goals
 

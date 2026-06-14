@@ -10,7 +10,9 @@ combination is orderable, how it is priced, and who can change prices.
 Guardrails
 
 **Related**:
-[order.md](order.md) for cart behavior and price-change effects;
+[cart.md](cart.md) for cart quote readiness, catalog-change handling, and
+checkout readiness;
+[order.md](order.md) for immutable order price snapshots;
 [delivery.md](delivery.md) for delivery fees and failed-delivery fee waivers;
 [identity-auth.md](identity-auth.md) for the full access matrix.
 
@@ -22,7 +24,7 @@ Guardrails
 - There is no deposit, cylinder-return obligation, customer credit account, or
   customer-level cylinder ownership tracking at launch.
 - New filled cylinder purchases may use any supported vendor available at the
-  assigned outlet.
+  outlet that claims the order.
 - A customer who loses or damages their cylinder must buy a new cylinder rather
   than treat the loss as a refill.
 
@@ -103,13 +105,13 @@ Refill price is determined by three dimensions.
 - All-or-nothing fulfillment applies across all lines: every refill in the
   order succeeds together or the whole order fails.
 
-### Pre-Checkout Filtering
+### Cart Filtering
 
 - Vendor options shown to a customer are filtered to combinations that are
   currently fulfillable for their delivery address and incoming cylinder.
-- Options that no eligible outlet can currently fulfill are not shown.
-- Checkout revalidates availability and price at order placement.
-- The pre-checkout filter is a usability measure, not a substitute for checkout
+- Options that no permitted outlet can currently fulfill are not shown.
+- Cart quote and checkout readiness revalidate availability and price.
+- Cart filtering is a usability measure, not a substitute for order placement
   revalidation.
 
 ## Bundle Pricing
@@ -152,7 +154,7 @@ and a standalone price.
   availability without bundle context.
 - Any later sale uses the then-applicable standalone or bundle pricing rule.
 - A bundle is a standalone sellable catalog offer and customer-facing bundle,
-  but stock reservation, picking, delivery, and inventory accountability remain
+  but stock reservation, pickup, delivery, and inventory accountability remain
   tied to physical component items.
 
 ## Outlet Price Guardrails
@@ -206,10 +208,11 @@ Delivery-fee guardrails are defined in [delivery.md](delivery.md).
 - Multi-country or jurisdiction-specific tax workflows are not launch behavior
   unless explicitly added to launch scope.
 
-### Cart Effects
+### Cart and Placement Effects
 
-Catalog or pricing changes affecting cart lines require customer review and
-acknowledgement before cart quote or checkout can proceed. See
+Cart quote and checkout readiness revalidate catalog availability and
+priceability under [cart.md](cart.md). Order placement revalidates the same
+requirements before creating the immutable order snapshot under
 [order.md](order.md).
 
 ## Permissions

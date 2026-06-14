@@ -7,7 +7,8 @@ authentication rules, authorization rules, and authorization edge cases.
 which permissions and outlet scopes can authorize an action, and which actor
 combinations require audit or co-approval.
 
-**Sources**: §2 Personas, §3 Access Matrix, §4 Auth Model, E-01-E-10
+**Sources**: §2 Personas, §3 Access Matrix, §4 Auth Model, E-01-E-05,
+E-07-E-10
 
 ## Invariants
 
@@ -17,8 +18,8 @@ combinations require audit or co-approval.
   individual who submitted or requested it.
 - This applies regardless of role.
 - Covered examples include expense above threshold, inventory adjustment, refund
-  above threshold, price change above guardrail, material forced financial
-  closure, and sensitive authorization-policy change.
+  above threshold, price change above guardrail, and sensitive
+  authorization-policy change.
 
 ## Terms
 
@@ -43,7 +44,7 @@ may hold multiple permission bundles across one or more outlets.
 - Uses the authenticated customer experience to track status and access
   customer-visible notices.
 - May have multiple saved addresses.
-- Pays cash for launch online delivery and walk-in POS transactions.
+- Pays cash at the doorstep for online COD delivery.
 - Collects cash refunds in person at the outlet.
 - Cannot manage outlet operations, view other customers' data, access financial
   records, or override business rules or policy controls.
@@ -54,20 +55,19 @@ may hold multiple permission bundles across one or more outlets.
 - Sees only assigned active deliveries and customer phone numbers for assigned
   active deliveries.
 - Performs required field actions during active delivery.
-- Collects COD cash, records returned cylinders, enters customer-provided
-  delivery PINs, reports failures, and submits cash handover.
-- Cannot reassign orders, view other agents' assignments, modify inventory,
-  issue refunds, or access financial records.
+- Collects COD cash, records returned cylinders, reports failures, and submits
+  cash handover.
+- Cannot change outlet claims, view other agents' assignments, modify
+  inventory, issue refunds, or access financial records.
 
 ### P-03 Outlet Cashier
 
-- Outlet staff responsible for walk-in POS transactions.
-- Records walk-in sales and accepts walk-in cash.
-- May assist with delivery PIN fallback when explicitly permissioned.
-- Issues walk-in receipts.
+- Outlet staff responsible for approved customer cash refund payouts when
+  explicitly permissioned.
+- Verifies customer-presented refund collection codes within active payout
+  limits.
+- Disburses approved cash refunds from the owning outlet.
 - Has no delivery responsibilities.
-- Online-order responsibilities are limited to explicitly permissioned
-  PIN-fallback workflows.
 - Cannot manage online orders, approve refunds, adjust inventory, or access
   another outlet's data.
 
@@ -78,23 +78,24 @@ may hold multiple permission bundles across one or more outlets.
   returned-cylinder intake, initiates outlet transfer requests, and records
   vendor refill movements.
 - Works within assigned outlet only.
-- Cannot accept/reject orders, collect customer cash, issue refunds, access
+- Cannot claim orders, collect customer cash, issue refunds, access
   financial records, or approve their own adjustment requests.
 
 ### P-05 Dispatcher
 
 - Outlet staff responsible for delivery coordination.
-- Creates and manages delivery batches.
-- Assigns delivery agents to orders and runs.
+- Assigns delivery agents to single-order delivery tasks.
 - Tracks delivery progress.
-- May reassign agents before pickup within outlet active delivery policy.
+- May change the assigned delivery agent before pickup within outlet active
+  delivery policy.
 - Cannot collect customer cash, approve refunds, adjust inventory, access
   financial records, or modify outlet policies.
 
 ### P-06 Outlet Manager
 
 - Operational owner of a single outlet.
-- Accepts or rejects orders.
+- Claims pending orders for the outlet when explicitly permissioned.
+- Marks claimed orders ready for pickup.
 - Reconciles daily cash.
 - Approves in-scope refund liabilities according to active approval policy.
 - Submits above-threshold inventory adjustments for approval.
@@ -108,8 +109,8 @@ may hold multiple permission bundles across one or more outlets.
 ### P-07 Customer Support Agent
 
 - Handles launch support fallback actions when explicitly permissioned.
-- May perform delivery PIN fallback and refund collection-code regeneration,
-  unlock, or audited customer-verified reveal when granted those permissions.
+- May perform refund collection-code regeneration, unlock, or audited
+  customer-verified reveal when granted those permissions.
 - May request approved transactional customer notifications when explicitly
   permissioned.
 - May relay operational escalation needs to the owning Outlet Manager or Super
@@ -127,7 +128,7 @@ may hold multiple permission bundles across one or more outlets.
 - Has read access to outlet operations, inventory, and financial summaries for
   assigned outlets.
 - Does not perform direct outlet operations.
-- Cannot accept orders, collect cash, adjust inventory, view or manage
+- Cannot claim orders, collect cash, adjust inventory, view or manage
   operational risk alerts, access outlets outside assignment, or override Super
   Admin controls.
 
@@ -147,8 +148,8 @@ may hold multiple permission bundles across one or more outlets.
 - Has full operational and configuration authority across all outlets, business
   domains, and records.
 - Approves above-guardrail price changes, above-threshold inventory adjustments,
-  forced financial closures, break-glass authorization policy changes, and other
-  actions no other persona can execute.
+  break-glass authorization policy changes, and other actions no other persona
+  can execute.
 - Sensitive mutations and overrides require explicit reason codes and permanent
   audit logging.
 - Cannot issue unaudited mutations.
@@ -175,27 +176,24 @@ may hold multiple permission bundles across one or more outlets.
 | Own account & address | Full | - | - | - | - | - | - | - | - | Full |
 | Address coordinate correction | Own map pin | - | - | - | - | - | - | - | - | Full |
 | Product catalog browsing | Read | - | Read | - | - | Read | Read | Read | - | Full |
-| Cart & order placement | Full | - | - | - | - | - | - | - | - | Full |
+| Cart creation and update | Full | - | - | - | - | - | - | - | - | Full |
+| Cart quote | Full | - | - | - | - | - | - | - | - | Full |
+| Cart checkout | Full | - | - | - | - | - | - | - | - | Full |
+| Order placement | Full | - | - | - | - | - | - | - | - | Full |
 | Order status tracking | Own | Own assigned | Scoped | - | Scoped | Scoped | Scoped | Read assigned outlets | Read | Full |
-| Order acceptance / rejection | - | - | - | - | - | Scoped with explicit permission | - | - | - | Full |
-| Outlet picking | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | - | Full |
+| Outlet claiming | - | - | - | - | - | Scoped with explicit permission | - | - | - | Full |
+| Ready-for-pickup marking | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | - | Full |
 | Outlet handover confirmation | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | - | Full |
 | Failed-order return receipt | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | - | Full |
-| Run-level returned-cylinder receipt | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | - | Full |
-| POS / walk-in sales | - | - | Scoped with explicit permission | - | - | Scoped with explicit permission | - | - | - | Full |
+| Returned-cylinder receipt | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | - | Full |
 | Delivery assignment | - | - | - | - | Scoped | Scoped | - | - | - | Full |
-| Delivery batch management | - | - | - | - | Scoped | Scoped | - | - | - | Full |
-| Delivery execution pickup, PIN, COD | - | Own | - | - | - | - | - | - | - | Full |
-| Delivery evidence safety review | - | - | - | - | - | - | - | - | - | Full |
+| Delivery execution pickup and COD | - | Own | - | - | - | - | - | - | - | Full |
 | Agent cash handover | - | Own | - | - | - | Scoped receive | - | - | - | Full |
-| Delivery PIN fallback regenerate | - | - | Scoped with explicit permission | - | - | Scoped with explicit permission | Scoped with explicit permission | - | - | Full |
 | Inventory viewing | - | - | - | Scoped | - | Scoped | Scoped | Read assigned outlets | - | Full |
 | Inventory adjustments submit | - | - | - | Scoped request | - | Scoped policy-limited post; above = request | - | - | - | Full |
 | Inventory adjustments approve | - | - | - | - | - | - | - | - | - | Full |
 | Outlet-to-outlet transfers | - | - | - | Scoped request | - | Scoped request/approve/receive | - | - | - | Full |
-| Pick reversal confirmation | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | - | Full |
 | Returned cylinder intake | - | - | - | Scoped | - | Scoped | - | - | - | Full |
-| Post-delivery return intake | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | - | Full |
 | Vendor refill batch management | - | - | - | Scoped | - | Scoped | - | - | - | Full |
 | Outlet configuration & policies | - | - | - | - | - | Read | - | Read assigned outlets | - | Full |
 | Outlet price rules within guardrail | - | - | - | - | - | Scoped | - | - | - | Full |
@@ -214,8 +212,6 @@ may hold multiple permission bundles across one or more outlets.
 | Audit log viewing | - | - | - | - | - | Scoped | - | Read assigned outlets | Read | Full |
 | Operational risk alerts | - | - | - | - | - | Scoped with explicit permission | - | - | - | Full |
 | Low-stock alerts | - | - | - | - | - | Scoped | - | Read assigned outlets | - | Full |
-| Order reassignment escalated | - | - | - | - | - | Scoped exception | - | - | - | Full |
-| Forced financial closure | - | - | - | - | - | - | - | - | - | Full |
 | Cross-outlet reporting | - | - | - | - | - | - | - | Read assigned outlets | Read | Full |
 | User & role management | - | - | - | - | - | - | - | - | - | Full |
 | Authorization policy management | - | - | - | - | - | - | - | - | - | Full with dual approval for sensitive changes |
@@ -236,7 +232,7 @@ may hold multiple permission bundles across one or more outlets.
 - Customer Support Agents can perform only explicitly permissioned fallback
   actions.
 - The authorized owner of the affected domain workflow remains responsible for
-  accepting, rejecting, or completing that workflow.
+  claiming, cancelling, or completing that workflow.
 - Customer Support Agents do not directly approve refunds, pay refunds, post
   ledger entries, mutate orders, adjust inventory, or complete delivery
   workflows through a support-owned workflow.
@@ -309,19 +305,11 @@ may hold multiple permission bundles across one or more outlets.
 
 - `Outlet configuration & policies` covers settings that only Super Admin may
   change: service zone, vendor acceptance list, delivery mode support,
-  operating-hours policy, workload/capacity limits, max batch size, and outlet
-  priority score.
+  operating-hours policy, workload/capacity limits, and outlet priority score.
 - `Outlet price rules within guardrail` covers outlet-scoped product, refill,
   accessory prices, delivery-fee overrides, and express-fee multipliers.
 - Outlet Managers have write access to price rules within configured guardrails.
 - Outlet Managers do not have write access to broader outlet configuration.
-
-### Order Reassignment
-
-- Outlet Managers may handle post-picking reassignment exceptions only for
-  orders in their outlet scope.
-- Super Admin retains full authority for cross-outlet, exhausted-candidate, and
-  global exception paths.
 
 ## Authentication Model
 
@@ -439,8 +427,9 @@ outlet scope or business authority.
 ## Authorization Edge Cases
 
 **E-01**: No launch actor can submit, verify, reuse, or administer an external
-payment reference. External prepayment rails are outside launch scope and
-require explicit scope re-entry before any related permission can be granted.
+payment reference. External electronic payment rails are outside launch scope
+and require explicit scope re-entry before any related permission can be
+granted.
 
 **E-02**: A Delivery Agent can see the customer's phone number only while an
 order is assigned to them and active. They lose this access when the delivery
@@ -454,7 +443,7 @@ issue type, priority, or customer complaint.
 
 **E-04**: An Area Manager can view reports and operational data for assigned
 outlets, but cannot view operational risk alerts or perform outlet actions such
-as accepting orders, collecting customer cash, approving refunds, or adjusting
+as claiming orders, collecting customer cash, approving refunds, or adjusting
 inventory.
 
 **E-05**: Refund liabilities at or above the approval-required threshold require
@@ -464,10 +453,6 @@ approval-required threshold is UGX 50,000 and the Outlet Manager approval
 threshold is UGX 500,000 within outlet scope. The approving actor cannot approve
 a refund on an order where they submitted the refund request themselves.
 
-**E-06**: A Super Admin performing forced financial closure must provide a
-reason. The action is always audit-logged with before/after values. No exception
-to audit logging exists, even for Super Admin.
-
 **E-07**: An Outlet Manager can approve refunds for their own outlet within their
 authorized threshold and approval policy. At launch, Outlet Managers may approve
 refund liabilities from UGX 50,000 through UGX 500,000 within outlet scope.
@@ -475,9 +460,10 @@ Refunds above that threshold require Super Admin approval. Outlet Managers
 cannot approve refunds at another outlet, and they cannot approve their own
 submitted refund request.
 
-**E-08**: A Dispatcher can reassign delivery agents to orders within their outlet
-until pickup with a recorded reason. After pickup, only an Outlet Manager or
-Super Admin can reassign, and the action requires an explicit reason code.
+**E-08**: A Dispatcher can change the assigned delivery agent within their
+outlet until pickup with a recorded reason. After pickup, only an Outlet Manager
+or Super Admin can change the assigned delivery agent, and the action requires
+an explicit reason code.
 
 **E-09**: A single human account may hold both Outlet Cashier and Inventory Clerk
 permissions at the same outlet only when the active authorization policy permits

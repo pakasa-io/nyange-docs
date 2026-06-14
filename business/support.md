@@ -3,7 +3,7 @@
 **Intent**: Define launch support fallback behavior and operational risk alerts.
 
 **Reader task**: Use this document to determine which support-related actions
-are available in the launch MVP and which domain owns the resulting business
+are available in launch scope and which domain owns the resulting business
 record.
 
 **Sources**: §7.16 Operational Risk Alerts
@@ -30,7 +30,6 @@ record.
 Customer Support Agents may perform only explicitly permissioned fallback
 actions. Launch fallback actions may include:
 
-- delivery PIN fallback or reveal actions allowed by [delivery.md](delivery.md);
 - refund collection-code regeneration, unlock, or audited customer-verified
   reveal allowed by [refund.md](refund.md);
 - approved transactional customer notification requests allowed by
@@ -51,7 +50,7 @@ Evaluated exception types include:
 - missing returned cylinders;
 - cash discrepancies;
 - custody losses;
-- forced-closure adjustments;
+- approved cash or stock adjustments;
 - unresolved custody exceptions.
 
 Thresholds start from global defaults and may define outlet and role overrides.
@@ -82,8 +81,8 @@ States: `OPEN`, `ACKNOWLEDGED`, `DISMISSED`, `ESCALATED`.
 
 - Acknowledging or dismissing an alert requires note/reason and audit.
 - `ESCALATED` means an Outlet Manager or Super Admin has linked the alert to an
-  owning-domain review, override, forced closure, personnel review, or other
-  launch-approved operational resolution path.
+  owning-domain review, override, personnel review, or other launch-approved
+  operational resolution path.
 - If work is manually assigned despite an active relevant risk alert, the
   assigning Outlet Manager or Super Admin must record a reason retained in
   audit.
@@ -105,8 +104,8 @@ States: `OPEN`, `ACKNOWLEDGED`, `DISMISSED`, `ESCALATED`.
 - The active staff-risk retention window is 24 months at launch.
 - Escalated alerts follow the retention policy of the linked owning-domain
   review or operational record, then use the risk-alert retention window.
-- Risk-alert retention must not delete underlying custody events, delivery runs,
-  cash variances, forced closures, ledger adjustments, or audit logs.
+- Risk-alert retention must not delete underlying custody events, delivery
+  tasks, cash variances, ledger adjustments, or audit logs.
 
 ## Permissions
 

@@ -1,20 +1,21 @@
 # Inventory
 
-**Intent**: Define launch inventory behavior for reservations, outlet transfers,
+**Intent**: Define inventory behavior for reservations, outlet transfers,
 vendor refill batches, returned-cylinder intake, stock counts, and low-stock
 alerts.
 
 **Reader task**: Use this document to decide whether stock can be reserved,
-released, transferred, counted, replenished, or recognized as returned-cylinder
-inventory.
+released, committed, transferred, counted, replenished, or recognized as
+returned-cylinder inventory.
 
 **Sources**: §6.4 Inventory Reservation Lifecycle, §6.5 Outlet Transfer
 Lifecycle, §6.8 Vendor Refill Batch Lifecycle, §6.9 Refill Exchange Request
 Lifecycle intake leg, §7.17 Stock Count Behaviour, §7.18 Low-Stock Alerts
 
 **Related**:
+[order.md](order.md) for reservation triggers;
 [delivery.md](delivery.md) for the refill exchange field leg and delivery
-custody; [order.md](order.md) for reservation triggers;
+custody;
 [identity-auth.md](identity-auth.md) for the full access matrix.
 
 ## Invariants
@@ -22,37 +23,37 @@ custody; [order.md](order.md) for reservation triggers;
 **BI-01 — Available stock never goes below zero.**
 
 - Stock committed to orders cannot exceed physical available stock.
-- When an order claims stock, the claim is atomic relative to other concurrent
-  claims.
-- A claim that cannot be satisfied is rejected.
+- When an outlet claims an order, the stock claim is atomic relative to other
+  concurrent claims.
+- A claim that cannot reserve every requested stock item is rejected.
 
 **BI-06 — Reserved stock is unavailable.**
 
-- Stock reserved for any active order cannot be allocated to any other order.
-- This applies to online orders and walk-in orders sharing the same physical
-  inventory.
+- Stock reserved for an active order cannot be claimed, sold, transferred, or
+  otherwise consumed by another workflow.
+- Reserved stock remains unavailable until it is explicitly committed or
+  released.
 
 **BI-11 — Outlet stock is isolated.**
 
-- Stock at Outlet A cannot be drawn down by an order assigned to Outlet B.
+- Stock at Outlet A cannot be drawn down by an order claimed by Outlet B.
 - Stock transfers between outlets follow an explicit, audited transfer
   workflow.
 - No order can implicitly access another outlet's inventory.
 
 ### Cross-Aggregate Invariants
 
-- **BI-08** is defined in [delivery.md](delivery.md). Delivery confirmation
+- **BI-08** is defined in [delivery.md](delivery.md). Delivery completion
   commits returned-cylinder field recording that later feeds inventory intake.
-- **BI-19** is defined in [delivery.md](delivery.md). Financial closure for
-  refill orders is blocked until expected cylinders are accounted for through
-  inventory intake or approved exception.
+- **BI-19** is defined in [delivery.md](delivery.md). Returned cylinders require
+  intake before inventory recognition.
 
 ## Boundary
 
 - Inventory owns physical stock availability, reservation state, transfer state,
   vendor refill movement state, and returned-cylinder intake recognition.
-- Inventory does not own delivery confirmation, customer payment, refund payout,
-  or financial closure.
+- Inventory does not own delivery completion, customer payment, refund payout,
+  receipt issuance, or outlet cash custody.
 - Incoming customer cylinders from refill delivery do not become outlet empty
   inventory until intake is confirmed.
 
@@ -60,69 +61,49 @@ custody; [order.md](order.md) for reservation triggers;
 
 ```
 (no reservation)
-  └─► RESERVED
-        ├─► COMMITTED
-        ├─► RELEASED
-        └─► REASSIGNMENT_HOLD
-              ├─► RESERVED
-              └─► RELEASED
+  -> RESERVED
+      -> COMMITTED
+      -> RELEASED
 
 TRANSFER_HOLD
-  └─► released when transfer received
-
-PICK_REVERSAL_PENDING
-  └─► RELEASED
-
-PENDING_RELEASE
+  -> released when transfer received
 ```
 
 | State | Meaning |
 | --- | --- |
-| `RESERVED` | Stock held for an active order. |
-| `COMMITTED` | Delivery confirmed; stock deducted. |
-| `RELEASED` | Order cancelled or hold released; stock returned to availability when valid. |
-| `REASSIGNMENT_HOLD` | Transitional hold during outlet reassignment. |
+| `RESERVED` | Stock held for an active claimed order. |
+| `COMMITTED` | Delivery succeeded; stock deducted from saleable inventory. |
+| `RELEASED` | Claim cancellation, customer cancellation, or failed delivery returned stock to availability when valid. |
 | `TRANSFER_HOLD` | Stock locked for an in-transit outlet transfer. |
-| `PICK_REVERSAL_PENDING` | Picked goods await authorized confirmation that they are physically back and sellable. |
-| `PENDING_RELEASE` | Release entry failed to post; stock remains unavailable until corrected. |
 
 ### Reservation Rules
 
-- Reserved and held stock is not visible as available to any new order or
-  walk-in sale.
+- No stock is reserved by cart creation, cart update, quote generation,
+  checkout readiness, or order placement.
+- Reservation occurs only when an active permitted outlet claims an order.
+- Claiming reserves every requested stock item atomically.
+- Partial item reservation is prohibited.
 - Only available stock can be reserved.
+- Reserved and held stock is not visible as available to any new order.
 - Reservation age alone does not release stock.
-- Stock release occurs only through an explicit policy-defined lifecycle, such
-  as failed delivery return, order cancellation, reassignment hold release, or
-  another audited release workflow.
-- A reservation that cannot be committed because delivery failed must be
-  released, not left open.
+- Stock release occurs only through an explicit lifecycle event.
+- Outlet claim cancellation before pickup releases the reservation.
+- Customer cancellation before pickup releases the reservation.
+- Delivery failure after pickup releases stock only after picked-up goods return
+  to outlet stock or are covered by an approved custody exception.
+- Delivery success commits reserved outgoing stock.
 - Incoming customer cylinders from refill delivery are tracked separately as
   `PENDING_INTAKE`.
 - `PENDING_INTAKE` cylinders do not enter available empty stock until outlet
   intake is confirmed.
 
-### Pick Reversal
-
-- `PICK_REVERSAL_PENDING` is entered when an order is pulled back after picking
-  has begun.
-- This is an Outlet Manager or Super Admin exception workflow only.
-- Picked stock remains unavailable to all new orders until an authorized
-  inventory/custody actor confirms it is physically back at the outlet and
-  sellable.
-- If the item is damaged or missing, the normal damaged/lost stock workflow
-  applies instead of release to available.
-- A recovery outlet may proceed on its own reserved stock before the original
-  reversal resolves if the exception is approved.
-- Financial closure of the original order waits for the pick-reversal outcome.
-
 ## Outlet Transfer Lifecycle
 
 ```
 REQUESTED
-  └─► APPROVED
-        └─► IN_TRANSIT
-              └─► RECEIVED
+  -> APPROVED
+      -> IN_TRANSIT
+          -> RECEIVED
 
 REJECTED
 ```
@@ -155,8 +136,8 @@ REJECTED
 
 ```
 EMPTY
-  └─► IN_REFILL
-        └─► FILLED
+  -> IN_REFILL
+      -> FILLED
 ```
 
 | State | Meaning |
@@ -184,21 +165,21 @@ EMPTY
   approval and ledger posting, with reason code, audit trail, and
   `INVENTORY_ADJUSTMENT_LAUNCH_V1` threshold evaluation before any ledger
   movement.
-- Overage cylinders remain pending and unavailable for sale, transfer, or
-  reassignment until the inventory adjustment is posted.
+- Overage cylinders remain pending and unavailable for sale or transfer until
+  the inventory adjustment is posted.
 
 ## Refill Exchange Request Intake Leg
 
 The field leg is defined in [delivery.md](delivery.md). Inventory owns
-`INTAKE_PENDING` through `COMPLETED` or `FAILED`.
+`INTAKE_PENDING` through `INTAKE_CONFIRMED` or `FAILED`.
 
 ```
 PENDING
-  └─► IN_PROGRESS
-        └─► RETURN_RECORDED
-              └─► INTAKE_PENDING
-                    ├─► COMPLETED
-                    └─► FAILED
+  -> IN_PROGRESS
+      -> RETURN_RECORDED
+          -> INTAKE_PENDING
+              -> INTAKE_CONFIRMED
+              -> FAILED
 
 CANCELLED
 ```
@@ -208,20 +189,18 @@ CANCELLED
 | `PENDING` | Created at order placement; expected cylinder vendor/size recorded. |
 | `IN_PROGRESS` | Order out for delivery; agent en route to customer. |
 | `RETURN_RECORDED` | Agent records returned cylinder vendor, size, and condition at doorstep. |
-| `INTAKE_PENDING` | Delivery confirmed; cylinder awaiting outlet intake confirmation. |
-| `COMPLETED` | Returned-cylinder intake actor confirms intake; cylinder enters outlet inventory. |
+| `INTAKE_PENDING` | Delivery succeeded; cylinder awaiting outlet intake confirmation. |
+| `INTAKE_CONFIRMED` | Returned-cylinder intake actor confirms intake; cylinder enters outlet inventory. |
 | `FAILED` | Intake rejected or cylinder not returned; exception raised. |
-| `CANCELLED` | Order cancelled before delivery; no cylinder exchange occurred. |
+| `CANCELLED` | Order cancelled before pickup; no cylinder exchange occurred. |
 
 ### Intake Rules
 
 - Each expected returned cylinder requires its own outlet intake confirmation
   before it becomes outlet empty inventory.
-- `INTAKE_PENDING` persists after customer PIN confirmation.
+- `INTAKE_PENDING` persists after delivery completion.
 - The order can be `DELIVERED` while exchange requests are still
   `INTAKE_PENDING`.
-- Financial closure for a refill order is blocked until all exchange requests
-  reach `COMPLETED` or `FAILED` with approved exception.
 - A `FAILED` intake creates an inventory exception and may supply operational
   escalation context.
 - A failed intake does not by itself undo completed customer delivery.
@@ -234,8 +213,6 @@ CANCELLED
   scope.
 - Correction requires reason code, before/after values, and audit trail.
 - Material differences require Outlet Manager or Super Admin approval.
-- A correction cannot create an unapproved size-mismatch adjustment after
-  delivery.
 - If the physical cylinder size does not match accepted delivery facts, intake
   follows the `FAILED` intake and approved-exception path.
 
@@ -264,7 +241,7 @@ CANCELLED
 - When a count begins, expected quantities are fixed as the count-start basis.
 - Ledger movements during the count window are tracked and used to calculate
   variance at count close.
-- Orders may continue to be placed, accepted, and fulfilled while a count is in
+- Orders may continue to be placed, claimed, and fulfilled while a count is in
   progress.
 
 ## Low-Stock Alerts
@@ -288,7 +265,7 @@ Low-stock alerts are based on available stock only.
 - Alerts are visible to permissioned Outlet Managers, Area Managers, and Super
   Admins within authorized scope.
 - Alerts may show relevant `IN_REFILL` and incoming-transfer context.
-- Alerts do not reserve stock, block orders, alter allocation, or forecast
+- Alerts do not reserve stock, block checkout, alter claiming, or forecast
   demand.
 
 ## Permissions
@@ -296,15 +273,13 @@ Low-stock alerts are based on available stock only.
 Trimmed access matrix rows relevant to inventory. Full matrix:
 [identity-auth.md](identity-auth.md).
 
-| Capability | P-04 | P-05 | P-06 | P-07 | P-08 | P-10 |
-| --- | --- | --- | --- | --- | --- | --- |
-| Inventory viewing | Scoped | - | Scoped | Scoped | Read assigned outlets | Full |
-| Inventory adjustments submit | Scoped request | - | Scoped policy-limited post; above = request | - | - | Full |
-| Inventory adjustments approve | - | - | - | - | - | Full |
-| Outlet-to-outlet transfers | Scoped request | - | Scoped request/approve/receive | - | - | Full |
-| Pick reversal confirmation | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
-| Returned cylinder intake | Scoped | - | Scoped | - | - | Full |
-| Post-delivery return intake | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
-| Vendor refill batch management | Scoped | - | Scoped | - | - | Full |
-| Low-stock alerts | - | - | Scoped | - | Read assigned outlets | Full |
-| Outlet picking | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
+| Capability | P-04 | P-06 | P-07 | P-08 | P-10 |
+| --- | --- | --- | --- | --- | --- |
+| Inventory viewing | Scoped | Scoped | Scoped | Read assigned outlets | Full |
+| Reservation from order claim | - | Scoped with explicit permission | - | - | Full |
+| Inventory adjustments submit | Scoped request | Scoped policy-limited post; above = request | - | - | Full |
+| Inventory adjustments approve | - | - | - | - | Full |
+| Outlet-to-outlet transfers | Scoped request | Scoped request/approve/receive | - | - | Full |
+| Returned cylinder intake | Scoped | Scoped | - | - | Full |
+| Vendor refill batch management | Scoped | Scoped | - | - | Full |
+| Low-stock alerts | - | Scoped | - | Read assigned outlets | Full |

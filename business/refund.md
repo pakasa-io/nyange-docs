@@ -10,7 +10,7 @@ liability.
 **Source**: §6.6 Refund Lifecycle
 
 **Related**:
-[order.md](order.md) for cancellation paths that create refund liabilities;
+[order.md](order.md) for cancellation and failed-delivery outcomes;
 [payment.md](payment.md) for cash collection and zero-collection facts;
 [delivery.md](delivery.md) for failed-delivery fee waiver;
 [finance.md](finance.md) for daily closing and liability reporting;
@@ -23,8 +23,7 @@ liability.
 - A refund owed to a customer remains open until a cash payout event is recorded
   or a Super Admin-approved void/write-off path resolves it.
 - Supported launch liability sources include approved cash over-collection
-  correction, approved post-collection price adjustment, and post-delivery
-  return.
+  correction and approved post-collection price adjustment.
 - Code expiry, daily closing, and time passing do not discharge the liability.
 - An open liability does not convert to revenue.
 - Open refund liabilities appear in the owning outlet's daily closing and
@@ -38,9 +37,9 @@ liability.
 - Failed verification attempts are rate-limited per refund and outlet actor.
 - Failed attempts are audit-logged with actor, outlet, refund ID, timestamp, and
   safe failure reason.
-- After the configured attempt threshold, the code is temporarily locked and
-  requires regeneration or unlock by a permissioned Customer Support Agent or
-  Super Admin with reason and audit trail.
+- After the configured attempt threshold, the code is locked for the configured
+  cool-down period and requires regeneration or unlock by a permissioned
+  Customer Support Agent or Super Admin with reason and audit trail.
 - The liability remains outstanding while the code is locked.
 - No payout may be recorded until the code is unlocked or regenerated.
 
@@ -192,13 +191,6 @@ Launch defaults:
 - The outlet that collected the original cash payment is responsible for
   disbursing the refund.
 - Another outlet cannot pay the refund on the collecting outlet's behalf.
-
-### Post-Delivery Returns
-
-- For post-delivery returns, a refund liability is created only after outlet
-  inspection and approval by the active return policy's approval role.
-- Returns rejected on condition do not enter the refund lifecycle and do not
-  create a liability.
 
 ## Permissions
 

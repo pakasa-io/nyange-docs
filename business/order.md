@@ -1,71 +1,63 @@
 # Order
 
-**Intent**: Define launch order behavior for placement, lifecycle state,
-allocation, reassignment, cancellation, cart behavior, COD fulfillment,
-post-delivery returns, and walk-in POS.
+**Intent**: Define order behavior for placement, lifecycle state, outlet
+claiming, COD fulfillment, and cancellation.
 
-**Reader task**: Use this document to decide whether an order can be placed,
-assigned, accepted, changed, cancelled, reassigned, delivered, refunded, or
-financially closed.
+**Reader task**: Use this document to decide whether an online COD order can be
+placed, claimed, prepared, picked up, delivered, failed, or cancelled.
 
-**Sources**: §6.1 Order Lifecycle, §7.1 Outlet Allocation, §7.6 Cascade &
-Reassignment, §7.15 Cart Behaviour, F-01, F-02
+**Sources**: BI-02, BI-07, BI-09, BI-20, BI-21, BI-22, BI-23
 
 **Related**:
-[catalog.md](catalog.md) for pricing and catalog rules;
-[payment.md](payment.md) for cash payment lifecycle;
-[delivery.md](delivery.md) for delivery lifecycle;
-[inventory.md](inventory.md) for reservation lifecycle;
-[refund.md](refund.md) for refund liabilities;
-[finance.md](finance.md) for forced closure;
+[cart.md](cart.md) for customer cart state, quote readiness, catalog-change
+acknowledgements, and checkout readiness;
+[catalog.md](catalog.md) for orderable products and priceability;
+[inventory.md](inventory.md) for stock reservation, commitment, release, and
+returned-empty intake recognition;
+[delivery.md](delivery.md) for delivery task state, assignment, pickup,
+custody, field facts, and failure handling;
+[payment.md](payment.md) for expected COD, collected cash facts, and
+zero-collection facts;
+[finance.md](finance.md) for cash handover, counted-cash acceptance, outlet
+cash custody, variance records, and receipts;
+[notifications.md](notifications.md) for notification fanout side effects;
 [identity-auth.md](identity-auth.md) for the full access matrix.
 
 ## Invariants
 
 **BI-02 — Price snapshot is write-once.**
 
-- When an order is placed, prices in effect at that moment are captured and
-  frozen on the order.
-- Subsequent pricing-rule changes do not alter historical orders.
-- Downstream financial calculations, including receipts and refunds, derive
-  from the frozen snapshot, not current rules.
+- Order placement freezes product, price, delivery-fee, tax, and total fields
+  on the order.
+- Subsequent catalog, price, outlet, tax, or delivery-fee changes do not alter
+  historical orders.
+- COD, receipts, refund liabilities, and reports derive from the frozen
+  snapshot, not current rules.
 
-**BI-07 — Launch online orders never require payment verification before
-fulfillment begins.**
+**BI-07 — No pre-payment gate before fulfillment.**
 
-- Outlet acceptance, picking, batching, dispatch, and delivery-agent assignment
-  may begin without any payment action.
-- Payment is collected at the doorstep by the delivery agent.
+- Online orders are COD.
+- No payment reference, provider verification, wallet, card, mobile-money, or
+  prepaid settlement gate exists before fulfillment.
+- Outlet claiming, ready-for-pickup marking, delivery assignment, and pickup
+  may proceed without customer payment action.
+- Cash is collected at the doorstep during delivery.
 
-**BI-09 — Fulfilled orders have no partial completion state.**
+**BI-09 — All-or-nothing delivery; no partial completion.**
 
-- Either all items in an order are successfully delivered, or the whole order
-  fails.
-- The only exception is an approved full-order adjustment that resolves the
-  delivery issue, such as an Outlet Manager-approved refill-to-new-cylinder
-  conversion at the doorstep.
-- The exception is still a whole-order mutation, not selective line-level
-  completion.
-
-**BI-17 — Outlet policy is a prerequisite for order acceptance, not a post-hoc
-check.**
-
-- Before an order is assigned to an outlet, the outlet's policies are evaluated.
-- Relevant policies include delivery mode support, refill vendor acceptance,
-  and same-vendor refill capability.
-- An order cannot be assigned to an outlet that does not meet its requirements.
+- Every line in an order delivers together or the whole order fails.
+- Partial item claims, partial delivery completion, split orders, and
+  multi-outlet fulfillment are prohibited.
+- Failed delivery records a whole-order failed outcome.
 
 **BI-20 — Order totals are immutable after placement.**
 
-- No business event can alter the total of a placed order except through an
-  explicit, audited adjustment workflow that generates its own financial record.
-- Covered events include price changes, outlet reassignment, bundle-discount
-  updates, and pricing-rule updates.
-- Delivery-fee changes and other post-placement deltas are explicit adjustments.
-- A customer refund created by a lower final amount remains a separate refund
-  liability.
-- Refund liabilities do not rewrite the placed order's price snapshot or
-  original charge.
+- Server-computed line totals and order totals are frozen when the order enters
+  `PENDING`.
+- Client-submitted values never set authoritative price, fee, tax, discount, or
+  total fields.
+- Later catalog, price, outlet, tax, stock, or delivery-fee changes do not
+  rewrite the placed order total.
 
 **BI-21 — Every cancellation must be fully attributed.**
 
@@ -77,622 +69,240 @@ Every cancellation record must capture:
 - reason note;
 - timestamp.
 
+Covered cancellations include:
+
+- customer cancellation from `PENDING`, `CLAIMED`, or `READY_FOR_PICKUP`;
+- outlet claim cancellation from `CLAIMED` or `READY_FOR_PICKUP`;
+- delivery task cancellation before pickup.
+
 A cancellation missing any required field is a data integrity violation.
 
 **BI-22 — Outlet disable is blocked by active orders.**
 
-- An outlet cannot be set inactive or disabled while it has any non-terminal
-  orders.
-- Terminal states for this rule are `COMPLETED`, `CANCELLED`, and `FAILED`
-  when no open closure blocker remains.
-- Disablement is allowed only after every order is completed, cancelled, failed
-  with no open closure blocker, or reassigned.
+- An outlet cannot be disabled while it has an active claim, active reservation,
+  active delivery task, or active order custody.
+- Terminal order states for this rule are `DELIVERED`,
+  `CUSTOMER_CANCELLED`, and `DELIVERY_FAILED`.
+- Disablement is allowed only after every outlet-owned order has reached a
+  terminal state and no related custody, reservation, or cash handover blocker
+  remains.
 
 **BI-23 — Critical mutations are idempotent.**
 
-- Critical one-time state transitions require idempotency keyed by actor,
-  endpoint, and client key.
-- Covered transitions include order creation, cancellation, delivery
-  completion, inventory reservation/adjustment/transfer, cash reconciliation,
-  refund payout, receipt generation, and comparable mutations.
+- Critical one-time mutations require idempotency keyed by actor, endpoint, and
+  client key.
+- Covered mutations include order creation, order claim, outlet claim
+  cancellation, customer cancellation, ready-for-pickup marking, pickup,
+  delivery completion, failed delivery, returned-empty reconciliation, COD
+  collection reporting, and cash handover.
 - Identical replays return the original result.
 - Same-key/different-body replays are rejected.
 - In-progress duplicates return a retryable response.
 - Domain uniqueness rules remain permanent even after operational replay records
   expire.
 
+### Cross-Aggregate Invariants
+
+- **BI-01** is defined in [inventory.md](inventory.md). Available stock never
+  goes below zero.
+- **BI-06** is defined in [inventory.md](inventory.md). Reserved stock is
+  unavailable.
+
 ## Boundary
 
-- Order owns the order request, placement, assignment, cancellation,
-  reassignment, customer-visible order state, and order-level immutable price
-  snapshot.
-- Order does not own cash payment facts, delivery execution, stock ledger
-  movement, refund payout, or financial closure ledger posting.
-- Other aggregates may observe or act on order state but must not rewrite the
-  placed order request or price snapshot.
+- Order owns order placement, order state, customer-visible status,
+  cancellation, claim association, and immutable price snapshot.
+- Inventory owns stock availability, reservations, stock commitment, release,
+  and returned-empty intake recognition.
+- Delivery owns delivery task state, assignment, pickup, agent custody,
+  doorstep field facts, failed delivery, and delivery completion.
+- Payment owns expected COD amount, collected cash fact, zero-collection fact,
+  and payment outcome.
+- Finance owns cash handover, counted-cash acceptance, outlet cash custody,
+  variance records, and receipt records.
+- Notifications own fanout attempts triggered by order and delivery events.
+- Order claims are whole-order only.
+- At most one active claim may exist for an order.
+- A claimed order requires an active reservation.
+- Inventory and cash ledgers are append-only.
+- Pickup creates agent custody before the order becomes `OUT_FOR_DELIVERY`.
+- Delivery completion commits outgoing stock.
+- Delivery completion records COD, returned-cylinder facts, task and order
+  terminal state, and custody changes in one transaction.
+- Client requests cannot override COD amount, currency, catalog-derived prices,
+  authoritative delivery timestamps, partial payments, refunds, fees, taxes, or
+  discounts.
+- Delivery-agent profiles are operational eligibility gates for assignment and
+  pickup; authorization remains controlled by explicit permissions.
 
 ## Order Lifecycle
 
-```
-DRAFT
-  └─► PLACED
-        └─► ASSIGNED_TO_OUTLET
-              └─► AWAITING_OUTLET_ACCEPTANCE
-                    ├─► ACCEPTED_BY_OUTLET
-                    │     └─► PICKING
-                    │           └─► READY_FOR_DISPATCH
-                    │                 └─► OUT_FOR_DELIVERY
-                    │                       ├─► DELIVERED ──► COMPLETED
-                    │                       └─► FAILED
-                    │
-                    └─► [Cascade / Reassignment]
-                          ├─► AWAITING_CUSTOMER_REASSIGNMENT_ACCEPTANCE
-                          │     ├─► ACCEPTED_BY_OUTLET
-                          │     └─► CANCELLED or REQUIRES_ADMIN_INTERVENTION
-                          │
-                          └─► REQUIRES_ADMIN_INTERVENTION
-                                ├─► ACCEPTED_BY_OUTLET
-                                └─► CANCELLED
+```text
+PENDING
+  -> CLAIMED
+  -> READY_FOR_PICKUP
+  -> OUT_FOR_DELIVERY
+  -> DELIVERED
 
-CANCELLED
-FAILED
-COMPLETED
+PENDING|CLAIMED|READY_FOR_PICKUP -> CUSTOMER_CANCELLED
+CLAIMED|READY_FOR_PICKUP -> PENDING   # outlet claim cancel before pickup
+OUT_FOR_DELIVERY -> DELIVERY_FAILED
 ```
+
+Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 
 | State | Meaning |
 | --- | --- |
-| `DRAFT` | Customer-derived order draft before placement. |
-| `PLACED` | Order request created with frozen price snapshot. |
-| `ASSIGNED_TO_OUTLET` | Order has serving outlet assignment. |
-| `AWAITING_OUTLET_ACCEPTANCE` | Fulfillment entry state after outlet assignment. |
-| `ACCEPTED_BY_OUTLET` | Outlet accepted order under active acceptance policy. |
-| `PICKING` | Authorized actor is picking stock. |
-| `READY_FOR_DISPATCH` | Picked and ready for delivery assignment/dispatch. |
-| `OUT_FOR_DELIVERY` | Delivery-run custody has begun. |
-| `DELIVERED` | Customer-facing delivery complete; financial closure may still be pending. |
-| `COMPLETED` | Internal financial closure complete; terminal. |
-| `FAILED` | Terminal failed delivery or failed fulfillment outcome after zero-collection and return/custody requirements. |
-| `CANCELLED` | Terminal order cancelled before completion. |
-| `REQUIRES_ADMIN_INTERVENTION` | All candidate outlets exhausted; Super Admin intervention required. |
+| `PENDING` | Order placement succeeded; no outlet has claimed the order and no stock is reserved. |
+| `CLAIMED` | One active permitted outlet has claimed the whole order and inventory has reserved all requested stock. |
+| `READY_FOR_PICKUP` | Claimed outlet has marked the whole order ready and a delivery task exists. |
+| `OUT_FOR_DELIVERY` | Delivery agent has picked up the whole order and holds full-cylinder custody. |
+| `DELIVERED` | Delivery succeeded; COD fact, stock commitment, claim completion, task state, order state, and returned-cylinder field facts committed together. |
+| `CUSTOMER_CANCELLED` | Customer cancellation completed before pickup; the order is terminal and never returns to the pending pool. |
+| `DELIVERY_FAILED` | Delivery failed after pickup; goods and custody were returned or resolved and zero collection was recorded. |
 
 ## State Rules
 
-### Cancellation and Changes
-
-- Customer cancellation is allowed up to and including `PICKING`.
-- `READY_FOR_DISPATCH` cancellation is a pre-custody exception for an explicitly
-  permissioned support fallback actor or Super Admin.
-- `READY_FOR_DISPATCH` cancellation requires override acknowledgement, reason,
-  note, audit, and pick-reversal handling when stock has already been picked.
-- Once delivery-run custody or `OUT_FOR_DELIVERY` begins, normal cancellation is
-  closed.
-- After custody begins, failed-delivery, return/refund, forced-closure, or
-  audited financial-adjustment workflows carry the outcome.
-- Outlet staff without explicit cancellation permission cannot use normal
-  cancellation after `PICKING`.
-- Those actors use cannot-fulfill, pick-reversal, failed-delivery, owning
-  manager escalation, or Super Admin handling according to fulfillment state.
-- After placement, customer-requested changes to items, delivery address, or
-  original pricing are not supported as order modifications.
-- If the customer wants a different order before fulfillment, the existing order
-  is cancelled where allowed and the customer places a new order.
-- Approved delivery-conversion, mismatch, refund, or reassignment-delta paths
-  are exception adjustments, not edits to the original order request.
-
-### Assignment and Fulfillment Gates
-
-- All orders receive outlet assignment and reserve inventory at placement.
-- Launch online orders transition to `ASSIGNED_TO_OUTLET` immediately after
-  placement.
-- No customer prepayment, payment-reference submission, or staff payment
-  verification is required before fulfillment begins.
-- Outlet acceptance, picking, batching, dispatch, and delivery-agent assignment
-  are governed by fulfillment eligibility and outlet policy, not by a prepaid
-  payment gate.
-- COD cash is collected at the doorstep before customer PIN confirmation.
-
-### Outlet Acceptance
-
-- `AWAITING_OUTLET_ACCEPTANCE` is the shared entry state for all order paths.
-- Orders enter it directly from `ASSIGNED_TO_OUTLET`.
-- Outlet acceptance follows the active outlet acceptance policy.
-- Launch default requires an actor with explicit order-acceptance permission to
-  manually accept or reject the order.
-- The system may alternatively be configured to automatically accept eligible
-  assigned orders without manual outlet action.
-- If the outlet rejects the order or the acceptance window expires, the order
-  enters cascade/reassignment before picking begins.
-- For orders accepted under no-manual-action policy, failure to start picking
-  within the active picking-start timeout enters the same pre-picking
-  cascade/reassignment path.
-- If an accepted outlet marks an order cannot-fulfill before `PICKING`, the
-  order re-enters cascade/reassignment.
-- After `PICKING`, cannot-fulfill is a post-picking exception and must use pick
-  reversal, cancellation/refund, failed-delivery, owning manager escalation, or
-  Super Admin handling according to custody state.
-
-### Delivery and Financial Closure
-
-- `DELIVERED` is customer-facing completion.
-- `COMPLETED` is internal financial closure and is not customer-facing.
-- Delivery confirmation is issued to the customer immediately at `DELIVERED`.
-- The financial receipt with full cost breakdown is generated and issued only at
-  `COMPLETED`.
-- If financial closure is delayed by unresolved custody or inventory exceptions,
-  the customer receives delivery confirmation first and the receipt later.
-- Online delivery `COMPLETED` requires delivery-run custody closure, successful
-  financial posting, and no unresolved closure blockers.
-- Refill orders additionally require returned-cylinder intake confirmation for
-  every expected cylinder or approved exception.
-- Non-refill orders may move from `DELIVERED` to `COMPLETED` as soon as closure
-  facts are present.
-- Normal financial closure occurs from recorded business facts.
-- Customers and outlet staff do not manually mark online orders `COMPLETED`.
-- Super Admin forced closure is a separate audited exception workflow before
-  closure effects are posted.
-
-### Pending Closure View
-
-- An order in `DELIVERED` but not `COMPLETED` appears in a derived internal
-  pending-closure view when unresolved closure blockers remain.
-- The pending-closure view is not a separate order lifecycle state.
-- The pending-closure view is not customer-facing.
-- Default target resolution is within the same business day.
-- A hard operational alert is raised if the order remains unclosed after 24
-  hours.
-- Super Admin escalation is triggered at 48 hours.
-- If blockers remain unresolved after escalation, Super Admin may use forced
-  financial closure only through [finance.md](finance.md).
-- Each closure blocker identifies blocker type, owning outlet or workflow,
-  related business record, SLA deadline, current status, and resolution or
-  waiver audit facts.
-
-### Delivery PIN
-
-- The delivery PIN is a six-digit one-time code.
-- It is generated when the order reaches `READY_FOR_DISPATCH`.
-- It is not generated at placement.
-- The customer is notified at `READY_FOR_DISPATCH`.
-- The short exposure window reduces PIN leakage risk before the delivery window
-  opens.
-
-### Failed and Refunded Outcomes
-
-- For online delivery orders, `FAILED` is terminal after required physical goods
-  return and custody facts are recorded.
-- The delivery fee is waived for failed delivery.
-- Failed delivery records a zero-collection payment fact because no launch
-  online order is prepaid.
-- Cancellation before delivery collection moves directly to `CANCELLED`.
-- Failed delivery or cancellation does not create a prepaid refund liability.
-- Refund liabilities may still be created by separate post-collection workflows,
-  such as approved post-delivery returns or approved cash over-collection
-  corrections.
-
-## Outlet Allocation
-
-### Geocoding Precondition
-
-- Checkout is blocked if the selected delivery address has no resolved
-  coordinates.
-- Outlet allocation requires valid latitude/longitude to calculate distances and
-  determine eligible outlets.
-- If geocoding fails on address save, the address is saved as `UNRESOLVED`.
-- Checkout remains blocked until coordinates are resolved or confirmed.
-- Customers may correct the map pin.
-- Non-customer coordinate correction requires explicit coordinate-correction
-  permission and audit logging.
-
-### Eligibility Gate
-
-An order is allocated to exactly one outlet.
-
-```
-outlet eligible :=
-  address_in_active_service_zone
-  AND outlet_active
-  AND (express_order  → outlet_currently_operating
-       batched_order  → has_valid_future_delivery_window)
-  AND supports_delivery_mode
-  AND sufficient_available_stock
-  AND (refill_order → accepts_incoming_vendor)
-  AND (same_vendor_requested → same_vendor_policy_enabled AND filled_stock_available)
-  AND (capacity_limit == none OR active_online_orders < capacity_limit)
-```
-
-### Eligibility Notes
-
-- Geographic eligibility uses confirmed coordinates inside an active radius-ring
-  service zone.
-- Minimum zone boundary is inclusive.
-- Maximum zone boundary is exclusive.
-- Polygon zones are out of launch scope.
-- The outlet must be active.
-- Express orders require the outlet to be currently operating at placement.
-- If no eligible outlet operates for express, express is unavailable and the
-  customer must choose batched.
-- Batched orders require a valid future delivery window.
-- Batched orders do not require the outlet to be currently operating at
-  placement.
-- Inventory is reserved at placement regardless.
-- Payment-method support is not an outlet-allocation criterion at launch.
-- Active online-fulfillment outlets are expected to support COD cash.
-- Stock availability is required for all order items.
-- For refill orders, stock checks include outgoing filled cylinders and
-  accessories only.
-- The customer's empty cylinder is an incoming return and does not consume stock
-  at placement.
-- Expected vendor-depot returns and `IN_REFILL` cylinders do not satisfy
-  same-vendor stock requirements.
-- Capacity gate is optional.
-- If capacity gate is configured and reached, the outlet is excluded.
-- Walk-in orders do not count toward active online order capacity.
-
-### Service Zone Templates
-
-| Template | Radius | Eligibility |
-| --- | --- | --- |
-| CORE | 0 km <= distance < 5 km | Eligible at minimum boundary; not at maximum |
-| STANDARD | 5 km <= distance < 10 km | Eligible at minimum boundary; not at maximum |
-| EXTENDED | 10 km <= distance < 15 km | Eligible at minimum boundary; not at maximum |
-
-- Each active online-fulfillment outlet must have confirmed outlet
-  latitude/longitude before it can be eligible.
-- Actual outlet coordinates are outlet master data, not hard-coded in this
-  domain specification.
-
-### Priority Ranking
-
-Among eligible outlets:
-
-```
-rank outlets by:
-  1. distance_to_customer      ASC
-  2. delivery_fee              ASC
-  3. active_online_order_load  ASC
-  4. outlet_priority_score     DESC
-```
-
-- `active_online_order_load` counts assignment through delivery-run closure.
-- Walk-ins are excluded from active online order load.
-- `outlet_priority_score` defaults to 0 when unset.
-- Delivery-agent capacity is not an outlet-allocation factor at launch.
-- An otherwise eligible outlet is not excluded because no delivery agent is
-  immediately available.
-- Delivery assignment happens after outlet allocation under delivery lifecycle.
-- Customers do not choose their outlet.
-- The serving outlet is determined by active allocation policy.
-
-### Split-Order Rules
-
-- Orders are not split across outlets.
-- If no single eligible outlet can provide every requested stock item,
-  allocation may fall back only to the closest outlet that satisfies every other
-  allocation rule and has all core cylinder items.
-- This fallback relaxes only accessory stock availability.
-- The customer may place the order without unavailable accessories or not place
-  the order.
-- If an order includes one or more core cylinder items and no single outlet has
-  all core cylinder items, the order cannot be placed.
-- Accessory-only orders still require one eligible outlet with requested
-  accessory stock.
-- Refill vendor-policy exhaustion is handled separately from core-stock absence.
-- If candidate outlets have required outgoing stock but are excluded by incoming
-  vendor acceptance policy, the order follows exhausted-candidate Super Admin
-  intervention instead of stock-unavailable checkout failure.
-
-## Cascade and Reassignment
-
-### Unchanged-Terms Cascade
-
-No customer notification is required when:
-
-- the first-choice outlet rejects the order;
-- the first-choice outlet marks cannot-fulfill before picking;
-- the first-choice outlet acceptance window expires;
-- the next eligible outlet can fulfill with unchanged delivery terms.
-
-Unchanged delivery terms mean same fee, same window, and same vendor.
-
-During unchanged-terms cascade, order status remains
-`AWAITING_OUTLET_ACCEPTANCE` while outlet assignment is updated internally to
-the next candidate.
-
-### Customer Acceptance Required
-
-Customer notification and acceptance are required when reassignment creates:
-
-- higher delivery fee or amount due;
-- later or different delivery window;
-- different outgoing cylinder vendor;
-- refill-to-new-cylinder conversion;
-- cancellation/refund-only outcome;
-- any other change affecting what the customer pays or receives.
-
-### Changed-Terms Sequence
-
-1. Stock is held at the candidate outlet as `REASSIGNMENT_HOLD`.
-2. The candidate outlet provisionally accepts the changed order within a short
-   window.
-3. Launch provisional acceptance windows are 5 minutes for express and 15
-   minutes for batched.
-4. Provisional acceptance is not full operational acceptance.
-5. Only after provisional outlet acceptance is the customer notified.
-6. The customer has a bounded acceptance window.
-7. Launch customer acceptance windows are 15 minutes for express and 30 minutes
-   for batched.
-8. If the customer accepts, the reassignment hold becomes the active reservation
-   at the new outlet.
-9. If the customer accepts, the order becomes fully assigned and accepted by the
-   new outlet.
-10. If the customer accepts, the previous outlet's reservation is released.
-11. If the customer rejects or does not respond, the new outlet hold is released.
-12. The normal outcome after rejection or timeout is cancellation, unless
-    active reassignment policy requires escalation.
-
-### Reassignment Rules
-
-- Delivery-window mismatches between outlets are not silently translated or
-  rebooked during cascade.
-- If the original customer-visible window cannot be honored by the candidate
-  outlet, the customer-acceptance path applies.
-- If the candidate outlet does not provisionally accept within timeout, the hold
-  is released and the next candidate is tried.
-- The customer is not notified about a candidate outlet that has not confirmed
-  it can fulfill the changed order.
-- Stock hold by itself is not outlet acceptance.
-- If no provisional outlet acceptance exists, the order remains in or returns to
-  `AWAITING_OUTLET_ACCEPTANCE`.
-- Customer notification is required only when customer-visible details change.
-
-### Candidate Skip Records
-
-- Every outlet evaluated but filtered out before stock hold or outlet
-  confirmation request records a candidate skip reason.
-- Candidate skip records support operational and support explanation.
-- Candidate skip records are diagnostic, not full reassignment attempts.
-- Launch retention is 180 days after record creation.
-- After retention, skip records may be archived or summarized.
-- Terminal order, financial, refund, and audit records remain durable under
-  their own retention rules.
-
-### Reassignment Attempt Records
-
-- A reassignment attempt begins only when stock is held or outlet confirmation
-  is requested.
-- Attempt records track candidate hold, provisional outlet acceptance/rejection,
-  outlet timeout, customer acceptance/rejection, customer timeout, and hold
-  release.
-- Once a reassignment attempt reaches a terminal outcome, that outcome is
-  immutable except for appended audit or status history.
-
-### Stock Reservation on Reassignment
-
-- For active reassignment, the candidate outlet hold must be secured before the
-  previous outlet reservation is released.
-- If the previous reservation cannot release after the new hold succeeds, the
-  previous reservation remains unavailable as `PENDING_RELEASE`.
-- `PENDING_RELEASE` stock is reported separately from normal reserved stock
-  until release outcome is corrected and recorded.
-
-### Delivery Fee Adjustments
-
-- Any delivery-fee difference from reassignment is an explicit price adjustment
-  recorded against the order and reassignment record.
-- Delivery-fee adjustments comply with BI-20.
-- A lower delivery fee does not require customer acceptance.
-- A lower delivery fee reduces amount due before COD collection.
-- The customer is notified of a reduction but does not need to act.
-- A higher delivery fee requires customer notification and acceptance before
-  reassignment activates.
-- After customer acceptance, the increase is collected as part of COD due at
-  delivery.
-
-### Post-Picking Block
-
-- Reassignment is blocked after picking has begun.
-- Post-picking order reassignment is an Outlet Manager or Super Admin exception
-  workflow.
-- Picked stock does not return to available inventory until an authorized
-  inventory/custody actor confirms pick reversal or return outcome.
-
-### All Candidates Exhausted
-
-- When all candidate outlets are exhausted, the order enters
-  `REQUIRES_ADMIN_INTERVENTION`.
-- The order is not immediately cancelled.
-- Permissioned Super Admins are notified by push.
-- Timeout-driven cancellation/refund applies only if escalation remains
-  unresolved within launch defaults.
-- Launch unresolved escalation timeout is 30 minutes from escalation for express
-  orders.
-- Launch unresolved escalation timeout is 2 hours from escalation for batched
-  orders.
-- During the intervention window, Super Admin may manually assign an outlet or
-  cancel the order.
-- Manual assignment is an audited exception override of normal eligibility gates.
-- Normal eligibility gates include zone, hours, inventory, and outlet policy.
-- Manual assignment requires explicit reason.
-- Manual assignment does not make eligibility gates optional in ordinary
-  allocation.
-- For refill vendor-policy exhaustion, intervention may include Super Admin or
-  permissioned Customer Support Agent contacting the customer through approved
-  notification paths to offer cancellation-and-reorder alternatives, such as
-  buying a new cylinder.
-- Intervention does not permit editing the placed order.
-- Exhausted-candidate intervention window may be extended only by Super Admin
-  with reason and audit.
-- A Customer Support Agent may relay an extension need to Super Admin, but
-  cannot execute the extension.
-
-## Payment Expiry
-
-- Launch online orders do not have payment-reference expiry because no
-  customer prepayment or reference submission exists in launch scope.
-- Orders may time out through outlet acceptance, reassignment, or escalation
-  workflows when the relevant fulfillment actor does not act within the active
-  window.
-- No payment deadline applies before doorstep COD collection.
-
-## Cart Behaviour
-
-- Cart creation, cart changes, quotes, and order placement require an
-  authenticated customer account at launch.
-- Anonymous guest cart and checkout are not launch behavior.
-- Out-of-stock cart items are marked unavailable and remain in the cart until
-  the customer removes them or stock returns.
-- The customer must resolve unavailable items before checkout can proceed.
-- Cart and checkout quote prices are estimates until order placement.
-- Final pricing is recalculated after outlet allocation.
-- Pricing is locked only when the order is placed and the price snapshot is
-  created.
-- Catalog or pricing changes affecting cart lines require customer review and
-  acknowledgement before cart quote or checkout can proceed.
-- Catalog or pricing changes include price changes, product disablement, or
-  bundle composition changes.
-- If a product's price changes while a cart is open, cart prices update to the
-  current price and the customer receives an explicit price-change notice before
-  checkout.
-- Disabled products are not orderable or sellable at any outlet, even if stock
-  exists.
-- Any cart item referencing a disabled product is marked unavailable.
-- Already-placed orders referencing a disabled product are not affected.
-- If a bundle's composition changes while a cart is open, any cart line
-  containing that bundle is flagged invalid.
-- The customer must review and acknowledge the bundle change before cart quote
-  or checkout can proceed.
-- Active carts are customer-derived commerce state, not durable order, payment,
-  ledger, custody, receipt, or audit facts.
-- Carts persist across customer sessions and devices.
-- A cart with no customer fetch, mutation, or quote activity for 90 days is
-  marked `ABANDONED`.
-- After an additional 30 days, abandoned cart item detail is no longer retained
-  as active cart detail.
-- A safe cart summary remains.
-- Checked-out carts and placed orders are never part of abandoned-cart cleanup.
-
-## Post-Delivery Return Policy
-
-Launch post-delivery returns require all conditions below.
-
-1. Return window is 7 calendar days from confirmed delivery timestamp.
-2. The customer must return the item or cylinder to the owning outlet in person.
-3. No reverse-logistics pickup is provided.
-4. The customer must be identifiable at return.
-5. Anonymous post-delivery returns are not accepted.
-6. An authorized outlet return-intake actor must inspect the returned item or
-   cylinder.
-7. The active return policy's approval role must approve condition before a
-   refund liability is created or returned-stock effect is recognized.
-8. A condition-rejected return does not create a refund or change inventory
-   availability.
-9. Post-delivery return refunds are cash-only at the outlet.
-10. No electronic or alternative refund method applies.
-
-Return eligibility, approved condition, refund amount, drop-off requirement, and
-approval role are controlled by active product-type return policy. Later policy
-changes must preserve explicit customer identity, approval, and audit
-requirements.
-
-- Post-delivery returns are processed against the original order whenever
-  possible.
-- Unlinked manual refunds are Super Admin-only exceptions.
-
-## Walk-In POS Rules
-
-- Walk-in orders require explicit POS/cashier permission.
-- Walk-in orders share the same inventory as online orders.
-- Walk-in stock reservation is immediate and final.
-- Walk-in stock reservation has no pending state and no delivery delay.
-- A walk-in sale reaches financial closure at sale completion.
-- The walk-in receipt number and immutable receipt are issued at sale
-  completion.
-- At launch, the same pricing rules apply to walk-in and online orders.
-- Different POS/online pricing requires a later explicit policy decision.
-- Operating hours govern online order allocation only.
-- Operating hours do not apply to walk-in POS.
-- Walk-in refill exchanges use the same incoming/outgoing vendor rules, pricing
-  matrix, same-vendor policy checks, and returned-cylinder inspection as online
-  refills.
-- The delivery and agent custody legs are skipped for walk-in refill exchanges.
-- An explicitly permissioned POS/cashier actor handles the exchange directly at
-  the counter.
-- The same all-or-nothing semantics apply.
-- If the returned cylinder is unacceptable, the POS/cashier actor may offer a
-  full-order conversion under the same approved adjustment path.
-- If the customer refuses conversion, the transaction does not proceed.
-- Anonymous walk-in customers are permitted.
-- Refunds, returns, and support follow-up require customer identity.
-- Walk-in POS sales are cash-only at launch.
-
-## F-01: Online Order to Delivery
-
-1. Customer places order from a selected delivery address with confirmed
-   coordinates. Coordinates may be provider-resolved or a customer-confirmed
-   manual pin.
-2. Serving outlet is selected from outlets that serve the address and meet all
-   allocation criteria.
-3. Stock for all order items is reserved at the selected outlet.
-4. Order proceeds directly to outlet acceptance.
-5. Outlet accepts.
-6. Authorized outlet picking actor picks items.
-7. Delivery-agent assignment and delivery-run creation follow active outlet
-   delivery policy.
-8. Default assignment policy applies unless Dispatcher or Outlet Manager
-   manually assigns or overrides before pickup within outlet scope.
-9. Outlet handover confirmation and agent receipt confirmation are both
-    recorded.
-10. Custody transfers to agent.
-11. At customer door for refill orders, agent records every expected returned
-    cylinder's vendor, size, condition, approved conversion, COD delta or cash
-    collection, and delivery exception before PIN confirmation.
-12. Customer confirms with PIN only when final delivered order and amount due are
-    correct.
-13. PIN confirmation atomically commits delivery status, order status, outgoing
-    stock commitment, returned-cylinder field recording, cash collection
-    recording, and payment status.
-14. For refill orders, returned-cylinder intake actor confirms intake for every
-    expected returned cylinder or failed intake receives approved exception.
-15. For all online deliveries, financial closure waits until delivery-run
-    custody is closed, intake/exception outcomes are complete, and no unresolved
-    closure blockers remain.
-16. Normal financial closure occurs from recorded business facts, generates the
-    receipt, and seals the order.
-
-## F-02: Reassignment with Changed Terms
-
-1. Order is assigned to Outlet A.
-2. Outlet A rejects, its acceptance window expires, or it marks cannot-fulfill
-   before picking.
-3. The next eligible outlet, Outlet B, is selected from the fallback list.
-4. Every outlet evaluated but filtered out before a full reassignment attempt is
-   recorded with a skip reason, such as zone mismatch, no stock, or policy
-   mismatch.
-5. Skip records give operations and support visibility into why an outlet was
-   bypassed without treating it as a full reassignment attempt.
-6. Stock is held at Outlet B under `REASSIGNMENT_HOLD`.
-7. The hold is unavailable to other orders but is not yet a final outlet
-   assignment.
-8. Outlet B provisionally confirms it can fulfill under the new terms within the
-   configured window.
-9. Customer is notified of the changed terms.
-10. Customer has a bounded window to accept.
-11. If customer accepts, the reassignment hold becomes the active reservation.
-12. If customer accepts, the order becomes fully assigned and accepted by Outlet
-    B.
-13. Outlet A's reservation is released.
-14. If customer rejects or does not respond, Outlet B stock hold is released.
-15. The normal outcome is order cancellation, unless active reassignment policy
-    requires escalation.
+### Order Placement (`POST /orders` -> `PENDING`)
+
+- Order placement consumes a checkout-ready cart.
+- Order placement requires an authenticated customer account.
+- The delivery address must have resolved coordinates.
+- An unresolved delivery address blocks order placement.
+- Order placement rejects disabled products.
+- Order placement rejects unavailable cart lines.
+- Order placement rejects unpriceable catalog combinations.
+- The server computes all line totals and order totals.
+- Client-submitted line totals, fees, taxes, discounts, and order totals are
+  ignored.
+- Order placement snapshots product, price, delivery-fee, tax, and total fields.
+- The snapshot is write-once.
+- Order placement stores the structured delivery address.
+- Order placement allocates an immutable `ORD-%08d` public order number.
+- Order placement grants the customer order-scoped read, status, and cancel
+  permissions.
+- No stock is reserved during cart activity or order placement.
+- Stock reservation occurs only when an outlet claims the order.
+- While an order is `PENDING`, permitted outlets may read the pending pool with
+  delivery-area detail redacted.
+- Pending-pool reads must not expose:
+  - full delivery address;
+  - recipient name;
+  - recipient phone;
+  - delivery instructions.
+
+### Claiming (`PENDING` -> `CLAIMED`)
+
+- Any active permitted outlet may claim an order from the pending pool.
+- Claim is whole-order only.
+- Partial item claims are prohibited.
+- Claiming reserves all requested stock atomically.
+- At most one active claim may exist per order.
+- A claimed order requires an active reservation.
+- The claim and reservation are inseparable.
+- No automatic outlet allocation, ranking, or outlet-change chain is defined.
+
+### Ready for Pickup (`CLAIMED` -> `READY_FOR_PICKUP`)
+
+- Only the claimed outlet may mark the order ready.
+- Marking ready creates a `READY_FOR_PICKUP` delivery task.
+- Ready-order notification fanout is attempted.
+- Failed or delayed notification fanout does not block the committed state
+  transition.
+
+### Out for Delivery (`READY_FOR_PICKUP` -> `OUT_FOR_DELIVERY`)
+
+- A delivery agent is assigned to the delivery task.
+- Assignment grants the agent order-scoped read access to the full delivery
+  address for the duration of the assignment.
+- Pickup keeps reserved stock unavailable.
+- Pickup creates full-cylinder custody for the assigned agent.
+- Pickup moves the delivery task to `PICKED_UP`.
+- Pickup moves the order to `OUT_FOR_DELIVERY`.
+
+### Delivery Completion (`OUT_FOR_DELIVERY` -> `DELIVERED`)
+
+- Completion requires `acknowledged_cash_collected=true`.
+- COD derives from the persisted order total.
+- Client requests cannot override COD.
+- Returned-cylinder field facts are recorded when applicable.
+- COD collection fact is recorded.
+- Outgoing stock is committed.
+- The active claim is completed.
+- The delivery task is marked `DELIVERED`.
+- The order is marked `DELIVERED`.
+- All completion effects commit in one transaction.
+- `DELIVERED` is the terminal successful order state.
+- No later order state follows `DELIVERED`.
+
+### Alternate Paths
+
+- Outlet claim cancellation before pickup releases the reservation, cancels any
+  pre-pickup delivery task, cancels the active claim, clears the claimed outlet,
+  and returns the order to `PENDING`.
+- Customer cancellation before pickup is terminal.
+- Customer cancellation releases any active reservation, cancels the active
+  claim, cancels any pre-pickup delivery task, records required cancellation
+  attribution, and marks the order `CUSTOMER_CANCELLED`.
+- A customer-cancelled order never returns to the pending pool.
+- Delivery failure after pickup returns all picked-up full-cylinder custody to
+  outlet stock, records a zero-collection payment fact, completes the claim,
+  marks the task `FAILED`, and marks the order `DELIVERY_FAILED`.
+
+## Main Flow
+
+1. Customer places an order from a checkout-ready cart and the order enters
+   `PENDING`.
+2. An active permitted outlet claims the whole order. The order moves
+   `PENDING -> CLAIMED`; inventory reserves all requested stock atomically.
+   Partial order-item claims are prohibited.
+3. The claimed outlet marks the order ready. The order moves
+   `CLAIMED -> READY_FOR_PICKUP`; fulfillment creates a `READY_FOR_PICKUP`
+   delivery task and attempts ready-order notification fanout.
+4. A delivery agent is assigned to the task. Assignment grants the agent
+   order-scoped read access to the full delivery address while the assignment
+   is active.
+5. The delivery agent picks up the order. Pickup keeps the reserved stock
+   unavailable, creates full-cylinder custody for the agent, moves the delivery
+   task to `PICKED_UP`, and moves the order to `OUT_FOR_DELIVERY`.
+6. The delivery agent completes delivery. Completion requires
+   `acknowledged_cash_collected=true`, derives COD from the persisted order
+   total, records returned-cylinder field facts when applicable, records the COD
+   collection fact, commits outgoing stock, completes the claim, and marks the
+   task and order `DELIVERED`.
+7. Returned empties are reconciled separately from delivery completion. Outlet
+   intake moves each returned-empty record into outlet empty stock and marks
+   those custody rows reconciled.
+8. COD cash remains delivery-agent-owned until handover and reconciliation. A
+   supervisor accepts counted cash, transfers custody to outlet cash, and
+   records any approved variance.
+
+## Out of Scope
+
+- Automatic outlet allocation, outlet ranking, outlet-change chains, and
+  customer acceptance of outlet changes.
+- Delivery batching, route optimization, and scheduled delivery windows.
+- External prepayment, mobile money, card, wallet, or provider reference
+  workflows.
+- A separate customer-visible order state after delivery.
+- Doorstep code fallback and evidence-retention detail.
+- Doorstep conversion, price-delta, refund, and returns after delivery
+  workflows.
+- Partial order fulfillment, split orders, and multi-outlet fulfillment.
+- Counter-sale workflows.
 
 ## Permissions
 
 Trimmed access matrix rows relevant to orders. Full matrix:
 [identity-auth.md](identity-auth.md).
 
-| Capability | P-01 | P-02 | P-03 | P-04 | P-05 | P-06 | P-07 | P-08 | P-10 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Cart & order placement | Full | - | - | - | - | - | - | - | Full |
-| Order status tracking | Own | Own assigned | Scoped | - | Scoped | Scoped | Scoped | Read assigned outlets | Full |
-| Order acceptance / rejection | - | - | - | - | - | Scoped with explicit permission | - | - | Full |
-| Order reassignment escalated | - | - | - | - | - | Scoped exception | - | - | Full |
+| Capability | P-01 | P-02 | P-05 | P-06 | P-07 | P-08 | P-10 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Order placement | Full | - | - | - | - | - | Full |
+| Order status tracking | Own | Own assigned | Scoped | Scoped | Scoped | Read assigned outlets | Full |
+| Outlet claiming | - | - | - | Scoped with explicit permission | - | - | Full |
+| Ready-for-pickup marking | - | - | - | Scoped with explicit permission | - | - | Full |
+| Delivery assignment | - | - | Scoped | Scoped | - | - | Full |
+| Delivery completion | - | Own assigned | - | - | - | - | Full |
+| COD recording | - | Own assigned | - | - | - | - | Full |
+| Cancellation | Own before pickup | - | - | Scoped outlet claim cancellation | Scoped with explicit permission | - | Full |

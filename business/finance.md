@@ -1,16 +1,17 @@
 # Finance
 
-**Intent**: Define launch financial operations for daily closing, expense
-controls, delivery cost reporting, and forced financial closure.
+**Intent**: Define financial operations for daily closing, expense controls,
+delivery cost reporting, receipt issuance, and cash custody reporting.
 
 **Reader task**: Use this document to determine how financial records are
-posted, sealed, reviewed, carried forward, or force-closed.
+posted, sealed, reviewed, carried forward, or reported.
 
 **Sources**: §7.8 Daily Closing, §7.9 Expense Controls, §7.19 Delivery Cost
-Reporting, BI-14, F-05
+Reporting, BI-14
 
 **Related**:
-[order.md](order.md) for reassignment and pending-closure behavior;
+[order.md](order.md) for order placement, terminal states, COD fulfillment, and
+cancellation;
 [payment.md](payment.md) for cash payment facts;
 [refund.md](refund.md) for refund liabilities;
 [identity-auth.md](identity-auth.md) for the full access matrix.
@@ -25,16 +26,16 @@ Reporting, BI-14, F-05
   to the erroneous entry.
 - The audit trail is always complete and continuous.
 
-**BI-05 — Financial closure is terminal.**
+**BI-05 — Financial closure is `DELIVERED`.**
 
-- Once an order reaches financial closure, its original sale financial state is
-  sealed.
-- The receipt issued at closure is immutable.
+- For online COD orders, financial closure means the order reaches
+  `DELIVERED`.
+- `DELIVERED` seals the original sale financial state.
+- The receipt issued at `DELIVERED` is immutable.
 - Later events do not rewrite the original receipt.
-- Post-closure financial activity is allowed only as a separate linked business
-  record, such as an approved post-delivery return/refund liability or approved
-  adjustment/void record.
-- Post-closure activity must not alter the original closure or receipt.
+- Later financial activity is allowed only as a separate linked business record,
+  such as an approved refund liability or approved adjustment/void record.
+- Later activity must not alter the original delivered sale or receipt.
 
 **BI-13 — Prepayment settlement is not a launch workflow.**
 
@@ -42,20 +43,18 @@ Reporting, BI-14, F-05
   fulfilling outlet.
 - No launch workflow records one outlet as the external prepayment receiver and
   another outlet as the fulfillment outlet.
-- Post-payment outlet reassignment settlement for externally prepaid orders is
-  outside launch scope.
-- Future prepaid or cross-outlet payment workflows require explicit settlement
-  rules before they can enter scope.
+- External prepaid payment workflows require explicit settlement rules before
+  they can enter scope.
 
 **BI-14 — Receipt numbers are permanent and sequential.**
 
 - Receipt numbers are outlet-scoped and sequential within the outlet/date
   receipt series.
 - Receipt numbers carry the outlet and receipt date in the business number.
-- Receipt numbers are issued at financial closure.
+- Receipt numbers are issued at `DELIVERED`.
 - Receipt numbers are distinct from order identifiers.
 - A number issued to a valid receipt cannot be reissued or modified.
-- Ordinary financial-closure rollback does not create a numbering gap.
+- Ordinary receipt rollback does not create a numbering gap.
 - Any skipped number range caused by an intentional exception requires a
   permanent approved exception and audit record explaining the gap.
 
@@ -86,17 +85,14 @@ Daily closing is the outlet's end-of-day financial reconciliation.
 Daily closing summarizes:
 
 - cash count reconciliation;
-- posted financial closures and receipts;
+- delivered orders and issued receipts;
 - cash and ledger entries;
 - outstanding refund liabilities carried forward with Outlet Manager
   acknowledgement.
 
 ### Non-Requirements
 
-Daily closing does not require:
-
-- every delivered order to reach `COMPLETED`;
-- every refund liability to be resolved.
+Daily closing does not require every refund liability to be resolved.
 
 ### Timing
 
@@ -120,10 +116,9 @@ if closing_overdue AND NOT super_admin_urgency_override:
   blocked:  price_changes_outside_guardrail
   blocked:  manual_financial_ledger_adjustments
   blocked:  above_threshold_expense_approval  // >= 100,000 UGX at launch
-  allowed:  online_order_placement, pos_walk_in_sales, inventory_reservation
-  allowed:  order_acceptance, picking, batching, dispatch, delivery_agent_assignment
-  allowed:  cod_collection, stock_intake
-  allowed:  within_guardrail_price_changes
+  allowed:  online_order_placement, order_claiming, inventory_reservation_for_claim
+  allowed:  ready_for_pickup, delivery_agent_assignment, pickup, cod_collection
+  allowed:  stock_intake, within_guardrail_price_changes
 ```
 
 - Outlet Manager urgent override is allowed for cash refund payouts when policy
@@ -132,7 +127,7 @@ if closing_overdue AND NOT super_admin_urgency_override:
 ### Liability Recognition
 
 - Overdue daily closing does not block creation or posting of refund liabilities
-  at financial closure.
+  at `DELIVERED` or from an approved adjustment.
 - Those records capture business truth and must be posted even when the outlet
   is behind on closing.
 - The overdue-closing restriction applies to later cash payout or manual
@@ -144,10 +139,10 @@ if closing_overdue AND NOT super_admin_urgency_override:
 - Refund liabilities carry forward until paid, voided, or written off.
 - Open refund liabilities do not block daily closing.
 
-### Deferred Prepayment Settlement Reporting
+### Deferred Prepayment Reporting
 
-- External payment receipts, merchant-account attribution, and post-payment
-  outlet reassignment settlement are not launch reporting requirements.
+- External payment receipts and merchant-account attribution are not launch
+  reporting requirements.
 - The fulfilling outlet reports COD collections, delivery work, inventory or
   estimated COGS where configured, refund liabilities it owns, and cash
   reconciliation facts.
@@ -219,17 +214,15 @@ Expense records capture:
 - Cost changes are audited and may carry effective dates for historical
   estimated-margin reporting.
 - When configured cost inputs are used for estimated margin reporting, the
-  applicable cost for each completed sale is fixed at financial closure.
-- Later cost changes do not silently restate closed-sale estimates.
+  applicable cost for each delivered sale is fixed at `DELIVERED`.
+- Later cost changes do not silently restate sealed-sale estimates.
 
 ## Internal Settlements
 
-Internal settlement for externally prepaid post-payment reassignment is outside
-launch scope.
+External prepaid settlement is outside launch scope.
 
 No ordinary launch workflow creates a cross-outlet customer-payment settlement
-because online delivery payment is COD cash collected for the fulfilling
-outlet.
+because online delivery payment is COD cash collected for the fulfilling outlet.
 
 ## Delivery Cost Reporting
 
@@ -243,63 +236,16 @@ governed by [order.md](order.md), [catalog.md](catalog.md), and
 ### Business Rules
 
 - Delivery cost policy/rule changes are audited and effective-dated.
-- At launch, delivery cost reporting defaults to treating each order separately.
-- Approved run-level cost allocation may use an even split or
-  delivery-fee/cylinder-count weighting across orders.
-- Run-level cost allocation finalizes when the delivery run closes.
-- Failed orders in batched runs may carry an internal failed-attempt delivery
-  cost for estimated outlet performance reporting.
+- Delivery cost reporting treats each delivery task as a single-order task.
+- Failed delivery tasks may carry an internal failed-attempt delivery cost for
+  estimated outlet performance reporting.
 - For failed orders, customer revenue remains zero, no delivery fee is charged
   to the customer, and failed-attempt cost is reported separately.
-- Closed delivery cost allocations are not recalculated directly.
+- Closed delivery cost entries are not recalculated directly.
 - Corrections require audited adjustment records.
 - Reports using delivery cost must label resulting margin or profitability
   values as estimated unless accounting-grade costing and expense controls are
   approved.
-
-## F-05: Forced Financial Closure
-
-Cross-reference: [order.md](order.md) for pending-closure SLA and escalation.
-
-1. An order remains in the pending-closure view beyond the SLA window.
-2. Escalation reaches Super Admin.
-3. Super Admin assigns a resolution path to every open closure blocker, such as
-   waiving with adjustment, marking lost stock, confirming damage, or accepting
-   a cash variance.
-4. Required forced-closure approval is obtained under the active materiality
-   policy.
-
-```
-material_forced_closure :=
-  combined_financial_or_inventory_impact >= 100,000 UGX
-  OR any_saleable_filled_cylinder_missing_or_lost
-  OR any_refund_or_write_off_created
-  OR closure_resolves_more_than_one_blocker_category
-// materiality policy starts from global defaults and may define
-// outlet/category overrides
-
-if material_forced_closure  → dual approval required
-else                        → single Super Admin approval within active policy
-```
-
-- The requester cannot satisfy second approval.
-- After required approval, compensating inventory and cash adjustment entries are
-  posted with explicit linkage to the forced closure.
-- Loss or variance responsibility defaults to the outlet or delivery run that
-  held custody when the loss, damage, or cash variance occurred.
-- When custody facts identify that holder, the custody-chain result is the
-  default.
-- Super Admin may override responsibility only when custody facts are unclear or
-  conflicting, and only with reason, note, and audit trail.
-- Staff, agent, and approver identities remain visible in custody and audit
-  reports for operational accountability.
-- Resulting losses affect outlet-level reporting, not staff payroll or personal
-  financial liability.
-- The forced-closure audit trail identifies the order, every resolved blocker,
-  approving actor(s), reason, timestamp, resolution path for each blocker, and
-  any adjustment facts used to correct business truth.
-- The order moves to `COMPLETED`.
-- All records of the exception are permanent.
 
 ## Permissions
 
@@ -312,12 +258,5 @@ Trimmed access matrix rows relevant to finance. Full matrix:
 | Financial ledger view | Scoped | Read assigned outlets | Full | Full |
 | Expense submission | Scoped | - | - | Full |
 | Expense approval | Scoped threshold | - | - | Full |
-| Forced financial closure | - | - | - | Full |
 | Cross-outlet reporting | - | Read assigned outlets | Read | Full |
 | Audit log viewing | Scoped | Read assigned outlets | Read | Full |
-
-## Authorization Edge Cases
-
-**E-06**: A Super Admin performing a forced financial closure must provide a
-reason. This action is always audit-logged with before/after values. No
-exception to audit logging exists, even for Super Admin.

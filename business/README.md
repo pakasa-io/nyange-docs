@@ -14,14 +14,12 @@ tests.
 - Nyange distributes gas cylinders, refills, and accessories through
   company-owned outlets.
 - Supported launch cylinder sizes are 6kg and 12kg.
-- Customers can order online for outlet delivery or buy through walk-in POS.
-- Online orders can mix new cylinder purchases, refill exchanges, and accessory
-  purchases in one cart.
+- Customers can order online for outlet delivery.
+- Customer carts can mix new cylinder purchases, refill exchanges, and
+  accessory purchases before order placement.
 - Online delivery orders are cash-on-delivery at launch and are collected by
   the Delivery Agent at the doorstep.
-- Walk-in POS sales are immediate cash sales at the outlet.
-- Delivery modes are express and batched.
-- Walk-in POS sales have no delivery leg.
+- Online orders create single-order delivery tasks.
 
 ## Outlet Model
 
@@ -55,12 +53,13 @@ tests.
 | --- | --- | --- |
 | [identity-auth.md](identity-auth.md) | Identity & Authorization | Personas, access matrix, authentication, authorization, edge cases E-01-E-10 |
 | [catalog.md](catalog.md) | Catalog & Pricing | Refill pricing, bundle pricing, price guardrails, launch commercial programs |
-| [order.md](order.md) | Order | Order lifecycle, outlet allocation, cascade and reassignment, cart behavior, COD fulfillment, POS rules |
-| [payment.md](payment.md) | Payment | COD cash collection, walk-in cash sales, zero-collection facts, payment boundaries |
+| [cart.md](cart.md) | Cart | Customer cart state, quote readiness, catalog-change handling, checkout readiness, abandoned-cart cleanup |
+| [order.md](order.md) | Order | Order placement, lifecycle state, outlet claiming, COD fulfillment, and cancellation |
+| [payment.md](payment.md) | Payment | COD cash collection, zero-collection facts, payment boundaries |
 | [delivery.md](delivery.md) | Delivery | Delivery lifecycle, delivery fee rules, agent cash handling, failed-delivery fee waiver, cylinder exchange field leg |
 | [inventory.md](inventory.md) | Inventory | Reservation lifecycle, outlet transfer, vendor refill batch, cylinder exchange intake leg, stock counts, low-stock alerts |
 | [refund.md](refund.md) | Refund | Refund lifecycle, approval thresholds, collection codes, cash payout constraints |
-| [finance.md](finance.md) | Finance | Daily closing, expense controls, delivery cost reporting, deferred settlement boundary, forced financial closure |
+| [finance.md](finance.md) | Finance | Daily closing, expense controls, delivery cost reporting, deferred settlement boundary, receipts, and cash custody reporting |
 | [support.md](support.md) | Support | Launch support fallback boundaries and operational risk alerts |
 | [notifications.md](notifications.md) | Notifications | Notification channel boundaries and event-to-channel assignments |
 
@@ -69,11 +68,14 @@ tests.
 - `§6.9 Refill Exchange Request Lifecycle` spans delivery and inventory.
   [delivery.md](delivery.md) owns the field leg from `PENDING` through
   `RETURN_RECORDED`. [inventory.md](inventory.md) owns the intake leg from
-  `INTAKE_PENDING` through `COMPLETED` or `FAILED`.
-- Deferred customer prepayment workflows, including post-payment outlet
-  reassignment settlement, are tracked outside the launch business documents.
-- `§7.15 Cart Behaviour` is in [order.md](order.md). [catalog.md](catalog.md)
-  references it for catalog-change and price-change effects on open carts.
+  `INTAKE_PENDING` through `INTAKE_CONFIRMED` or `FAILED`.
+- Deferred customer prepayment workflows are tracked outside the launch
+  business documents.
+- Cart owns customer-selected pre-order state and checkout readiness.
+  [order.md](order.md) owns order placement and the immutable order lifecycle
+  after checkout succeeds.
+- Catalog availability and priceability rules are referenced by [cart.md](cart.md)
+  for quote readiness and by [order.md](order.md) for placement revalidation.
 - The complete access matrix is in [identity-auth.md](identity-auth.md). Each
   aggregate file includes only the permission rows directly relevant to that
   aggregate.
