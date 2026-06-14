@@ -66,6 +66,8 @@ orders can run on global online pricing.
 - Outlet Managers cannot configure local prices in the MVP.
 - Online COD checkout uses global online product, refill, accessory, tax, and
   delivery-fee rules.
+- No outlet-scoped delivery-fee override authority exists in the MVP access
+  matrix.
 - Super Admin manages global catalog and pricing changes.
 - No outlet-local price approval workflow is required for MVP operations.
 

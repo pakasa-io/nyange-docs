@@ -321,6 +321,12 @@ order placement.
 - Delivery fee is part of the order total.
 - Delivery fee is not folded into product, refill, or accessory prices.
 - Later delivery-fee changes do not rewrite the placed order.
+- Outlet-scoped delivery-fee overrides are not launch behavior.
+- No Outlet Manager, Dispatcher, Delivery Agent, Area Manager, or outlet-scoped
+  staff actor may create, change, approve, or apply a delivery-fee override at
+  launch.
+- Claiming, ready-for-pickup marking, delivery assignment, pickup, and delivery
+  completion cannot alter the frozen delivery fee.
 - Express delivery pricing, express-fee multipliers, and customer-facing
   priority delivery promises are not launch behavior.
 - Express delivery fee scope is deferred in
@@ -337,6 +343,9 @@ order placement.
 - These fees apply unless an active global online delivery-fee rule overrides
   them.
 - Only Super Admin may change the active global online delivery-fee rule.
+- Outlet-local delivery-fee rules, guardrails, and approval workflows are
+  deferred in
+  [../out-of-scope/2026-06-14-outlet-local-pricing-guardrails.md](../out-of-scope/2026-06-14-outlet-local-pricing-guardrails.md).
 
 ## Failed Delivery Fee Waiver
 

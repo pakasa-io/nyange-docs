@@ -149,6 +149,15 @@ Refill price is determined by three dimensions.
   are the launch pricing basis.
 - Only Super Admin may create, change, disable, or retire global catalog and
   pricing rules.
+- Outlet-local product, refill, accessory, and delivery-fee price configuration
+  is not launch behavior.
+- Outlet Managers cannot create, change, approve, or apply outlet-local price
+  rules or delivery-fee overrides at launch.
+- Online COD quotes and order placement never consult outlet-local price rules
+  at launch.
+- Outlet-local pricing guardrails and local delivery-fee overrides are deferred
+  in
+  [../out-of-scope/2026-06-14-outlet-local-pricing-guardrails.md](../out-of-scope/2026-06-14-outlet-local-pricing-guardrails.md).
 - All price changes require an effective window and audit record.
 - `Immediate` means the effective start is now.
 - Price changes are future-dated or now-dated; they are not backdated.

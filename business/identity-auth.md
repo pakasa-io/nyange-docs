@@ -247,7 +247,25 @@ may hold multiple permission bundles across one or more outlets.
 - `Outlet configuration & policies` covers settings that only Super Admin may
   change: service zone, vendor acceptance list, delivery mode support,
   operating-hours policy, workload/capacity limits, and outlet priority score.
+- Outlet configuration does not include product prices, refill prices,
+  accessory prices, tax rules, delivery-fee rules, or outlet-local pricing
+  guardrails.
 - Outlet Managers do not have write access to outlet configuration.
+
+### Pricing Permissions
+
+- Identity owns pricing-related permission grants and outlet scope.
+- [catalog.md](catalog.md) owns global catalog, product, refill, accessory, tax,
+  and launch pricing administration rules.
+- [delivery.md](delivery.md) owns delivery-fee calculation rules.
+- At launch, `Global pricing & catalog` is Super Admin-only.
+- No outlet-scoped delivery-fee override permission exists at launch.
+- No Outlet Manager, Dispatcher, Delivery Agent, Area Manager, or other
+  outlet-scoped actor may create, change, approve, or apply outlet-local
+  delivery-fee rules.
+- Outlet-local product, refill, accessory, and delivery-fee price permissions are
+  deferred in
+  [../out-of-scope/2026-06-14-outlet-local-pricing-guardrails.md](../out-of-scope/2026-06-14-outlet-local-pricing-guardrails.md).
 
 ### Claim-Block Permissions
 
