@@ -54,3 +54,13 @@ Launch channels are assigned by event type, not customer preference.
 - WhatsApp integration.
 - Customer-configurable channel preferences.
 - SMS for anything other than customer authentication OTP.
+
+## Permissions
+
+Trimmed access matrix rows relevant to notifications. Full matrix:
+[identity-auth.md](identity-auth.md).
+
+| Capability | P-06 | P-10 |
+| --- | --- | --- |
+| Notification template administration | - | Full |
+| Customer notification requests | Scoped approved transactional only | Full |

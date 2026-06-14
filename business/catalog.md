@@ -226,4 +226,4 @@ Trimmed access matrix rows relevant to catalog and pricing. Full matrix:
 | Capability | P-01 | P-03 | P-06 | P-08 | P-10 |
 | --- | --- | --- | --- | --- | --- |
 | Product catalog browsing | Read | Read | Read | Read | Full |
-| Global pricing and catalog | - | - | - | - | Full |
+| Global pricing & catalog | - | - | - | - | Full |

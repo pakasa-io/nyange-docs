@@ -166,19 +166,24 @@ may hold multiple permission bundles across one or more outlets.
 | Cart creation and update | Full | - | - | - | - | - | - | - | Full |
 | Cart quote | Full | - | - | - | - | - | - | - | Full |
 | Cart checkout | Full | - | - | - | - | - | - | - | Full |
+| Cart cleanup policy administration | - | - | - | - | - | - | - | - | Full |
 | Order placement | Full | - | - | - | - | - | - | - | Full |
 | Order status tracking | Own | Own assigned | Scoped | - | Scoped | Scoped | Read assigned outlets | Read | Full |
 | Outlet claiming | - | - | - | - | - | Scoped with explicit permission | - | - | Full |
 | Claim-block resolution | - | - | - | - | - | Scoped reopen with explicit permission | Read assigned outlets | - | Full |
 | Unclaimable closure | - | - | - | - | - | - | - | - | Full |
 | Ready-for-pickup marking | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
+| Cancellation | Own before pickup | - | - | - | - | Scoped outlet claim cancellation | - | - | Full |
 | Outlet handover confirmation | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
 | Failed-order return receipt | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
 | Returned-cylinder receipt | - | - | - | Scoped with explicit permission | - | Scoped with explicit permission | - | - | Full |
 | Delivery assignment | - | - | - | - | Scoped | Scoped | - | - | Full |
+| Delivery completion | - | Own assigned | - | - | - | - | - | - | Full |
+| COD recording | - | Own assigned | - | - | - | - | - | - | Full |
 | Delivery execution pickup and COD | - | Own | - | - | - | - | - | - | Full |
 | Agent cash handover | - | Own | - | - | - | Scoped receive | - | - | Full |
 | Inventory viewing | - | - | - | Scoped | - | Scoped | Read assigned outlets | - | Full |
+| Reservation from order claim | - | - | - | - | - | Scoped with explicit permission | - | - | Full |
 | Inventory adjustments submit | - | - | - | Scoped request | - | Scoped policy-limited post; above = request | - | - | Full |
 | Inventory adjustments approve | - | - | - | - | - | - | - | - | Full |
 | Outlet-to-outlet transfers | - | - | - | Scoped request | - | Scoped request/approve/receive | - | - | Full |
