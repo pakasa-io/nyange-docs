@@ -83,8 +83,11 @@ LIABILITY_OPEN|COLLECTIBLE
 - `UNCLAIMABLE` closure before doorstep COD collection does not create a refund
   liability.
 - Failed delivery does not create a refund liability.
-- If an authorized and posted Finance-owned cash over-collection correction
-  creates a refund liability, the refund lifecycle begins from `LIABILITY_OPEN`.
+- When an authorized and posted Finance-owned cash over-collection correction
+  confirms customer cash collected above expected COD, the refund lifecycle
+  begins from `LIABILITY_OPEN` for the excess amount.
+- If Finance cannot authorize or post the correction, no Refund liability is
+  created yet; the discrepancy remains Finance-owned until resolved.
 - Post-collection refund liabilities do not reopen orders, change order state,
   rewrite the frozen order total, or rewrite the collected payment fact.
 
@@ -227,10 +230,10 @@ from [identity-auth.md](identity-auth.md).
 ## Authorization Edge Cases
 
 **E-05**: Refund liabilities have no amount-based approval threshold at launch.
-A valid authorized and posted Finance-owned cash over-collection correction may
-create a refund liability eligible for collection-code issuance regardless of
-amount. Finance owns source authorization and any required separation-of-duty
-rule for the source correction.
+A valid authorized and posted Finance-owned cash over-collection correction that
+confirms customer cash collected above expected COD creates a refund liability
+eligible for collection-code issuance regardless of amount. Finance owns source
+authorization and any required separation-of-duty rule for the source correction.
 
 **E-07**: An Outlet Manager may initiate scoped refund liabilities. An Outlet
 Manager may disburse collectible refunds within outlet scope only when

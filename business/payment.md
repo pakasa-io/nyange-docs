@@ -203,9 +203,10 @@ state and does not create a terminal payment fact.
   terminal state.
 - Payment links to the approved Finance-owned variance record but does not own
   the variance record.
-- An approved Finance-owned cash over-collection correction may create a refund
-  liability in [refund.md](refund.md), but does not rewrite the frozen order
-  total or payment expectation.
+- An authorized and posted Finance-owned cash over-collection correction that
+  confirms customer cash collected above expected COD creates a Refund-owned
+  liability source event in [refund.md](refund.md), but does not rewrite the
+  frozen order total or payment expectation.
 - Payment records preserve expected amount, collected amount, variance link,
   actor, outlet, task, and order identity needed for audit and reconciliation.
 

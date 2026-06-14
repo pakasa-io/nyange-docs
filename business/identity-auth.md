@@ -567,10 +567,10 @@ outlets, but cannot perform outlet actions such as claiming orders, collecting
 customer cash, paying refunds, or adjusting inventory.
 
 **E-05**: Refund liabilities have no amount-based approval threshold at launch.
-A valid authorized and posted Finance-owned cash over-collection correction may
-create a refund liability eligible for collection-code issuance regardless of
-amount. Finance owns source authorization and any required separation-of-duty
-rule for the source correction.
+A valid authorized and posted Finance-owned cash over-collection correction that
+confirms customer cash collected above expected COD creates a refund liability
+eligible for collection-code issuance regardless of amount. Finance owns source
+authorization and any required separation-of-duty rule for the source correction.
 
 **E-07**: An Outlet Manager may initiate scoped refund liabilities. An Outlet
 Manager may disburse collectible refunds within outlet scope only when
