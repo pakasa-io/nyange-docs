@@ -41,6 +41,7 @@ Launch channels are assigned by event type, not customer preference.
 | Out for delivery | Transactional | Push |
 | Payment confirmation | Transactional | Push |
 | Failed delivery | Transactional | Push |
+| Refund collectible | Transactional | Push |
 
 ## Sensitive Content
 
@@ -48,10 +49,13 @@ Launch channels are assigned by event type, not customer preference.
 
 - Refund collection codes are not sent in push, SMS, or any future email message
   body.
-- A notification may tell the customer that a refund is collectible.
-- A notification may identify the collection outlet.
-- A notification may direct the customer to the authenticated customer
+- `Refund collectible` is sent when Refund moves a refund to `COLLECTIBLE`.
+- The notification may tell the customer that a refund is collectible.
+- The notification may identify the owning collection outlet.
+- The notification may direct the customer to the authenticated customer
   experience.
+- Failed or delayed `Refund collectible` notification fanout does not block the
+  Refund state transition.
 
 ## Non-Goals
 
