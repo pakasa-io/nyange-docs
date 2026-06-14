@@ -68,8 +68,9 @@ COLLECTIBLE
   └─► CODE_LOCKED
         └─► COLLECTIBLE
 
-VOIDED
-WRITTEN_OFF
+LIABILITY_OPEN|PENDING_APPROVAL|COLLECTIBLE|CODE_EXPIRED|CODE_LOCKED
+  ├─► VOIDED
+  └─► WRITTEN_OFF
 ```
 
 | State | Meaning |
@@ -101,6 +102,21 @@ WRITTEN_OFF
 - Failed delivery does not create a prepaid refund liability.
 - If a separate approved post-collection adjustment creates a refund liability,
   the refund lifecycle begins from `LIABILITY_OPEN`.
+- Post-collection refund liabilities do not reopen orders, change order state,
+  rewrite the frozen order total, or rewrite the collected payment fact.
+
+### Terminal Exception Outcomes
+
+- `VOIDED` and `WRITTEN_OFF` are terminal Super Admin-approved exception
+  outcomes.
+- Eligible source states are `LIABILITY_OPEN`, `PENDING_APPROVAL`,
+  `COLLECTIBLE`, `CODE_EXPIRED`, and `CODE_LOCKED`.
+- The transition requires actor identity, actor role, reason code, reason note,
+  timestamp, and audit trail.
+- A void or write-off discharges the refund liability for daily-closing and
+  liability-reporting purposes.
+- A void or write-off does not create a provider refund, customer wallet credit,
+  order mutation, or payment mutation.
 
 ### Approval Thresholds
 

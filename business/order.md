@@ -18,6 +18,8 @@ returned-empty intake recognition;
 custody, field facts, and failure handling;
 [payment.md](payment.md) for expected COD, collected cash facts, and
 zero-collection facts;
+[refund.md](refund.md) for post-collection refund liabilities and payout
+lifecycle;
 [finance.md](finance.md) for cash handover, counted-cash acceptance, outlet
 cash custody, variance records, and receipts;
 [notifications.md](notifications.md) for notification fanout side effects;
@@ -127,6 +129,9 @@ A cancellation missing any required field is a data integrity violation.
   doorstep field facts, failed delivery, and delivery completion.
 - Payment owns expected COD amount, collected cash fact, zero-collection fact,
   and payment outcome.
+- Refund owns approved post-collection refund liabilities and payout lifecycle.
+- Refund liabilities do not reopen orders, change order state, or rewrite the
+  frozen order total.
 - Finance owns cash handover, counted-cash acceptance, outlet cash custody,
   variance records, and receipt records.
 - Notifications own fanout attempts triggered by order and delivery events.
@@ -301,8 +306,8 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
   workflows.
 - A separate customer-visible order state after delivery.
 - Doorstep code fallback and evidence-retention detail.
-- Doorstep conversion, price-delta, refund, and returns after delivery
-  workflows.
+- Order-state mutation workflows for doorstep conversion, delivery-time
+  price-delta or refund negotiation, and returns after delivery.
 - Partial order fulfillment, split orders, and multi-outlet fulfillment.
 - Counter-sale workflows.
 
