@@ -55,6 +55,13 @@ module_contracts:
   event_dispatch: in-process post-commit dispatch
   consistency: atomic UoW for same-transaction workflows; documented async contracts otherwise
 
+dependency_policy:
+  default: use approved libraries directly at the owning edge
+  no_wrapper_for: github.com/pakasa-io/uow, github.com/pakasa-io/di
+  wrap_when: domain boundary, cross-module contract, volatile provider, transaction boundary, or test determinism requires it
+  avoid: forwarding wrappers or local interfaces created only to hide approved libraries
+  domain_rule: domain packages must not expose framework, SDK, ORM, DI, UoW, or transport types
+
 data_conventions:
   ids: ULID for application-owned public identifiers
   id_generator: github.com/oklog/ulid/v2
