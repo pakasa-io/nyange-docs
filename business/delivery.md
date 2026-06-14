@@ -269,13 +269,16 @@ else                                             -> Super Admin approval
 ## Delivery Fee Rules
 
 Delivery fee is a customer-visible charge component frozen into the order at
-checkout.
+order placement.
 
 ### Fee Calculation
 
-- The active delivery-fee rule must produce a fee before order placement.
+- The active global online delivery-fee rule must produce a fee before order
+  placement.
 - If no authoritative fee can be computed for the resolved delivery address and
-  order contents, checkout is rejected as unpriceable.
+  order contents, order placement is rejected as unpriceable.
+- The delivery fee is computed from the resolved delivery address and online
+  fee policy, not from the eventual claiming outlet.
 - Delivery fee is part of the order total.
 - Delivery fee is not folded into product, refill, or accessory prices.
 - Later delivery-fee changes do not rewrite the placed order.
@@ -288,7 +291,8 @@ checkout.
 | STANDARD | 5 km <= distance < 10 km | UGX 5,000 |
 | EXTENDED | 10 km <= distance < 15 km | UGX 8,000 |
 
-- These fees apply unless an active delivery-fee rule overrides them.
+- These fees apply unless an active global online delivery-fee rule overrides
+  them.
 - Delivery-fee guardrail is the smaller of 15% or UGX 2,000 from the current
   approved basis.
 - Above-guardrail delivery-fee changes require Super Admin approval.

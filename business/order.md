@@ -29,6 +29,8 @@ cash custody, variance records, and receipts;
 
 - Order placement freezes product, price, delivery-fee, tax, and total fields
   on the order.
+- Order placement uses the global online pricing and address-based delivery-fee
+  basis, independent of the outlet that later claims the order.
 - Subsequent catalog, price, outlet, tax, or delivery-fee changes do not alter
   historical orders.
 - COD, receipts, refund liabilities, and reports derive from the frozen
@@ -175,6 +177,8 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 - The server computes all line totals and order totals.
 - Client-submitted line totals, fees, taxes, discounts, and order totals are
   ignored.
+- The server uses global online catalog, price, delivery-fee, and tax rules for
+  order placement.
 - Order placement snapshots product, price, delivery-fee, tax, and total fields.
 - The snapshot is write-once.
 - Order placement stores the structured delivery address.
@@ -200,6 +204,10 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 - At most one active claim may exist per order.
 - A claimed order requires an active reservation.
 - The claim and reservation are inseparable.
+- The claiming outlet must be able to fulfill every frozen product, vendor,
+  quantity, delivery address, and COD term on the placed order.
+- Claiming cannot change product price, delivery fee, tax, discount, order
+  total, or expected COD.
 - No automatic outlet allocation, ranking, or outlet-change chain is defined.
 
 ### Ready for Pickup (`CLAIMED` -> `READY_FOR_PICKUP`)

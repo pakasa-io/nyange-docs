@@ -26,8 +26,11 @@ tests.
 - Each outlet is a company-owned branch within the same legal entity.
 - Outlet independence is operational and reporting-oriented, not legal or
   financial separation.
-- Each outlet has its own inventory, pricing within guardrails, staff, and cash
-  ledger.
+- Each outlet has its own inventory, staff, cash ledger, and local price-rule
+  configuration within guardrails.
+- Online COD checkout uses the global online pricing and address-based delivery
+  fee basis; local outlet price-rule configuration does not alter placed online
+  order totals.
 - Outlet cash is company cash.
 - Outlets are not franchisees or marketplace merchants.
 - Outlet stocking is vendor-specific and outlet-owned.

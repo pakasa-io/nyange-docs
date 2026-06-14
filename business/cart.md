@@ -87,8 +87,10 @@ Terminal cart states: `CHECKED_OUT`, `SUMMARY_RETAINED`, `CLEARED`.
 - Quote generation is server-computed.
 - Client-submitted line totals, fees, taxes, discounts, and order totals are
   ignored.
-- Quote generation evaluates current catalog, pricing, delivery-fee, tax, and
-  availability rules.
+- Quote generation evaluates current catalog, global online pricing,
+  address-based delivery-fee, tax, and availability rules.
+- Quote generation does not use local price or delivery-fee rules from a future
+  claiming outlet.
 - Pricing is locked only when Order creates the immutable order snapshot.
 - No stock is reserved by cart creation, cart update, quote generation, or
   checkout readiness.

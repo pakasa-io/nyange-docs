@@ -1,7 +1,8 @@
 # Catalog & Pricing
 
-**Intent**: Define launch product pricing behavior for refill pricing, bundle
-pricing, outlet price guardrails, and launch commercial-program limits.
+**Intent**: Define launch product pricing behavior for online checkout pricing,
+refill pricing, bundle pricing, outlet price guardrails, and launch
+commercial-program limits.
 
 **Reader task**: Use this document to determine whether a catalog item or refill
 combination is orderable, how it is priced, and who can change prices.
@@ -23,8 +24,10 @@ checkout readiness;
 - A customer who buys a new filled cylinder owns the cylinder and gas outright.
 - There is no deposit, cylinder-return obligation, customer credit account, or
   customer-level cylinder ownership tracking at launch.
-- New filled cylinder purchases may use any supported vendor available at the
-  outlet that claims the order.
+- New filled cylinder purchases may use any globally supported vendor available
+  through the online checkout catalog.
+- The claiming outlet must fulfill the frozen outgoing vendor, product, and
+  quantity terms without changing the placed order total.
 - A customer who loses or damages their cylinder must buy a new cylinder rather
   than treat the loss as a refill.
 
@@ -74,8 +77,11 @@ Refill price is determined by three dimensions.
 - Incoming-to-outgoing refill pair eligibility is global at launch.
 - Outlets may restrict which incoming vendors they accept.
 - Outlets do not define outlet-specific incoming-to-outgoing pair overrides.
-- A refill pair is orderable for a specific outlet only when the global pair is
-  eligible and that outlet accepts the customer's incoming vendor.
+- A refill pair is orderable online only when the global pair is eligible,
+  priceable, and fulfillable by at least one permitted outlet for the delivery
+  address.
+- The claiming outlet must accept the frozen incoming vendor and fulfill the
+  frozen outgoing vendor, size, and quantity terms.
 
 ### Required Pricing Rules
 
@@ -108,11 +114,24 @@ Refill price is determined by three dimensions.
 ### Cart Filtering
 
 - Vendor options shown to a customer are filtered to combinations that are
-  currently fulfillable for their delivery address and incoming cylinder.
+  currently fulfillable by at least one permitted outlet for their delivery
+  address and incoming cylinder.
 - Options that no permitted outlet can currently fulfill are not shown.
 - Cart quote and checkout readiness revalidate availability and price.
 - Cart filtering is a usability measure, not a substitute for order placement
   revalidation.
+
+## Online Checkout Pricing Basis
+
+- Online COD cart quotes and order placement use global online catalog, price,
+  tax, and delivery-fee rules.
+- The eventual claiming outlet cannot change the frozen product price,
+  delivery fee, tax, discount, or order total.
+- Local outlet price-rule configuration does not affect online COD order totals
+  unless an approved global online pricing policy explicitly uses that rule as
+  an input before order placement.
+- Claim eligibility requires the outlet to fulfill the frozen catalog terms,
+  vendor terms, quantities, and delivery address scope.
 
 ## Bundle Pricing
 
@@ -160,6 +179,10 @@ and a standalone price.
 ## Outlet Price Guardrails
 
 Outlet Managers may adjust outlet-specific prices within configured limits.
+
+Outlet-specific price rules are local configuration. They do not affect online
+COD cart quotes or placed order totals unless an approved global online pricing
+policy explicitly uses them before order placement.
 
 ### Guardrail Logic
 
