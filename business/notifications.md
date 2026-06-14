@@ -29,15 +29,15 @@ use and to confirm that notification delivery does not control business state.
 
 Launch channels are assigned by event type, not customer preference.
 
-| Event | Channels |
-| --- | --- |
-| Order confirmation | Push, Email |
-| Claim blocked | Push, Email |
-| Unclaimable closure | Push, Email |
-| Ready for pickup | Push, Email |
-| Out for delivery | Push only |
-| Payment confirmation | Push, Email |
-| Failed delivery | Push, Email |
+| Event | Classification | Channels |
+| --- | --- | --- |
+| Order confirmation | Transactional | Push, Email |
+| Claim blocked | Transactional | Push, Email |
+| Unclaimable closure | Transactional | Push, Email |
+| Ready for pickup | Transactional | Push, Email |
+| Out for delivery | Transactional | Push only |
+| Payment confirmation | Transactional | Push, Email |
+| Failed delivery | Transactional | Push, Email |
 
 ## Sensitive Content
 
