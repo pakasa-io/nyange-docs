@@ -136,8 +136,8 @@ Refill price is determined by three dimensions.
 
 ## Online Checkout Pricing Basis
 
-- Online COD cart quotes and order placement use global online catalog, price,
-  tax, and delivery-fee rules.
+- Online COD cart quotes and order placement use Catalog-owned global online
+  catalog, price, and tax rules plus the Delivery-owned delivery-fee output.
 - The eventual claiming outlet cannot change the frozen product price,
   delivery fee, tax, discount, or order total.
 - Claim eligibility requires the outlet to fulfill the frozen catalog terms,
@@ -162,19 +162,22 @@ Refill price is determined by three dimensions.
 
 ## Price Administration
 
-- Global launch catalog, product, refill, accessory, tax, and delivery-fee rules
-  are the launch pricing basis.
+- Global launch catalog, product, refill, accessory, bundle, and tax rules are
+  the Catalog-owned launch pricing basis.
 - Only Super Admin may create, change, disable, or retire global catalog and
   pricing rules.
-- Outlet-local product, refill, accessory, and delivery-fee price configuration
-  is not launch behavior.
-- Outlet Managers cannot create, change, approve, or apply outlet-local price
-  rules or delivery-fee overrides at launch.
+- Delivery owns global online delivery-fee rules, calculation, administration,
+  and authorization under [delivery.md](delivery.md).
+- Outlet-local product, refill, accessory, and tax price configuration is not
+  launch behavior.
+- Outlet Managers cannot create, change, approve, or apply outlet-local Catalog
+  price rules at launch.
 - Online COD quotes, order placement, and POS sale completion never consult
   outlet-local price rules at launch.
-- Outlet-local pricing guardrails and local delivery-fee overrides are deferred
-  in
+- Outlet-local Catalog pricing guardrails are deferred in
   [../out-of-scope/2026-06-14-outlet-local-pricing-guardrails.md](../out-of-scope/2026-06-14-outlet-local-pricing-guardrails.md).
+- Delivery-owned outlet-local delivery-fee overrides are deferred under
+  [delivery.md](delivery.md).
 - All price changes require an effective window and audit record.
 - `Immediate` means the effective start is now.
 - Price changes are future-dated or now-dated; they are not backdated.

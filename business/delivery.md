@@ -73,6 +73,8 @@ delivery completion commits atomically:
 - Delivery owns delivery task state, delivery assignment, pickup, outgoing-goods
   agent custody, doorstep field facts, failed-delivery outcome, delivery cash
   collection evidence, and cash handover submission evidence.
+- Delivery owns global online delivery-fee rules, calculation, administration,
+  and delivery-fee authorization.
 - Delivery does not own inventory intake recognition, refund payout, payment
   policy, receipt issuance, Finance-owned cash variance records, cash handover
   acceptance, or outlet cash custody.
@@ -326,6 +328,9 @@ order placement.
 
 - The active global online delivery-fee rule must produce a fee before order
   placement.
+- Delivery owns the active global online delivery-fee rule and exposes the
+  computed delivery-fee output used by Cart and Order for quote and order
+  totals.
 - If no authoritative fee can be computed for the resolved delivery address and
   order contents, order placement is rejected as unpriceable.
 - The delivery fee is computed from the resolved delivery address and online
