@@ -43,7 +43,7 @@ ABANDONED -> ACTIVE
 | --- | --- |
 | `ACTIVE` | Customer can view, change, quote, and prepare the cart for checkout. |
 | `CHECKED_OUT` | Cart produced a placed order and is no longer mutable as active cart detail. |
-| `ABANDONED` | Cart has had no customer fetch, mutation, or quote activity for the configured inactivity period; item detail is still retained and can return to active use before summary retention. |
+| `ABANDONED` | Cart has had no customer fetch, mutation, or quote activity for the 90-day launch inactivity period; item detail is still retained and can return to active use before summary retention. |
 | `SUMMARY_RETAINED` | Abandoned cart item detail is no longer retained as active cart detail; safe summary remains and cannot be restored as the active cart. |
 | `CLEARED` | Customer explicitly removed active cart contents. |
 
@@ -165,6 +165,7 @@ business requirements before creating the order snapshot.
 
 - A cart with no customer fetch, mutation, or quote activity for 90 days is
   marked `ABANDONED`.
+- The 90-day inactivity period is the Cart-owned launch cleanup default.
 - An `ABANDONED` cart returns to `ACTIVE` when the customer fetches, mutates,
   quotes, or otherwise resumes the cart before item detail is removed.
 - After an additional 30 days, abandoned cart item detail is no longer retained
