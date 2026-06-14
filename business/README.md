@@ -82,8 +82,9 @@ tests.
 
 - `§6.9 Refill Exchange Request Lifecycle` spans delivery and inventory.
   [delivery.md](delivery.md) owns the field leg from `PENDING` through
-  `RETURN_RECORDED`. [inventory.md](inventory.md) owns the intake leg from
-  `INTAKE_PENDING` through `INTAKE_CONFIRMED` or `FAILED`.
+  `RETURN_RECORDED`, plus Delivery-owned field-leg `FAILED`.
+  [inventory.md](inventory.md) owns the intake leg from `INTAKE_PENDING` through
+  `INTAKE_CONFIRMED` or Inventory-owned intake `FAILED`.
 - Cart owns customer-selected pre-order state and checkout readiness.
   [order.md](order.md) owns order placement and the immutable order lifecycle
   after checkout succeeds.

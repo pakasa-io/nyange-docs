@@ -104,8 +104,9 @@ Terminal states: `CANCELLED`, `DELIVERED`, `FAILED`.
 ## Refill Exchange Field Leg
 
 Each `REFILL_EXCHANGE` order line creates one exchange request. Delivery owns the
-field leg from creation through `RETURN_RECORDED`. Delivery completion hands off
-the returned-cylinder intake record to Inventory in `INTAKE_PENDING`.
+field leg from creation through `RETURN_RECORDED` or field-leg `FAILED`.
+Delivery completion hands off the returned-cylinder intake record to Inventory in
+`INTAKE_PENDING` only after successful delivery.
 
 ```
 PENDING
@@ -113,6 +114,7 @@ PENDING
   -> RETURN_RECORDED
   -> INTAKE_PENDING
 
+IN_PROGRESS|RETURN_RECORDED -> FAILED
 CANCELLED
 ```
 
@@ -123,6 +125,7 @@ CANCELLED
 | `RETURN_RECORDED` | Agent records returned cylinder vendor, size, and condition at the doorstep. |
 | `INTAKE_PENDING` | Inventory-owned handoff state after successful delivery; cylinder awaits outlet intake confirmation. |
 | `CANCELLED` | Order was cancelled before pickup; no cylinder exchange occurred. |
+| `FAILED` | Delivery-owned terminal field-leg state for a failed delivery after pickup; no Inventory intake handoff occurs. |
 
 ### Field Leg Rules
 
@@ -133,6 +136,11 @@ CANCELLED
 - `INTAKE_PENDING` is owned by Inventory and persists after delivery completion.
 - The order can be `DELIVERED` while exchange requests are still
   `INTAKE_PENDING`.
+- A failed delivery after pickup moves every affected exchange request to
+  `FAILED`.
+- Failed exchange requests retain controlled field facts and failure reason for
+  audit, but do not create Inventory intake records.
+- `FAILED` is terminal for the Delivery-owned field leg.
 - Inventory intake determines when returned cylinders become outlet empty stock.
 
 ## Delivery Assignment
@@ -239,6 +247,9 @@ Transition to `PICKED_UP` requires both:
 - Failed delivery records a zero-collection payment fact.
 - Failed delivery completes the active fulfillment acceptance.
 - Failed delivery marks the order `DELIVERY_FAILED`.
+- Failed refill deliveries move affected exchange requests to Delivery-owned
+  field-leg `FAILED`; no returned-cylinder intake handoff is created for those
+  failed exchange requests.
 - The agent cannot reschedule the failed order.
 - If the customer still wants the goods, the customer places a new order.
 

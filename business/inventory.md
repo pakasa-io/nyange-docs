@@ -256,11 +256,13 @@ INTAKE_PENDING
 
 - Each expected returned cylinder requires its own outlet intake confirmation
   before it becomes outlet empty inventory.
-- Upstream `PENDING`, `IN_PROGRESS`, `RETURN_RECORDED`, and `CANCELLED` are
-  Delivery-owned field-leg states and are not Inventory intake states.
+- Upstream `PENDING`, `IN_PROGRESS`, `RETURN_RECORDED`, `CANCELLED`, and
+  field-leg `FAILED` are Delivery-owned field-leg states and are not Inventory
+  intake states.
 - `INTAKE_PENDING` persists after delivery completion.
 - The order can be `DELIVERED` while exchange requests are still
   `INTAKE_PENDING`.
+- Delivery-owned field-leg `FAILED` creates no Inventory intake record.
 - A `FAILED` intake creates an inventory exception and may supply operational
   escalation context.
 - A failed intake does not by itself undo completed customer delivery.
