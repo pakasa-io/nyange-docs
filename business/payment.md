@@ -44,9 +44,8 @@ exceptions hand off to delivery, refund, or finance.
 ## State
 
 ```
-PENDING_COLLECTION
-  -> COLLECTED
-  -> ZERO_COLLECTION
+PENDING_COLLECTION -> COLLECTED
+PENDING_COLLECTION -> ZERO_COLLECTION
 ```
 
 Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
