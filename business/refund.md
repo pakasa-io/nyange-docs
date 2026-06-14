@@ -155,22 +155,18 @@ t = 24h  → if code not used  → CODE_EXPIRED; liability remains open
 
 ### Payout Process
 
-At payout, the Outlet Manager or explicitly permissioned Outlet Cashier must act
-within active payout limits and:
+At payout, the Outlet Manager or explicitly permissioned Outlet Cashier must:
 
 1. Verify the one-time collection code.
 2. Confirm the collector is the original account holder tied to the order.
 3. Confirm the customer/order phone matches before cash is marked paid.
 
-### Payout Limits
+### Payout Authorization
 
-Launch defaults:
-
-| Actor | Per-refund limit | Per-outlet-business-day limit |
-| --- | --- | --- |
-| Outlet Cashier with explicit permission | UGX 100,000 | UGX 300,000 |
-| Outlet Manager | UGX 500,000 | UGX 1,500,000 |
-| Above Outlet Manager limit | Super Admin release approval required before cash is disbursed | - |
+- A permitted payout actor may disburse any approved collectible refund within
+  the owning outlet's scope.
+- Launch refund payouts have no per-refund or per-outlet-business-day cash cap.
+- Refund approval thresholds remain separate from payout permission.
 
 ### Payout Records
 
@@ -217,7 +213,7 @@ Trimmed access matrix rows relevant to refunds. Full matrix:
 | --- | --- | --- | --- | --- | --- |
 | Refund initiation | Own request | - | Scoped threshold | Request | Full |
 | Refund approval | - | - | Scoped threshold | - | Full |
-| Refund payout cash at outlet | - | Scoped with explicit permission and payout limits | Scoped within payout limits | - | Full |
+| Refund payout cash at outlet | - | Scoped with explicit permission | Scoped | - | Full |
 | Refund collection code management | - | - | - | Scoped with explicit permission | Full |
 
 ## Authorization Edge Cases

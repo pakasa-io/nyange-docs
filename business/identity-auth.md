@@ -64,8 +64,8 @@ may hold multiple permission bundles across one or more outlets.
 
 - Outlet staff responsible for approved customer cash refund payouts when
   explicitly permissioned.
-- Verifies customer-presented refund collection codes within active payout
-  limits.
+- Verifies customer-presented refund collection codes for approved collectible
+  refunds.
 - Disburses approved cash refunds from the owning outlet.
 - Has no delivery responsibilities.
 - Cannot manage online orders, approve refunds, adjust inventory, or access
@@ -202,7 +202,7 @@ may hold multiple permission bundles across one or more outlets.
 | Global pricing & catalog | - | - | - | - | - | - | - | - | - | Full |
 | Refund initiation | Own request | - | - | - | - | Scoped threshold | Request | - | - | Full |
 | Refund approval | - | - | - | - | - | Scoped threshold | - | - | - | Full |
-| Refund payout cash at outlet | - | - | Scoped with explicit permission; payout limits | - | - | Scoped within payout limits | - | - | - | Full |
+| Refund payout cash at outlet | - | - | Scoped with explicit permission | - | - | Scoped | - | - | - | Full |
 | Refund collection code management | - | - | - | - | - | - | Scoped with explicit permission | - | - | Full |
 | Daily cash closing | - | - | - | - | - | Scoped | - | - | - | Full |
 | Financial ledger view | - | - | - | - | - | Scoped | - | Read assigned outlets | Full | Full |
@@ -266,14 +266,10 @@ may hold multiple permission bundles across one or more outlets.
 ### Refund Payout Permission
 
 - An Outlet Cashier with explicit refund-payout permission may verify the
-  customer's collection code and disburse cash only within active refund payout
-  limits.
-- Launch default cashier payout limits are UGX 100,000 per refund and UGX
-  300,000 per outlet business day.
-- Launch default Outlet Manager payout limits are UGX 500,000 per refund and UGX
-  1,500,000 per outlet business day.
-- A payout above the Outlet Manager limit requires Super Admin release approval
-  before cash is disbursed.
+  customer's collection code and disburse approved collectible refunds within
+  their outlet scope.
+- Outlet Managers may disburse approved collectible refunds within outlet scope.
+- Launch refund payouts have no per-refund or per-outlet-business-day cash cap.
 - Without explicit per-outlet permission, cashiers cannot handle refund payouts.
 
 ### Refund Approval Thresholds
