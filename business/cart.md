@@ -32,11 +32,9 @@ pricing, and price rules;
 ## Cart Lifecycle
 
 ```
-ACTIVE
-  -> CHECKED_OUT
-  -> CLEARED
-  -> ABANDONED
-      -> SUMMARY_RETAINED
+ACTIVE -> CHECKED_OUT
+ACTIVE -> CLEARED
+ACTIVE -> ABANDONED -> SUMMARY_RETAINED
 ```
 
 | State | Meaning |
