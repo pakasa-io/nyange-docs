@@ -67,7 +67,7 @@ tests.
 
 | File | Aggregate | Authoritative for |
 | --- | --- | --- |
-| [identity-auth.md](identity-auth.md) | Identity & Authorization | Personas, access matrix, authentication, authorization, edge cases E-02-E-10 |
+| [identity-auth.md](identity-auth.md) | Identity & Authorization | Personas, access matrix, authentication, authorization, edge cases E-02-E-09 |
 | [catalog.md](catalog.md) | Catalog & Pricing | Refill pricing, bundle pricing, global online pricing, launch commercial programs |
 | [cart.md](cart.md) | Cart | Customer cart state, quote readiness, catalog-change handling, checkout readiness, abandoned-cart cleanup |
 | [order.md](order.md) | Order | Order placement, lifecycle state, fulfillment outlet assignment, COD fulfillment, and cancellation |

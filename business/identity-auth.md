@@ -5,20 +5,19 @@ authentication rules, authorization rules, and authorization edge cases.
 
 **Reader task**: Use this document to decide whether an actor can authenticate,
 which permissions and outlet scopes can authorize an action, and which actor
-combinations require audit or co-approval.
+combinations require audit.
 
 **Sources**: §2 Personas, §3 Access Matrix, §4 Auth Model, E-02, E-04-E-05,
-E-07-E-10
+E-07-E-09
 
 ## Invariants
 
 **BI-16 — A persona cannot approve their own submission.**
 
-- Any action requiring approval or co-approval cannot be approved by the same
-  individual who submitted or requested it.
+- Any action requiring approval cannot be approved by the same individual who
+  submitted or requested it.
 - This applies regardless of role.
-- Covered examples include expense above threshold, inventory adjustment, price
-  change, and sensitive authorization-policy change.
+- Covered examples include expense above threshold and inventory adjustment.
 
 ## Terms
 
@@ -131,8 +130,8 @@ may hold multiple permission bundles across one or more outlets.
 - Has full operational and configuration authority across all outlets, business
   domains, and records.
 - Manages global pricing, approves above-threshold inventory adjustments,
-  break-glass authorization policy changes, and other actions no other persona
-  can execute.
+  manages authorization policy changes, and other actions no other persona can
+  execute.
 - Sensitive mutations and overrides require explicit reason codes and permanent
   audit logging.
 - Cannot issue unaudited mutations.
@@ -191,7 +190,7 @@ may hold multiple permission bundles across one or more outlets.
 | Audit log viewing | - | - | - | - | - | Scoped | Read assigned outlets | Read | Full |
 | Cross-outlet reporting | - | - | - | - | - | - | Read assigned outlets | Read | Full |
 | User & role management | - | - | - | - | - | - | - | - | Full |
-| Authorization policy management | - | - | - | - | - | - | - | - | Full with dual approval for sensitive changes |
+| Authorization policy management | - | - | - | - | - | - | - | - | Full |
 
 ## Matrix Scope Notes
 
@@ -285,13 +284,13 @@ outlet scope or business authority.
   Super Admin-mediated only.
 - At launch, Super Admin recovery means recovery of an account with Super Admin
   authority.
-- Super Admin recovery requires break-glass dual approval by two distinct active
-  Super Admins: one initiating or performing recovery and a second
-  non-requesting co-approver.
+- Super Admin recovery requires two distinct active Super Admin actors: one
+  initiating or performing recovery and a second non-requesting confirming
+  actor.
 - The recovered account subject cannot approve the recovery.
 - No single-actor Super Admin recovery path exists at launch.
 - The recovery record must identify the subject account, affected credential or
-  recovery factor, initiating actor, co-approving actor, reason code, note,
+  recovery factor, initiating actor, confirming actor, reason code, note,
   timestamp, before/after account-status and credential-readiness values, and
   confirmation that no authentication secrets are stored.
 
@@ -389,10 +388,3 @@ permissions at the same outlet only when the active authorization policy permits
 that combination. The combination must be explicit, recorded, and subject to
 audit on sensitive actions. The actor still cannot approve their own submissions
 or bypass normal approval thresholds.
-
-**E-10**: Authorization policy changes that affect financial behavior,
-reporting, audit semantics, user-visible functionality, or launch scope require
-Product Manager approval and co-approval under the active authorization-change
-policy. The Super Admin proposing the change cannot satisfy that co-approval
-alone. Product Manager approval is business-governance authority, not runtime
-platform permission.
