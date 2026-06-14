@@ -76,7 +76,7 @@ tests.
 | [payment.md](payment.md) | Payment | COD cash collection, zero-collection facts, payment boundaries |
 | [delivery.md](delivery.md) | Delivery | Delivery lifecycle, delivery fee rules, agent cash handling, failed-delivery fee waiver, cylinder exchange field leg |
 | [inventory.md](inventory.md) | Inventory | Reservation lifecycle, outlet transfer, vendor refill batch, cylinder exchange intake leg, stock counts, low-stock alerts |
-| [refund.md](refund.md) | Refund | Refund lifecycle, approval thresholds, collection codes, cash payout constraints |
+| [refund.md](refund.md) | Refund | Refund lifecycle, collection codes, cash payout constraints |
 | [finance.md](finance.md) | Finance | Daily closing, expense controls, delivery cost reporting, deferred settlement boundary, receipts, and cash custody reporting |
 | [support.md](support.md) | Support | Launch support fallback boundaries and operational risk alerts |
 | [notifications.md](notifications.md) | Notifications | Notification channel boundaries and event-to-channel assignments |

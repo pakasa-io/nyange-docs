@@ -17,9 +17,8 @@ E-07-E-10
 - Any action requiring approval or co-approval cannot be approved by the same
   individual who submitted or requested it.
 - This applies regardless of role.
-- Covered examples include expense above threshold, inventory adjustment, refund
-  above threshold, price change above guardrail, and sensitive
-  authorization-policy change.
+- Covered examples include expense above threshold, inventory adjustment, price
+  change above guardrail, and sensitive authorization-policy change.
 
 ## Terms
 
@@ -62,14 +61,13 @@ may hold multiple permission bundles across one or more outlets.
 
 ### P-03 Outlet Cashier
 
-- Outlet staff responsible for approved customer cash refund payouts when
-  explicitly permissioned.
-- Verifies customer-presented refund collection codes for approved collectible
-  refunds.
-- Disburses approved cash refunds from the owning outlet.
+- Outlet staff responsible for customer cash refund payouts when explicitly
+  permissioned.
+- Verifies customer-presented refund collection codes for collectible refunds.
+- Disburses collectible cash refunds from the owning outlet.
 - Has no delivery responsibilities.
-- Cannot manage online orders, approve refunds, adjust inventory, or access
-  another outlet's data.
+- Cannot manage online orders, create refund liabilities, adjust inventory, or
+  access another outlet's data.
 
 ### P-04 Inventory Clerk
 
@@ -89,7 +87,7 @@ may hold multiple permission bundles across one or more outlets.
 - Tracks delivery progress.
 - May change the assigned delivery agent before pickup within outlet active
   delivery policy.
-- Cannot collect customer cash, approve refunds, adjust inventory, access
+- Cannot collect customer cash, pay refunds, adjust inventory, access
   financial records, or modify outlet policies.
 
 ### P-06 Outlet Manager
@@ -98,14 +96,15 @@ may hold multiple permission bundles across one or more outlets.
 - Claims pending orders for the outlet when explicitly permissioned.
 - Marks claimed orders ready for pickup.
 - Reconciles daily cash.
-- Approves in-scope refund liabilities according to active approval policy.
+- Initiates scoped refund liabilities and disburses collectible refunds when
+  explicitly permissioned.
 - Submits above-threshold inventory adjustments for approval.
 - Oversees staff, manages delivery operations, and views outlet-specific
   reports.
 - Has elevated authority over P-03, P-04, and P-05 within their outlet.
 - Cannot access another outlet's data unless explicitly granted.
-- Cannot change global prices or catalog, approve refunds outside outlet scope,
-  or override Super Admin controls.
+- Cannot change global prices or catalog, pay refunds outside outlet scope, or
+  override Super Admin controls.
 
 ### P-07 Customer Support Agent
 
@@ -118,7 +117,7 @@ may hold multiple permission bundles across one or more outlets.
   Admin path.
 - Cannot directly mutate orders, payments, inventory, or financial records
   outside explicitly permissioned fallback actions.
-- Cannot approve, pay, void, or write off refunds.
+- Cannot create, pay, void, or write off refund liabilities.
 - Cannot access another outlet's fallback actions or operational records unless
   explicitly granted cross-outlet access.
 
@@ -200,8 +199,7 @@ may hold multiple permission bundles across one or more outlets.
 | Outlet price rules within guardrail | - | - | - | - | - | Scoped | - | - | - | Full |
 | Outlet price rules above guardrail | - | - | - | - | - | Request | - | - | - | Approve / Full |
 | Global pricing & catalog | - | - | - | - | - | - | - | - | - | Full |
-| Refund initiation | Own request | - | - | - | - | Scoped threshold | Request | - | - | Full |
-| Refund approval | - | - | - | - | - | Scoped threshold | - | - | - | Full |
+| Refund initiation | Own request | - | - | - | - | Scoped | Request | - | - | Full |
 | Refund payout cash at outlet | - | - | Scoped with explicit permission | - | - | Scoped | - | - | - | Full |
 | Refund collection code management | - | - | - | - | - | - | Scoped with explicit permission | - | - | Full |
 | Daily cash closing | - | - | - | - | - | Scoped | - | - | - | Full |
@@ -234,9 +232,9 @@ may hold multiple permission bundles across one or more outlets.
   actions.
 - The authorized owner of the affected domain workflow remains responsible for
   claiming, cancelling, or completing that workflow.
-- Customer Support Agents do not directly approve refunds, pay refunds, post
-  ledger entries, mutate orders, adjust inventory, or complete delivery
-  workflows through a support-owned workflow.
+- Customer Support Agents do not directly create refund liabilities, pay
+  refunds, post ledger entries, mutate orders, adjust inventory, or complete
+  delivery workflows through a support-owned workflow.
 
 ### Inventory Adjustment Threshold
 
@@ -266,26 +264,23 @@ may hold multiple permission bundles across one or more outlets.
 ### Refund Payout Permission
 
 - An Outlet Cashier with explicit refund-payout permission may verify the
-  customer's collection code and disburse approved collectible refunds within
-  their outlet scope.
-- Outlet Managers may disburse approved collectible refunds within outlet scope.
+  customer's collection code and disburse collectible refunds within their
+  outlet scope.
+- Outlet Managers may disburse collectible refunds within outlet scope.
 - Launch refund payouts have no per-refund or per-outlet-business-day cash cap.
 - Without explicit per-outlet permission, cashiers cannot handle refund payouts.
 
-### Refund Approval Thresholds
+### Refund Source and Payout Boundary
 
-- Refund liabilities below the approval-required threshold become collectible
-  without separate approval.
-- At launch, the approval-required threshold is UGX 50,000.
-- Refund liabilities at or above UGX 50,000 require approval before a collection
-  code is issued.
-- The active refund approval policy starts from global defaults and may define
-  outlet/refund-reason overrides.
-- At launch, Outlet Managers may approve refund liabilities from UGX 50,000
-  through UGX 500,000 within outlet scope.
-- Above UGX 500,000, Super Admin approval is required.
-- Approval makes the liability collectible.
+- Refund liabilities have no amount-based approval threshold at launch.
+- A valid authorized and posted source correction, adjustment, or other
+  launch-approved source event may create a refund liability eligible for
+  collection-code issuance regardless of amount.
+- Source authorization remains owned by the source workflow that creates the
+  refund liability.
 - Payout is the separate cash-disbursement event.
+- Payout permission does not authorize creating, voiding, or writing off a
+  refund liability.
 
 ### Refund Collection Code Management
 
@@ -295,7 +290,7 @@ may hold multiple permission bundles across one or more outlets.
 - It covers unlocking or regenerating rate-limited codes.
 - It covers audited reveal by a permissioned Customer Support Agent or Super
   Admin after customer verification.
-- It does not allow approving, paying, voiding, or writing off a refund
+- It does not allow creating, paying, voiding, or writing off a refund
   liability.
 
 ### Outlet Configuration vs. Price Rules
@@ -440,22 +435,19 @@ issue type, priority, or customer complaint.
 
 **E-04**: An Area Manager can view reports and operational data for assigned
 outlets, but cannot view operational risk alerts or perform outlet actions such
-as claiming orders, collecting customer cash, approving refunds, or adjusting
+as claiming orders, collecting customer cash, paying refunds, or adjusting
 inventory.
 
-**E-05**: Refund liabilities at or above the approval-required threshold require
-approval from the Outlet Manager for that outlet within their active approval
-threshold, or from a Super Admin above that threshold. At launch, the
-approval-required threshold is UGX 50,000 and the Outlet Manager approval
-threshold is UGX 500,000 within outlet scope. The approving actor cannot approve
-a refund on an order where they submitted the refund request themselves.
+**E-05**: Refund liabilities have no amount-based approval threshold at launch.
+A valid authorized and posted source event may create a refund liability
+eligible for collection-code issuance regardless of amount. The source workflow
+still owns any required source authorization and separation-of-duty rule.
 
-**E-07**: An Outlet Manager can approve refunds for their own outlet within their
-authorized threshold and approval policy. At launch, Outlet Managers may approve
-refund liabilities from UGX 50,000 through UGX 500,000 within outlet scope.
-Refunds above that threshold require Super Admin approval. Outlet Managers
-cannot approve refunds at another outlet, and they cannot approve their own
-submitted refund request.
+**E-07**: An Outlet Manager may initiate scoped refund liabilities and disburse
+collectible refunds within outlet scope when explicitly permissioned. Outlet
+Managers cannot pay refunds for another outlet, void or write off refund
+liabilities, bypass source-workflow authorization, or approve their own source
+submission when the source workflow requires approval.
 
 **E-08**: A Dispatcher can change the assigned delivery agent within their
 outlet until pickup with a recorded reason. After pickup, no normal reassignment

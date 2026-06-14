@@ -20,10 +20,10 @@ record.
 - Support does not own order, payment, delivery, inventory, refund, finance,
   notification, or ledger records.
 - Owning domain workflows execute their own state transitions and audit records.
-- Customer Support Agents do not approve refunds, pay refunds, post ledger
-  entries, mutate orders, adjust inventory, complete delivery workflows, or
-  close financial records unless a separate owning-domain permission explicitly
-  grants that action.
+- Customer Support Agents do not create refund liabilities, pay refunds, post
+  ledger entries, mutate orders, adjust inventory, complete delivery workflows,
+  or close financial records unless a separate owning-domain permission
+  explicitly grants that action.
 
 ## Launch Support Actions
 

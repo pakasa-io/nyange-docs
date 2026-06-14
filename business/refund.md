@@ -1,11 +1,10 @@
 # Refund
 
-**Intent**: Define the customer refund liability lifecycle, approval thresholds,
-collection-code rules, and cash payout constraints.
+**Intent**: Define the customer refund liability lifecycle, collection-code
+rules, and cash payout constraints.
 
 **Reader task**: Use this document to decide when a refund liability exists, who
-can approve or pay it, and why collection-code expiry never discharges the
-liability.
+can pay it, and why collection-code expiry never discharges the liability.
 
 **Source**: §6.6 Refund Lifecycle
 
@@ -22,8 +21,9 @@ liability.
 
 - A refund owed to a customer remains open until a cash payout event is recorded
   or a Super Admin-approved void/write-off path resolves it.
-- Supported launch liability sources include approved cash over-collection
-  correction and approved post-collection price adjustment.
+- Supported launch liability sources include authorized and posted cash
+  over-collection correction and authorized and posted post-collection price
+  adjustment.
 - Code expiry, daily closing, and time passing do not discharge the liability.
 - An open liability does not convert to revenue.
 - Open refund liabilities appear in the owning outlet's daily closing and
@@ -56,10 +56,7 @@ liability.
 ```
 PENDING_CREATION
   └─► LIABILITY_OPEN
-        ├─► COLLECTIBLE
-        └─► PENDING_APPROVAL
-              ├─► COLLECTIBLE
-              └─► LIABILITY_OPEN
+        └─► COLLECTIBLE
 
 COLLECTIBLE
   ├─► PAID
@@ -68,7 +65,7 @@ COLLECTIBLE
   └─► CODE_LOCKED
         └─► COLLECTIBLE
 
-LIABILITY_OPEN|PENDING_APPROVAL|COLLECTIBLE|CODE_EXPIRED|CODE_LOCKED
+LIABILITY_OPEN|COLLECTIBLE|CODE_EXPIRED|CODE_LOCKED
   ├─► VOIDED
   └─► WRITTEN_OFF
 ```
@@ -76,8 +73,7 @@ LIABILITY_OPEN|PENDING_APPROVAL|COLLECTIBLE|CODE_EXPIRED|CODE_LOCKED
 | State | Meaning |
 | --- | --- |
 | `PENDING_CREATION` | A liability condition exists and the refund record is being created. |
-| `LIABILITY_OPEN` | Refund is owed; no currently usable collection code exists. |
-| `PENDING_APPROVAL` | Approval is required before the code can be issued. |
+| `LIABILITY_OPEN` | Refund is owed and eligible for collection-code issuance; no currently usable collection code exists. |
 | `COLLECTIBLE` | Code issued; customer can present it at the owning outlet. |
 | `PAID` | Terminal successful cash payout. |
 | `CODE_EXPIRED` | Code expired; liability remains open and a new code can be issued. |
@@ -100,8 +96,8 @@ LIABILITY_OPEN|PENDING_APPROVAL|COLLECTIBLE|CODE_EXPIRED|CODE_LOCKED
 - Cancellation before doorstep COD collection does not create a refund
   liability.
 - Failed delivery does not create a prepaid refund liability.
-- If a separate approved post-collection adjustment creates a refund liability,
-  the refund lifecycle begins from `LIABILITY_OPEN`.
+- If a separate authorized and posted post-collection adjustment creates a
+  refund liability, the refund lifecycle begins from `LIABILITY_OPEN`.
 - Post-collection refund liabilities do not reopen orders, change order state,
   rewrite the frozen order total, or rewrite the collected payment fact.
 
@@ -109,8 +105,8 @@ LIABILITY_OPEN|PENDING_APPROVAL|COLLECTIBLE|CODE_EXPIRED|CODE_LOCKED
 
 - `VOIDED` and `WRITTEN_OFF` are terminal Super Admin-approved exception
   outcomes.
-- Eligible source states are `LIABILITY_OPEN`, `PENDING_APPROVAL`,
-  `COLLECTIBLE`, `CODE_EXPIRED`, and `CODE_LOCKED`.
+- Eligible source states are `LIABILITY_OPEN`, `COLLECTIBLE`, `CODE_EXPIRED`,
+  and `CODE_LOCKED`.
 - The transition requires actor identity, actor role, reason code, reason note,
   timestamp, and audit trail.
 - A void or write-off discharges the refund liability for daily-closing and
@@ -118,16 +114,18 @@ LIABILITY_OPEN|PENDING_APPROVAL|COLLECTIBLE|CODE_EXPIRED|CODE_LOCKED
 - A void or write-off does not create a provider refund, customer wallet credit,
   order mutation, or payment mutation.
 
-### Approval Thresholds
+### Source Authorization and Collectibility
 
-Launch defaults:
-
-```
-if refund_amount < 50,000 UGX             → COLLECTIBLE
-if refund_amount in [50,000-500,000 UGX]  → PENDING_APPROVAL (Outlet Manager)
-if refund_amount > 500,000 UGX            → PENDING_APPROVAL (Super Admin)
-// active refund approval policy may define outlet/refund-reason overrides
-```
+- A refund liability must originate from an authorized and posted source
+  correction, adjustment, or other launch-approved source event.
+- Source authorization is owned by the source workflow that creates the refund
+  liability.
+- Refund has no amount-based approval threshold at launch.
+- Refund amount does not create a separate amount-based hold state.
+- Once a valid source event creates the liability, the refund may receive a
+  collection code without amount-band hold.
+- Payout permission remains separate from liability creation and collection-code
+  issuance.
 
 ### Collection Code Expiry and Regeneration
 
@@ -163,15 +161,16 @@ At payout, the Outlet Manager or explicitly permissioned Outlet Cashier must:
 
 ### Payout Authorization
 
-- A permitted payout actor may disburse any approved collectible refund within
-  the owning outlet's scope.
+- A permitted payout actor may disburse any collectible refund within the owning
+  outlet's scope.
 - Launch refund payouts have no per-refund or per-outlet-business-day cash cap.
-- Refund approval thresholds remain separate from payout permission.
+- Refund payout permission does not authorize creating, voiding, or writing off
+  a refund liability.
 
 ### Payout Records
 
 - Every payout attempt captures actor, role, outlet, amount, order/refund ID,
-  reason, approval status, active threshold policy version, and timestamp.
+  reason, source record status, active source policy version, and timestamp.
 - Paid cash events also capture the customer/order identity snapshot and
   attestation note.
 
@@ -211,23 +210,19 @@ Trimmed access matrix rows relevant to refunds. Full matrix:
 
 | Capability | P-01 | P-03 | P-06 | P-07 | P-10 |
 | --- | --- | --- | --- | --- | --- |
-| Refund initiation | Own request | - | Scoped threshold | Request | Full |
-| Refund approval | - | - | Scoped threshold | - | Full |
+| Refund initiation | Own request | - | Scoped | Request | Full |
 | Refund payout cash at outlet | - | Scoped with explicit permission | Scoped | - | Full |
 | Refund collection code management | - | - | - | Scoped with explicit permission | Full |
 
 ## Authorization Edge Cases
 
-**E-05**: Refund liabilities at or above the approval-required threshold require
-approval from the Outlet Manager for that outlet within their active approval
-threshold, or from a Super Admin above that threshold. At launch, the
-approval-required threshold is UGX 50,000 and the Outlet Manager approval
-threshold is UGX 500,000 within outlet scope. The approving actor cannot approve
-a refund on an order where they submitted the refund request themselves.
+**E-05**: Refund liabilities have no amount-based approval threshold at launch.
+A valid authorized and posted source event may create a refund liability
+eligible for collection-code issuance regardless of amount. The source workflow
+still owns any required source authorization and separation-of-duty rule.
 
-**E-07**: An Outlet Manager can approve refunds for their own outlet within their
-authorized threshold and approval policy. At launch, Outlet Managers may approve
-refund liabilities from UGX 50,000 through UGX 500,000 within their outlet scope;
-refunds above that threshold require Super Admin approval. Outlet Managers
-cannot approve refunds at another outlet, and they cannot approve their own
-submitted refund request.
+**E-07**: An Outlet Manager may initiate scoped refund liabilities and disburse
+collectible refunds within outlet scope when explicitly permissioned. Outlet
+Managers cannot pay refunds for another outlet, void or write off refund
+liabilities, bypass source-workflow authorization, or approve their own source
+submission when the source workflow requires approval.
