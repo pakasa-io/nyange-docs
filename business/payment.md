@@ -53,7 +53,7 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 
 | State | Meaning |
 | --- | --- |
-| `PENDING_COLLECTION` | COD is expected but has not yet been collected. |
+| `PENDING_COLLECTION` | Active COD expectation derived from the placed order; no customer cash fact has been recorded. |
 | `COLLECTED` | Terminal successful cash collection fact. |
 | `ZERO_COLLECTION` | Terminal fact for failed delivery where no customer cash was collected. |
 
@@ -83,10 +83,16 @@ Terminal states: `COLLECTED`, `ZERO_COLLECTION`.
 
 - Failed delivery records a zero-collection payment fact tied to the failed
   delivery reason.
+- `PENDING_COLLECTION` is an active expectation, not a durable terminal payment
+  fact.
 - Cancellation before delivery collection creates no payment terminal state and
   records no customer payment fact.
+- Cancellation before delivery collection retires the COD expectation through the
+  authoritative Order cancellation outcome.
 - Order cancellation is the authoritative outcome for cancelled orders before
   collection.
+- Payment does not create `CANCELLED`, `NOT_COLLECTED`, or equivalent terminal
+  payment state for pre-collection cancellations.
 - Because launch online orders are COD, cancellation and failed delivery do not
   create refund liabilities from prior customer collection.
 
