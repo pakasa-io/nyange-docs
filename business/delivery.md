@@ -188,6 +188,11 @@ Transition to `PICKED_UP` requires both:
 - After `PICKED_UP`, outgoing stock remains in the agent's custody until
   delivery completion, failed-order return receipt at the outlet, or an approved
   custody exception covers the item.
+- After `PICKED_UP`, the assigned delivery agent cannot be changed as a normal
+  assignment action.
+- A Super Admin may record a manual custody exception for an abnormal after-pickup
+  custody issue, but the exception is a break-glass custody resolution, not a
+  normal reassignment workflow.
 - Pickup keeps reserved stock unavailable.
 - Pickup creates outgoing goods custody for the agent.
 - Pickup moves the order to `OUT_FOR_DELIVERY`.
@@ -343,6 +348,6 @@ reaches a terminal state. Phone-number access is scoped to the active assignment
 and is audit-sensitive under the active audit policy.
 
 **E-08**: A Dispatcher can change the assigned delivery agent within their
-outlet until pickup with a recorded reason. After pickup, only an Outlet Manager
-or Super Admin can change the assigned delivery agent, and the action requires
-an explicit reason code.
+outlet until pickup with a recorded reason. After pickup, no normal reassignment
+is allowed. A Super Admin may record a manual custody exception for an abnormal
+after-pickup custody issue, with reason, note, known goods/cash status, and audit.

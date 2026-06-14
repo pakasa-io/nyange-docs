@@ -462,9 +462,9 @@ cannot approve refunds at another outlet, and they cannot approve their own
 submitted refund request.
 
 **E-08**: A Dispatcher can change the assigned delivery agent within their
-outlet until pickup with a recorded reason. After pickup, only an Outlet Manager
-or Super Admin can change the assigned delivery agent, and the action requires
-an explicit reason code.
+outlet until pickup with a recorded reason. After pickup, no normal reassignment
+is allowed. A Super Admin may record a manual custody exception for an abnormal
+after-pickup custody issue, with reason, note, known goods/cash status, and audit.
 
 **E-09**: A single human account may hold both Outlet Cashier and Inventory Clerk
 permissions at the same outlet only when the active authorization policy permits
