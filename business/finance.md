@@ -285,8 +285,14 @@ if closing_overdue:
   are `PENDING_APPROVAL` under Inventory's launch threshold policy: loss,
   missing-source adjustment, manual correction, positive available-stock
   increase, or absolute delta greater than one unit.
+- For this gate, `manual_financial_ledger_adjustments` means Finance-owned
+  manual correction, reversal, or adjustment records created after the source
+  transaction has committed that change outlet cash, financial ledger, receipt,
+  expense, payout, variance, or delivery-cost reporting.
 - For this gate, `above_threshold_expense_approval` is the existing action label
   for approving expenses at or above the active Finance-owned expense threshold.
+- The manual adjustment gate does not block automated Finance participant writes
+  that are part of the same atomic source transaction.
 - Finance owns the overdue-closing condition and exposes it to Inventory;
   Inventory remains the owner of adjustment lifecycle, approval, and inventory
   ledger posting.
