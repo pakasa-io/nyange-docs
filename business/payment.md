@@ -62,7 +62,7 @@ without a void.
 | `PENDING_COLLECTION` | Durable active COD expectation derived from the placed order; no customer cash fact has been recorded and the expectation has not been retired. |
 | `COLLECTED` | Terminal successful cash collection fact; may include an approved short/over variance link. |
 | `ZERO_COLLECTION` | Terminal fact for a failed delivery finalized with no customer cash collected. |
-| `POS_CASH_COLLECTED` | Terminal successful immediate cash collection fact for a completed POS sale. |
+| `POS_CASH_COLLECTED` | Successful immediate cash collection fact for a completed POS sale; voidable until the same-day POS void window closes. |
 | `POS_CASH_VOIDED` | Terminal linked reversal fact for an allowed same-day POS void. |
 
 Retired COD expectations remain durable records, but retirement is not a Payment
@@ -148,6 +148,8 @@ state and does not create a terminal payment fact.
   snapshot basis differs from the POS completion request.
 - If the POS completion transaction fails before commit, no POS cash fact is
   recorded.
+- `POS_CASH_COLLECTED` remains voidable through the allowed same-day POS void
+  window and becomes terminal only when that window closes without a void.
 - An allowed POS same-day void appends a linked `POS_CASH_VOIDED` reversal fact.
 - A POS void does not create a Refund-owned liability or collection code.
 
