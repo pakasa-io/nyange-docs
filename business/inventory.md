@@ -94,6 +94,11 @@ ledger-posting rules for stock corrections.
   `PENDING_APPROVAL`.
 - `PENDING_APPROVAL` inventory adjustments require Super Admin approval before
   ledger movement is posted.
+- If Finance reports that the outlet daily closing is overdue, `PENDING_APPROVAL`
+  inventory adjustments may be submitted and reviewed, but must not be approved
+  or ledger-posted until closing is no longer overdue unless Inventory defines an
+  action-specific urgency override.
+- No Inventory urgency override exists at launch.
 - Every adjustment requires reason, note, active policy code, ledger correlation
   when posted, and audit trail.
 

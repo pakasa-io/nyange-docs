@@ -281,6 +281,13 @@ if closing_overdue:
   action.
 - Any other overdue-closing override must be explicitly named by the owning
   policy for that action.
+- For this gate, `large_inventory_adjustments` means Inventory adjustments that
+  are `PENDING_APPROVAL` under Inventory's launch threshold policy: loss,
+  missing-source adjustment, manual correction, positive available-stock
+  increase, or absolute delta greater than one unit.
+- Finance owns the overdue-closing condition and exposes it to Inventory;
+  Inventory remains the owner of adjustment lifecycle, approval, and inventory
+  ledger posting.
 
 ### Liability Recognition
 
