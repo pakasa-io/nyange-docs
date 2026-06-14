@@ -110,12 +110,14 @@ Daily closing does not require every refund liability to be resolved.
   restrictions listed here.
 
 ```
-if closing_overdue AND NOT super_admin_urgency_override:
-  blocked:  cash_refund_payouts
-  blocked:  large_inventory_adjustments
-  blocked:  price_changes_outside_guardrail
-  blocked:  manual_financial_ledger_adjustments
-  blocked:  above_threshold_expense_approval  // >= 100,000 UGX at launch
+if closing_overdue:
+  blocked unless super_admin_cash_refund_payout_urgency_override:
+            cash_refund_payouts
+  blocked unless owning_policy_action_specific_urgency_override:
+            large_inventory_adjustments
+            price_changes_outside_guardrail
+            manual_financial_ledger_adjustments
+            above_threshold_expense_approval  // >= 100,000 UGX at launch
   allowed:  online_order_placement, order_claiming, inventory_reservation_for_claim
   allowed:  ready_for_pickup, delivery_agent_assignment, pickup, cod_collection
   allowed:  stock_intake, within_guardrail_price_changes
@@ -123,6 +125,10 @@ if closing_overdue AND NOT super_admin_urgency_override:
 
 - Only Super Admin urgency override can allow blocked cash refund payouts while
   daily closing is overdue.
+- The cash-refund-payout urgency override does not unlock any other blocked
+  action.
+- Any other overdue-closing override must be explicitly named by the owning
+  policy for that action.
 
 ### Liability Recognition
 
