@@ -226,6 +226,10 @@ may hold multiple permission bundles across one or more outlets.
 - Permission to submit, post, or approve an adjustment does not bypass
   Inventory-owned source-reference, reason, note, policy-code, ledger
   correlation, or audit requirements.
+- Inventory viewing or adjustment permission does not authorize a formal stock
+  count lifecycle, count-window variance workflow, or low-stock alert
+  administration at launch. Those workflows are deferred in
+  [../out-of-scope/2026-06-14-stock-counts-low-stock-alerts.md](../out-of-scope/2026-06-14-stock-counts-low-stock-alerts.md).
 
 ### Refund Payout Permission
 

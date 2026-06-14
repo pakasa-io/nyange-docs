@@ -98,6 +98,17 @@ ledger-posting rules for stock corrections.
 - Adjustment records are audited and follow the active Inventory-owned approval
   threshold before stock is recognized as changed.
 
+### Stock Count Deferral
+
+- A formal stock count lifecycle is not launch behavior.
+- Count-start snapshots, count-window variance calculation, count close,
+  variance proposals, and low-stock alert thresholds are deferred in
+  [../out-of-scope/2026-06-14-stock-counts-low-stock-alerts.md](../out-of-scope/2026-06-14-stock-counts-low-stock-alerts.md).
+- Launch inventory review uses ordinary inventory viewing and source-referenced
+  inventory adjustment records.
+- Inventory adjustment records remain the only launch path for posting stock
+  corrections from manual review.
+
 ## Inventory Reservation Lifecycle
 
 ```
