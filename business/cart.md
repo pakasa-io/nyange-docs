@@ -36,14 +36,15 @@ assurance, permission-grant facts, and outlet-scope facts.
 ACTIVE -> CHECKED_OUT
 ACTIVE -> CLEARED
 ACTIVE -> ABANDONED -> SUMMARY_RETAINED
+ABANDONED -> ACTIVE
 ```
 
 | State | Meaning |
 | --- | --- |
 | `ACTIVE` | Customer can view, change, quote, and prepare the cart for checkout. |
 | `CHECKED_OUT` | Cart produced a placed order and is no longer mutable as active cart detail. |
-| `ABANDONED` | Cart has had no customer fetch, mutation, or quote activity for the configured inactivity period. |
-| `SUMMARY_RETAINED` | Abandoned cart item detail is no longer retained as active cart detail; safe summary remains. |
+| `ABANDONED` | Cart has had no customer fetch, mutation, or quote activity for the configured inactivity period; item detail is still retained and can return to active use before summary retention. |
+| `SUMMARY_RETAINED` | Abandoned cart item detail is no longer retained as active cart detail; safe summary remains and cannot be restored as the active cart. |
 | `CLEARED` | Customer explicitly removed active cart contents. |
 
 Terminal cart states: `CHECKED_OUT`, `SUMMARY_RETAINED`, `CLEARED`.
@@ -164,9 +165,13 @@ business requirements before creating the order snapshot.
 
 - A cart with no customer fetch, mutation, or quote activity for 90 days is
   marked `ABANDONED`.
+- An `ABANDONED` cart returns to `ACTIVE` when the customer fetches, mutates,
+  quotes, or otherwise resumes the cart before item detail is removed.
 - After an additional 30 days, abandoned cart item detail is no longer retained
   as active cart detail.
 - A safe cart summary remains.
+- After transition to `SUMMARY_RETAINED`, item detail is no longer restorable as
+  the active cart.
 - Checked-out carts and placed orders are never part of abandoned-cart cleanup.
 - Claim-blocked or unclaimable placed orders are Order lifecycle outcomes, not
   abandoned-cart cleanup outcomes.
