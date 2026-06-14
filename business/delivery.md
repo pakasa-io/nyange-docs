@@ -264,7 +264,7 @@ Transition to `PICKED_UP` requires both:
 - Returned cylinders do not become outlet inventory until outlet intake
   confirmation.
 
-## Field Proof
+## Live Field Recording
 
 - Delivery-agent field actions must be recorded live.
 - Required live actions include pickup, cash collection acknowledgement,
@@ -272,8 +272,6 @@ Transition to `PICKED_UP` requires both:
 - If the agent cannot record the action live, the action has not completed for
   business purposes.
 - An authoritative timestamp is always recorded.
-- GPS, photo, or note requirements are controlled by active field-proof policy.
-- Field-proof policy must not allow partial delivery completion.
 
 ## Agent Cash Handling
 

@@ -332,7 +332,6 @@ Terminal states: `DELIVERED`, `CUSTOMER_CANCELLED`, `DELIVERY_FAILED`.
 
 - Delivery batching, route optimization, and scheduled delivery windows.
 - A separate customer-visible order state after delivery.
-- Doorstep code fallback and evidence-retention detail.
 - Order-state mutation workflows for doorstep conversion, delivery-time
   price-delta or refund negotiation, and returns after delivery.
 - Partial order fulfillment, split orders, and multi-outlet fulfillment.

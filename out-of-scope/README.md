@@ -33,6 +33,7 @@ YYYY-MM-DD-short-item-name.md
 | [Delivery Assignment Ranking](2026-06-14-delivery-assignment-ranking.md) | Deferred |
 | [Advanced Stock Counts and Low-Stock Alerts](2026-06-14-stock-counts-low-stock-alerts.md) | Deferred |
 | [Refund Code Expiry and Regeneration](2026-06-14-refund-code-expiry-regeneration.md) | Deferred |
+| [Delivery Field Proof Policy](2026-06-14-delivery-field-proof-policy.md) | Deferred |
 | [Post-Collection Price Adjustments](2026-06-14-post-collection-price-adjustments.md) | Deferred |
 
 Revisit express delivery fee when the Product Manager approves a customer-facing
@@ -65,6 +66,10 @@ fulfillment acceptance.
 Revisit refund code expiry and regeneration when expired, lost, or inaccessible
 codes create repeated payout support cases that cannot be handled by ordinary
 customer authentication and outlet verification.
+
+Revisit delivery field proof policy when delivery disputes, safety incidents, or
+cash/cylinder custody exceptions require GPS, photo, note, fallback-code, or
+evidence-retention rules beyond live field recording.
 
 Revisit post-collection price adjustments when the Product Manager approves a
 post-delivery adjustment policy with source owner, authorization, posting,
