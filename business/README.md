@@ -75,6 +75,7 @@ tests.
 | File | Aggregate | Authoritative for |
 | --- | --- | --- |
 | [identity-auth.md](identity-auth.md) | Identity & Authorization Facts | Personas, authentication, account state, authentication-link facts, permission-grant facts, outlet-scope facts, and cross-aggregate authorization edge cases E-02-E-09 |
+| [outlet.md](outlet.md) | Outlet Configuration & Serviceability | Outlet records, status lifecycle, service areas, online-fulfillment capability, business day/timezone, vendor acceptance, staff scope, disablement blockers, serviceability queries, pending-pool candidate queries, daily-closing due-date basis, receipt-series basis, claim-eligibility inputs, outlet-scoped authorization inputs. |
 | [catalog.md](catalog.md) | Catalog & Pricing | Refill pricing, bundle pricing, global online pricing, launch commercial programs |
 | [cart.md](cart.md) | Cart | Customer cart state, quote readiness, catalog-change handling, checkout readiness, abandoned-cart cleanup |
 | [order.md](order.md) | Order | Order placement, lifecycle state, outlet claiming, COD fulfillment, and cancellation |
